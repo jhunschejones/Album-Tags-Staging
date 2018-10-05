@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <% include partials/templates/head_tags.ejs %>
+		<link rel="stylesheet" href="/stylesheets/about.css">
+    </head>
+    <body>
+
+        <!-- BASIC NAVBAR TEMPLATE -->
+		<% include partials/templates/navbar_basic.ejs %>
+		
+		<div id="background_image_container">
+		<!--CSS INSERTS BACKGROUND HERE-->
+		</div>
+
+		<div id="absolute_content">
+
+			<div class='container-fluid'>
+				<h1 id="about_header" class="text-center mb-3 mt-3">Welcome, Music Fan.</h1>
+
+				<h4 class="text-secondary mb-0 mt-4 about_subheader">Let's start with this: we <strong class="text-danger">LOVE</strong> music.</h4>
+				
+				<p>In fact, just like you, we can go into endless detail describing what we enjoy about our favorite records. As streaming has become a larger part of the music industry, we started to notice it was becoming harder and harder to keep track of all the great music in our libraries. We also noticed we were missing out on opportunities to share records we liked with our friends.</p>
+
+				<h4 class="text-secondary mb-0 mt-4 about_subheader">Our solution?</h4>
+				<p>We built Album Tags<small>&trade;</small>, an app where you can <a href="/search/">search</a> for music and write custom tags describing exactly what you love about it. You can then use these tags to find and keep track of even more awesome music! Words can't do your feelings justice? No problem! Just manually connect one album to another so you can remember how they are related later.</p>
+				
+				<h4 class="text-secondary mb-0 mt-4 about_subheader">How Do I Start?</h4>
+				<p>Getting started is easy! Watch a couple of the <a href="#features">feature walkthroughs</a> below to see Album Tags<small>&trade;</small> in action, or try <a href="/search/">searching</a> for some music and check out our <a href="/favorites">favorite albums</a> of <%= thisYear %> to see how we use the app. Finally, sign in with your google account so you can start saving your own tags and connections!</p>
+			</div>
+		
+			<div class='container-fluid'>
+				<h4 id="features" class="text-secondary mb-2 mt-4 about_subheader">Feature Walkthroughs:</h4>
+			</div>
+
+			<div class='container-fluid' id="accordion">
+				<!-- CARD ONE 
+				<div class="card bg-light">
+					<div class="card-header header_clickable" id="headingFour" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+						<button class="btn btn-link collapsed text-dark accordion_button">
+							<h6 class="mb-0">Login, Search for Music, and Add an Album to Your Favorites</h6>
+						</button>
+					</div>
+					<div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordion">
+						<div class="card-body video_card">
+							<iframe allowFullScreen frameborder="0" height="564" mozallowfullscreen src="https://player.vimeo.com/video/278707134?autoplay=1&loop=1&autopause=0" webkitAllowFullScreen width="640"></iframe>
+						</div>
+					</div>
+				</div>
+				-->
+				
+				<!-- ===== Modal 1 ==== -->
+
+				<button type="button" class="btn btn-primary feature_button" data-toggle="modal" data-target="#modalOne">
+					<img src="/images/play_button_empty_white.png" id="modal_one_button" class="feature_button_icon" data-toggle="tooltip" data-placement="bottom" title="Login, Search for Music, and Add an Album to Your Favorites" data-trigger="hover"><br/>Start Here
+				</button>
+
+				<div class="modal fade" id="modalOne" tabindex="-1" role="dialog" aria-labelledby="modalOneCenterTitle" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title mb-0 mt-0" id="modalOneCenterTitle">Feature Walkthrough:<br/><small class="text-secondary">Login, Search for Music, and Add an Album to Your Favorites</small></h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<div style="padding:86.96% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/278707134?autoplay=1&loop=1&title=0&byline=0&portrait=0" style="position:absolute;top:0;left:0;width:100%;height:100%;" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
+								<a href="/search" class="btn btn-sm btn-primary text-white">Start Search</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+
+				<!-- CARD TWO 
+				<div class="card bg-light">
+					<div class="card-header header_clickable" id="headingTwo" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+						<button class="btn btn-link collapsed text-dark accordion_button">
+							<h6 class="mb-0">Add and Search by Custom Tags</h6>
+						</button>
+					</div>
+					<div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+						<div class="card-body video_card">
+							<iframe allowFullScreen frameborder="0" height="564" mozallowfullscreen src="https://player.vimeo.com/video/278707126?autoplay=1&loop=1&autopause=0" webkitAllowFullScreen width="640"></iframe>
+						</div>
+					</div>
+				</div>
+				-->
+
+				<!-- ===== Modal 2 ==== -->
+
+				<button type="button" class="btn btn-primary feature_button" data-toggle="modal" data-target="#modalTwo">
+					<img src="/images/play_button_empty_white.png" id="modal_two_button" class="feature_button_icon" data-toggle="tooltip" data-placement="bottom" title="Add and Search by Custom Tags" data-trigger="hover"><br/>Custom Tags
+				</button>
+
+				<div class="modal fade" id="modalTwo" tabindex="-1" role="dialog" aria-labelledby="modalTwoCenterTitle" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title mb-0" id="modalTwoCenterTitle">Feature Walkthrough:<br/><small class="text-secondary">Add and Search by Custom Tags</small></h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body">
+								<div style="padding:86.54% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/278707126?autoplay=1&loop=1&title=0&byline=0&portrait=0" style="position:absolute;top:0;left:0;width:100%;height:100%;" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
+								<a href="/search" class="btn btn-sm btn-primary text-white">Start Search</a>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- CARD THREE
+				<div class="card bg-light">
+					<div class="card-header header_clickable" id="headingThree" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">					
+						<button class="btn btn-link collapsed text-dark accordion_button">
+							<h6 class="mb-0">Search Albums and Add a Connection</h6>
+						</button>
+					</div>
+					<div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+						<div class="card-body video_card">
+							<iframe allowFullScreen frameborder="0" height="564" mozallowfullscreen src="https://player.vimeo.com/video/279113954?autoplay=1&loop=1&autopause=0" webkitAllowFullScreen width="640"></iframe>
+						</div>
+					</div>
+				</div>
+				 -->
+
+				 <!-- ===== Modal 3 ==== -->
+
+				<button type="button" class="btn btn-primary feature_button" data-toggle="modal" data-target="#modalThree">
+					<img src="/images/play_button_empty_white.png" id="modal_three_button" class="feature_button_icon" data-toggle="tooltip" data-placement="bottom" title="Search Albums and Add a Connection" data-trigger="hover"><br/>Connections
+				</button>
+
+				<div class="modal fade" id="modalThree" tabindex="-1" role="dialog" aria-labelledby="modalThreeCenterTitle" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title mb-0" id="modalThreeCenterTitle">Feature Walkthrough:<br/><small class="text-secondary">Search Albums and Add a Connection</small></h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+								<div class="modal-body">
+								<div style="padding:79.3% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/279113954?autoplay=1&loop=1&title=0&byline=0&portrait=0" style="position:absolute;top:0;left:0;width:100%;height:100%;" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+								</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
+								<a href="/search" class="btn btn-sm btn-primary text-white">Start Search</a>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- CARD FOUR
+				<div class="card bg-light">
+					<div class="card-header header_clickable" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+						<button class="btn btn-link collapsed text-dark accordion_button">
+							<h6 class="mb-0">Search From All Tags</h6>
+						</button>
+					</div>
+					<div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+						<div class="card-body video_card">
+							<iframe allowFullScreen frameborder="0" height="564" mozallowfullscreen src="https://player.vimeo.com/video/261418274?autoplay=1&loop=1&autopause=0" webkitAllowFullScreen width="640"></iframe>						
+						</div>
+					</div>
+				</div>	
+				 -->
+				
+				<!-- ===== Modal 4 ==== -->
+
+				<button type="button" class="btn btn-primary feature_button" data-toggle="modal" data-target="#modalFour">
+					<img src="/images/play_button_empty_white.png" id="modal_four_button" class="feature_button_icon" data-toggle="tooltip" data-placement="bottom" title="Search From All Tags" data-trigger="hover"><br/>All Tags
+				</button>
+
+				<div class="modal fade" id="modalFour" tabindex="-1" role="dialog" aria-labelledby="modalFourCenterTitle" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title mb-0" id="modalFourCenterTitle">Feature Walkthrough:<br/><small class="text-secondary">Search From All Tags</small></h5>
+								<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+								<div class="modal-body">
+									<div style="padding:82.95% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/261418274?autoplay=1&loop=1&title=0&byline=0&portrait=0" style="position:absolute;top:0;left:0;width:100%;height:100%;" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+								</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Close</button>
+								<a href="/alltags" class="btn btn-sm btn-primary text-white">Start Search</a>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>	         
+
+        <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
+		<% include partials/templates/footer.ejs %>
+		<% include partials/templates/authfooter.ejs %>
+		<script src="/javascripts/about.script.js"></script>
+    </body>
+</html>

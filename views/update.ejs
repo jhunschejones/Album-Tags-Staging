@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <% include partials/templates/head_tags.ejs %>
+        <link rel="stylesheet" href="/stylesheets/update.css">
+    </head>
+    <body>
+
+        <!-- BASIC NAVBAR TEMPLATE -->
+        <% include partials/templates/navbar_basic.ejs %>
+
+        <!-- START PAGE CONTENT -->
+        <div id="all_the_things" class="container-fluid hide_when_logged_out">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="row container-fluid">
+                        <div class="albumdetails_details">
+                            <h1 class="albumdetails_artist"></h1> 
+                            <br class="slim_br_sm"/>
+                            <span class="albumdetails_album"></span>
+                            <br class="slim_br_sm"/>
+                            <img class="img-fluid albumdetails_cover" src="" alt="" onclick="scrollDown()">
+                        </div>
+                    </div>
+                    <br class="slim_br"/>
+
+                    <div class="row container-fluid">
+                        <form>
+                            <div class="form-row">
+                            <div class="form-group mx-sm-3 mb-2 add_tag_text_input">
+                                <input type="search" class="form-control add_tag_field" id="new_tag" placeholder="Add a Tag!" data-toggle="tooltip" data-placement="right" title="Create your own tag!" data-trigger="hover">
+                            </div>
+                            <button type="button" onclick="addTag()" id="add_tag_button" class="btn btn-primary mb-2 add_tag_button float-right">Add</button>
+                            <span class="warning_label text-danger"></span>
+                            </div>
+                            
+                            <div class="form-row add_connection_row">
+                            <div class="form-group mx-sm-3 mb-2 add_connection_text_input">
+                                <input type="search" class="form-control add_connection_field" id="new_connection" placeholder="Add a Connection!" data-toggle="tooltip" data-placement="right" title="Add an Apple Album ID to connect to another record!" data-trigger="hover">
+                            </div>
+                            <button type="button" onclick="newConnection()" class="btn btn-primary mb-2 add_connection_button">Add</button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+
+                <div class="col-md-7 container-fluid">
+                    <table class="table table-bordered" id="tags_table">
+                        <thead class="bg-light">
+                            <tr>
+                            <th scope="col">Tag</th>
+                            <th scope="col">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody class="tag_results">                           
+                        </tbody>
+                    </table>
+
+                    <table class="table table-bordered" id="connections_table">
+                        <thead class="bg-light">
+                            <tr>
+                            <th scope="col">Connection</th>
+                            <th scope="col">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table_overflow" class="connection_results">                         
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                <br />
+                <button class="btn btn-sm btn-light" onclick="window.history.back()"><img id="back_arrow" src="/images/back_arrow.png"><span class="button_text">Back</span></button>
+                <button class="btn btn-sm btn-light" onclick="scrollToTop()"><img id="up_arrow" src="/images/up_arrow.png"><span class="button_text">Top</span></button>
+                </div>
+            </div>
+
+        </div>
+
+        <span class="hide_when_logged_in" id="log_in_message"></span>
+        <!-- END PAGE CONTENT -->    
+
+        <!-- Messy way to pull album ID so I can get it in my javascript -->
+        <p class="heres_the_album_id" style="display:none;"> <%= albumId %> </p>   
+
+        <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
+        <% include partials/templates/footer.ejs %>
+        <script src="/javascripts/update.script.js"></script>
+        <script src="/javascripts/albumconnections_update.script.js"></script>
+        <% include partials/templates/authfooter.ejs %>
+    </body>
+</html>

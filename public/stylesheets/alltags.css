@@ -1,0 +1,15 @@
+.badge {
+    font-size: .8em;
+    padding: 5px;
+    margin: 3px;
+}
+
+.all_tags_button, .back_button {
+    margin-top: 10px;
+}
+
+.warning_label {
+    margin-left: 0px;
+    margin-bottom: 0px;
+    margin-top: 5px;
+}

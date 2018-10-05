@@ -1,0 +1,86 @@
+.albumdetails_artist {
+    padding-bottom: 0px !important;
+    margin-bottom: 0px !important;
+}
+
+.albumdetails_cover {
+    margin-top: 8px;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px grey;
+    margin-bottom: 10px;
+}
+
+.add_tag_form {
+    margin-bottom: 10px;
+}
+
+.add_tag_text_input, 
+.add_connection_text_input {
+    margin-left: 8px !important;
+    /* height: 40px; */
+}
+
+.add_connection_row {
+    margin-bottom: 10px;
+}
+	/* This overrides bootstrap's style for the text input
+	 box so that it will display the 'x' in chrome */
+     input[type=search]::-webkit-search-cancel-button {
+		-webkit-appearance: searchfield-cancel-button;
+    }
+
+td, th {
+    padding: 5px 0px 5px 10px !important;
+}
+
+/* currently this scrolling table body doesnt work */
+#table_overflow {
+    max-height: 258px;
+    overflow: auto;
+}
+
+.please_log_in {
+    text-align: center;
+    margin: 50px 0px 80px 0px;
+}
+
+.slim_br {
+    display: block; /* makes it have a width */
+    content: ""; /* clears default height */
+    margin-top: 6px; /* change this to whatever height you want it */
+}
+
+.slim_br_sm {
+    display: block; /* makes it have a width */
+    content: ""; /* clears default height */
+    margin-top: 0px; /* change this to whatever height you want it */
+}
+
+.warning_label {
+    /* margin-left: 0px; */
+    margin-bottom: 10px;
+}
+
+/* ======= navigation arrows ======== */
+#back_arrow {
+    height: 22px;
+    padding: 0px 6px 2px 3px;
+}
+#up_arrow {
+    height: 18px;
+    padding: 0px 4px 5px 4px;
+}
+
+@media screen and (min-width: 500px) {
+
+    .button_text {
+        display: inline;
+    }
+}
+
+@media screen and (max-width: 500px) {
+
+    .button_text {
+        display: none;
+    }
+}

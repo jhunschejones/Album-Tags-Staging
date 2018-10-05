@@ -1,0 +1,40 @@
+<button id="clear_filters_button" class="btn btn-sm btn-light sticky-top float-right hide_when_logged_out" onclick="clearFilters()">
+Clear <span class="button_text">Filters</span>
+</button>
+
+<div class="dropdown sticky-top float-right">
+    <button id="filter_by_year_dropdown_button" class="btn btn-sm btn-light dropdown-toggle hide_when_logged_out" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="buildYearFilters()">
+    <span class="button_text">Filter by </span>Year
+    </button>
+    <div id="year_filter_menu" class="dropdown-menu dropdown-menu-right" aria-labelledby="filter_by_year_dropdown_button">
+        <!-- javascript puts filter years here -->
+    </div>
+</div>
+
+<div class="dropdown sticky-top float-right">
+    <button id="filter_by_genre_dropdown_button" class="btn btn-sm btn-light dropdown-toggle hide_when_logged_out" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="buildGenreFilters()">
+    <span class="button_text">Filter by </span>Genre
+    </button>
+    <div id="genre_filter_menu" class="dropdown-menu dropdown-menu-right" aria-labelledby="filter_by_genre_dropdown_button">
+        <!-- javascript puts filter tags here -->
+    </div>
+</div>
+
+<div class="dropdown sticky-top float-right">
+    <button id="filter_by_artist_dropdown_button" class="btn btn-sm btn-light dropdown-toggle hide_when_logged_out" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="buildArtistFilters()">
+    <span class="button_text">Filter by </span>Artist
+    </button>
+    <div id="artist_filter_menu" class="dropdown-menu dropdown-menu-right" aria-labelledby="filter_by_artist_dropdown_button">
+        <!-- javascript puts filter tags here -->
+    </div>
+</div>
+
+<div class="to_top_button_container sticky-top">
+    <button id="top_10_button" class="btn btn-sm btn-light float-right hide_when_logged_out" onclick="selectTopTen()" style="display:none;" data-toggle="tooltip" data-placement="top" title="Top 10" data-trigger="hover">
+        <img id="top_star_full" src="/images/star_yellow.png" style="display:none;"><img id="top_star_empty" src="/images/star_grey_2.png"><!--<span class="button_text">Top 10</span>-->
+    </button>
+</div>
+
+<div class="to_top_button_container sticky-top float-left">
+    <button id="to_top_button" class="btn btn-sm btn-light hide_when_logged_out" onclick="scrollToTop()"><img id="up_arrow" src="/images/up_arrow.png"><span class="button_text">Top</span></button>
+</div>

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <% include partials/templates/head_tags.ejs %>
+        <link rel="stylesheet" href="/stylesheets/cards.min.css">
+        <link rel="stylesheet" href="/stylesheets/spinner.min.css">
+    </head>
+    <body>
+
+        <!-- BASIC NAVBAR TEMPLATE -->
+        <% include partials/templates/navbar_basic.ejs %>
+
+        <!-- BEGIN ALBUM CARDS -->
+        <div id="favorites_all_cards" class="row container-fluid">
+            <div id="loader"></div>
+        </div>
+
+        <div class="container-fluid album_list_instruction">
+            <!-- <span class="text-secondary">Click an Album for More Details</span> -->
+            <ul class="album_list" style="list-style-type: none;">
+
+            </ul>
+        </div>
+        <!-- END ALBUM CARDS -->       
+
+        <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
+        <% include partials/templates/footer.ejs %>
+        <% include partials/templates/authfooter.ejs %>
+        <script src="/javascripts/favorites.script.js"></script>
+    </body>
+</html>

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <% var pageTitle = "Error Page" %> 
+        <% include partials/templates/head_tags.ejs %>
+		<link rel="stylesheet" href="/stylesheets/home.css">
+    </head>
+    <body>
+        <!-- BASIC NAVBAR TEMPLATE -->
+        <% var subTitle = "Error Page" %>
+        <% include partials/templates/navbar_basic.ejs %>
+
+        <!-- END NAVBAR -->
+
+        <div class="container" style="margin-top:50px;margin-bottom:50px;">
+            <h1>There appears to have been an error!</h1>
+            <p><span class="text-secondary">Here's what we know:</span><span class="text-danger"> <%= error %></span></p>
+            <button class="btn btn-sm btn-light" onclick="window.history.back()"><img id="back_arrow" src="/images/back_arrow.png" style="height:20px;"><span class="button_text" style="margin-left:10px;">Take Me Back Please!</span></button>
+        </div>
+
+        <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
+        <% include partials/templates/footer.ejs %>
+        <% include partials/templates/authfooter.ejs %>
+    </body>
+</html>

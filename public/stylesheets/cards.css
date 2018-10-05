@@ -1,0 +1,83 @@
+/* ====== custom styling for cards ======= */
+#all_cards,
+#favorites_all_cards {
+  margin: 0px 8px 0px 8px;
+  padding: 0px;
+}
+
+#all_cards .card,
+#favorites_all_cards .card {
+  width: 16rem;
+}
+
+.album_list {
+  display: none;
+  padding-left: 0px;
+}
+
+.album_list_instruction {
+  display: none;
+}
+
+@media screen and (max-width: 800px) {
+  #all_cards .card,
+  #favorites_all_cards .card {
+    width: 10.8rem;
+  }
+  .large_artist,
+  .large_album {
+    display: none;
+  }
+  .small_artist,
+  .small_album {
+    display: block;
+  }
+}
+
+@media screen and (min-width: 800px) {
+  .small_artist,
+  .small_album {
+    display: none;
+  }
+  .large_artist,
+  .large_album {
+    display: block;
+  }
+}
+  
+.card {
+  margin: 5px !important;
+}
+
+.card img {
+  width: 100%;
+  height: auto;
+}
+
+.card-title {
+  margin-bottom: 3px;
+  font-size: 1.1rem;
+  line-height: 1.1;
+}
+
+.card-body {
+  padding: 5px 9px 6px 9px;
+  line-height: 1.1;
+}
+
+.album {
+  /* font-style: italic; */
+  font-size: .9rem;
+  color: #6c757d;
+  font-weight: 100;
+}
+
+.release_and_label {
+  line-height: normal;
+  color: gray;
+}
+
+.please_log_in {
+  margin: 40px 0px 60px 0px;
+  text-align: center;
+}

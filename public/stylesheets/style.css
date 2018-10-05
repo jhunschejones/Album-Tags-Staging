@@ -1,0 +1,120 @@
+/* ======== styling for navbar ========= */
+.jumbotron {
+  padding-top: 10px !important;
+  padding-bottom: 0px !important;
+  padding-left: 17px !important;
+  text-align: left !important;
+  margin-bottom: 7px;
+}
+
+.jumbotron h1 {
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+}
+  #brand_home:hover {
+    text-decoration: none;
+  }
+
+.jumbotron p {
+  padding-top: 2px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.my_dropdown {
+  padding-top: 0px;
+  padding-bottom: 12px;
+  padding-left: 0px;
+  padding-right: 12px;
+}
+.dropdown-menu {
+  z-index: 2000;
+}
+
+.dropdown-menu a {
+  padding-right: 0px;
+}
+
+/* ====== Full screen Navbar ===== */
+
+#login_container {
+  display: none;
+}
+
+#full_menu {
+  padding: 0px;
+}
+
+.full_menu_link {
+  padding: 6px 0px 12px 0px !important;
+}
+
+.full_menu_divider {
+  padding: 6px 10px 12px 10px
+}
+
+#full_menu_page_title {
+  margin-left: 10px;
+  font-size: 50%;
+  text-transform: uppercase;
+  font-weight: 100;
+}
+
+#full_menu_login_button {
+  margin: 0px 10px 22px 0px;
+  padding: 2px 10px 2px 10px;
+}
+
+#full_menu_logout_button {
+  margin: 0px 10px 22px 0px;
+  padding: 2px 6px 2px 6px;
+}
+
+@media screen and (max-width: 750px) {
+  #full_menu, 
+  #full_menu_page_title, 
+  #full_menu_search_input,
+  #full_menu_login_logout_container {
+      display: none !important;
+  }
+}
+
+@media screen and (min-width: 751px) {
+  #compact_menu {
+      display: none;
+  }
+}
+
+/* ======= styling for warnings ========= */
+.warning_label {
+  margin-left: 16px;
+  margin-right: 16px;
+  font-size: .8em !important;
+}
+
+
+/* ====== styling for the footer ======== */
+hr {
+  margin-bottom: 0px;
+}
+.my_footer .nav-item {
+  margin-bottom: 0px;
+}
+
+.my_footer small {
+  color: lightgray !important;
+  margin-top: 0px;
+}
+
+.my_footer .nav-link {
+  padding-left: 5px;
+}
+
+.my_footer .nav_seperator {
+  padding-right: 7px;
+  padding-top: 7px;
+}
+
+.hide_me {
+  display: none !important;
+}

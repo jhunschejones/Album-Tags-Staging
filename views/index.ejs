@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <% include partials/templates/head_tags.ejs %>
+		<link rel="stylesheet" href="/stylesheets/home.css">
+    </head>
+    <body>
+
+        <!-- BASIC NAVBAR TEMPLATE -->
+        <% include partials/templates/navbar_basic.ejs %>
+
+
+        <!-- MAIN PAGE CONTENT -->
+        <div id="background_image_container">
+            <!--CSS INSERTS BACKGROUND HERE-->
+        </div>
+
+        <div id="centered_content" class='container-fluid'>
+            <h1 class="text-dark">Just like you, we're here for the music.</h1>
+            <a href="/search" class="btn btn-outline-dark">Search Music</a>
+            <a href="/myfavorites" class="btn btn-outline-dark">Your Favorites</a>    
+        </div>
+
+
+        <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
+        <% include partials/templates/footer.ejs %>
+        <script src="/javascripts/home.script.js"></script>
+        <% include partials/templates/authfooter.ejs %>
+    </body>
+</html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <% include partials/templates/head_tags.ejs %>
+        <link rel="stylesheet" href="/stylesheets/search.css">
+        <link rel="stylesheet" href="/stylesheets/spinner.min.css">
+        
+        <!-- spinner styles just for search page -->
+        <style>
+            #loader {
+                position: absolute;
+                left: 45%;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- BASIC NAVBAR TEMPLATE -->
+        <% include partials/templates/navbar_basic.ejs %>
+
+
+        <!-- MAIN PAGE CONTENT -->
+
+        <div id="background_image_container">
+            <!--CSS PUTS BACKGROUND HERE-->
+        </div>
+
+        <div id="absolute_content" class="container-fluid">
+            <form class="form-inline">
+                <div class="form-group mx-sm-3 mb-2 artist_search">
+                    <!-- for continuous search, add oninput="populateSearchResults()" to input field -->
+                    <input type="search" class="form-control" id="search_box" placeholder="Try a Search!">
+                </div>
+                <button onclick="populateSearchResults(pageReloaded)" class="btn btn-primary mb-2 search_button">Search</button>
+            </form>
+
+            <span id="warning_label" class="text-danger"></span>
+            <div id="loader" style="display:none;"></div>  
+
+            <div id="results_returned">           
+                <h4 id="artists_label" class="artists_label"></h4>
+                <span id="artist_results" class="artist_results"></span>
+                <h4 id="albums_label" class="albums_label"></h4>
+                <span id="album_results" class="album_results"></span>
+            </div>
+        </div>  
+        
+
+        <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
+        <% include partials/templates/footer.ejs %>
+        <script src="/javascripts/search.script.js"></script>
+        <% include partials/templates/authfooter.ejs %>
+    </body>
+</html>

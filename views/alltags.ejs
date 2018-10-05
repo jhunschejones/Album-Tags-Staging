@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <% include partials/templates/head_tags.ejs %>
+        <link rel="stylesheet" href="/stylesheets/alltags.css">
+    </head>
+    <body>
+
+        <!-- BASIC NAVBAR TEMPLATE -->
+        <% include partials/templates/navbar_basic.ejs %>
+
+        <div class="container-fluid">
+            <h4>All Tags:</h4>
+            <span class="all_tags"></span>
+
+            <br />
+            <a href="" onclick="tagSearch()" class="btn btn-sm btn-outline-primary all_tags_button">Search by Selected Tags</a>
+            <a href="" onclick="clearTagArray()" class="btn btn-sm btn-outline-danger all_tags_button">Clear Selected Tags</a>
+            <p class="warning_label text-danger"></p>
+            <button class="btn btn-sm btn-secondary back_button" onclick="window.history.back()">Go Back</button>
+
+        </div>           
+
+        <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
+        <% include partials/templates/footer.ejs %>
+
+        <script src="/javascripts/alltags.script.js"></script>
+        <% include partials/templates/authfooter.ejs %>
+    </body>
+</html>

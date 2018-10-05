@@ -1,0 +1,76 @@
+<!-- BEGIN NAVBAR -->
+<div class="jumbotron jumbotron-fluid bg-dark ">
+    <h1 class="display-5">
+        <!-- home link -->
+        <a class="display-5 text-light" id="brand_home" href="/">Album Tags</a>
+        
+        <!-- page subtitle -->
+        <span id="full_menu_page_title" class="text-muted font-weight-light"> <%= subTitle %> </span>
+
+        <!-- login and logout buttons -->
+        <div id="full_menu_login_logout_container" class="float-right" style="display:none;">
+            <a class="btn btn-sm btn-primary hide_when_logged_in" id="full_menu_login_button">Log In</a>
+            <a class="btn btn-sm btn-danger hide_when_logged_out" id="full_menu_logout_button">Log Out</a>
+        </div>          
+        
+        <!-- menu search -->
+        <!-- NOTE: search functionality does not currently work in a manner that it can be easily called from any page -->
+        <!-- <form class="form-inline my-2 my-lg-0 float-right">
+            <input id="full_menu_search_input" class="form-control mr-sm-2" type="search" placeholder="Search for Music" aria-label="Search" onsearch="myFunction()">
+        </form> -->
+    </h1>
+ 
+    <!-- compact navigation -->
+    <ul id="compact_menu" class="nav">
+        <li class="nav-item dropdown">
+            <a class="my_dropdown lead text-secondary nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><img id="menu_hamburger" style="height:23px" src="/images/menu.png"></a>
+            <div class="dropdown-menu">
+                <a class="dropdown-item hide_when_logged_in" id="login_button" style="cursor:pointer;">Log In</a>
+                <a class="dropdown-item hide_when_logged_out" id="logout_button" style="cursor:pointer;">Log Out</a>
+                <div class="dropdown-divider" id="login_divider"></div>
+                <a class="dropdown-item" href="/">Home</a>
+                <a class="dropdown-item" href="/about">About</a>
+                <a class="dropdown-item" href="/search">Search</a>
+                <a class="dropdown-item" href="/alltags">All Tags</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="/myfavorites">My Favorites</a>
+                <a class="dropdown-item" href="/favorites">Our Favorites</a>
+                
+                <!-- <div class="dropdown-divider"></div> -->
+                <!-- <a class="dropdown-item" href="mailto:joshua@hunschejones.com?subject=This Week App">Contact</a> -->
+            </div>
+        </li>
+        <p class="lead text-muted"><%= subTitle %> </p>
+    </ul> 
+
+    <!-- full navigation -->
+    <nav id="full_menu" class="navbar navbar-expand-sm navbar-dark bg-dark">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link full_menu_link" href="/">Home</a>
+                </li>
+                <li class="text-secondary full_menu_divider">|</li>
+                <li class="nav-item">
+                    <a class="nav-link full_menu_link" href="/about">About</a>
+                </li>  
+                <li class="text-secondary full_menu_divider">|</li>            
+                <li class="nav-item">                
+                    <a class="nav-link full_menu_link" href="/search">Search</a>
+                </li>
+                <li class="text-secondary full_menu_divider">|</li>               
+                <li class="nav-item">
+                    <a class="nav-link full_menu_link" href="/alltags">All Tags</a>
+                </li>
+                <li class="text-secondary full_menu_divider">|</li>   
+                <li class="nav-item">
+                    <a class="nav-link full_menu_link" href="/myfavorites">My Favorites</a>
+                </li> 
+                <li class="text-secondary full_menu_divider">|</li>             
+                <li class="nav-item">
+                    <a class="nav-link full_menu_link" href="/favorites">Our Favorites</a>
+                </li>                                                        
+            </ul>         
+        </div>
+    </nav>
+</div>

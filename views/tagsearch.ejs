@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <% include partials/templates/head_tags.ejs %>
+        <link rel="stylesheet" href="/stylesheets/search.css">
+    </head>
+    <body>
+
+        <!-- BASIC NAVBAR TEMPLATE -->
+        <% include partials/templates/navbar_basic.ejs %>
+
+        <div class="container-fluid">
+            <h4>Tags:</h4>
+            <span class="tags_searched"></span>
+            <br /> 
+            <br />
+            <h4>Albums:</h4>
+            <span class="album_results"></span>
+            <br />
+            <br />
+            <button class="btn btn-sm btn-secondary" onclick="window.history.back()">Go Back</button>
+
+        </div>           
+
+        <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
+        <% include partials/templates/footer.ejs %>
+
+        <!-- Messy way to pull album ID so I can get it in my javascript -->
+        <p class="heres_the_selected_tags" style="display:none;"> <%= selectedTags %> </p>   
+
+        <script src="/javascripts/tagsearch.script.js"></script>
+        <% include partials/templates/authfooter.ejs %>
+    </body>
+</html>
