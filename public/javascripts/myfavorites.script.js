@@ -118,7 +118,7 @@ function bubbleSort(arr, prop)
 
 function getAlbumInfo(albumNumber, cardNumber) {
     
-    $.getJSON( '/favorites/album/' + albumNumber)
+    $.getJSON( '/api/v1/apple/albumdetails/' + albumNumber)
     .done(function(rawData) {     
     // send album info to populateCard
     try {
@@ -427,7 +427,7 @@ var genresList = [];
 // and retrieved by the router stored at the URL listed with the album number
 function getGenreTags(albumNumber, cardNumber) {
 
-    $.getJSON ( '/albumdetails/newtags/database/' + albumNumber, function(rawData) {
+    $.getJSON ( '/api/v1/tags/' + albumNumber, function(rawData) {
         if (typeof(rawData[0]) != "undefined") {
             
 
@@ -690,7 +690,7 @@ let release
 function timedSteps(index) {
     albumID = favoritesToUpdate[index];
     
-    $.getJSON ( '/albumdetails/json/' + albumID, function(rawData) {
+    $.getJSON ( '/api/v1/apple/albumdetails/' + albumID, function(rawData) {
         artist = rawData.data[0].attributes.artistName;
         album = rawData.data[0].attributes.name;
         release = rawData.data[0].attributes.releaseDate;

@@ -63,7 +63,7 @@ function populateSearchResults(pageReloaded, artist) {
         hideDOMelement("warning_label");
 
         // this is pulling data from url and populating cards
-        $.getJSON ( '/search/' + mySearch, function(rawData) {
+        $.getJSON ( '/api/v1/apple/search/' + mySearch, function(rawData) {
 
             if (typeof(rawData.results.artists) != null) {  
                 // this stores an array
@@ -183,7 +183,7 @@ function showArtistAlbums(event) {
     var thisArtistName = clickedLink[0].trim();
     var thisArtistId = clickedLink[1].trim();
 
-    $.getJSON ( '/search/' + thisArtistName, function(rawData) {
+    $.getJSON ( '/api/v1/apple/search/' + thisArtistName, function(rawData) {
 
         if (typeof(rawData.results.albums) != "undefined") {
             try {

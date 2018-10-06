@@ -38,7 +38,7 @@ function bubbleSort(arr, prop)
 
 function getAlbumInfo(albumNumber, cardNumber) {
     
-    $.getJSON( '/favorites/album/' + albumNumber)
+    $.getJSON( '/api/v1/apple/albumdetails/' + albumNumber)
     .done(function(rawData) {
     
     // if the album is from this year, populate the page, otherwise remove the card

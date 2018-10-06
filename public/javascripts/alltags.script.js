@@ -2,7 +2,7 @@ console.log("The custom script for the alltags page is running")
 var allTags = [];
 
 function populateTags() {
-    $.getJSON ( '/alltags/newtags/database/', function(rawData) {
+    $.getJSON ( '/api/v1/tags', function(rawData) {
         if (typeof(rawData[0]) != "undefined") {
             // clear default no-tags notice if tags exist
             $(".all_tags").text('');

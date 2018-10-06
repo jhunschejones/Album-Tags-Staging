@@ -130,7 +130,7 @@ function populateConnections() {
             let connection = directConnections[index];
 
             if (connection != albumId) {
-                $.getJSON ( '/albumdetails/json/' + parseInt(connection), function(rawData) {
+                $.getJSON ( '/api/v1/apple/albumdetails/' + parseInt(connection), function(rawData) {
                     var cover = rawData.data[0].attributes.artwork.url.replace('{w}', 75).replace('{h}', 75);
                     $('.connection_results').append(`<tr><td><a href="/albumdetails/${connection}" data-toggle="tooltip" data-placement="right" title="Album Details" data-trigger="hover"><img class="small_cover" src="${cover}"></a></td><td><a href="" onclick="deleteConnection(${connection})">Delete</a></td></tr>`)
                 });
@@ -147,7 +147,7 @@ function newConnection() {
         newAlbumId = parseInt($('#new_connection').val());
         isDelete = false;
 
-        $.getJSON ( '/albumdetails/json/' + parseInt(newAlbumId), function(rawData) {
+        $.getJSON ( '/api/v1/apple/albumdetails/' + parseInt(newAlbumId), function(rawData) {
             // check if this is a valid album id
             // rawData.errors returns undefined if there are no errors
             // rawData.data returns undefined if there are no albums
@@ -184,7 +184,7 @@ function createConnection(newAlbumId, isDelete) {
 
     let newArtist
     let newAlbum
-    $.getJSON ( '/albumdetails/json/' + newAlbumId, function(rawData) {
+    $.getJSON ( '/api/v1/apple/albumdetails/' + newAlbumId, function(rawData) {
         newArtist = rawData.data[0].attributes.artistName;
         newAlbum = rawData.data[0].attributes.name;
     }).then(function(){
@@ -237,7 +237,7 @@ function addSecondConnection() {
 
     let newArtist
     let newAlbum
-    $.getJSON ( '/albumdetails/json/' + albumId, function(rawData) {
+    $.getJSON ( '/api/v1/apple/albumdetails/' + albumId, function(rawData) {
         newArtist = rawData.data[0].attributes.artistName;
         newAlbum = rawData.data[0].attributes.name;
     }).then(function(){
@@ -256,7 +256,7 @@ function removeSecondConnection(connectedAlbum) {
     // taking in album id of the connected record where we want to remove the CURRENT connection
     let newArtist
     let newAlbum
-    $.getJSON ( '/albumdetails/json/' + albumId, function(rawData) {
+    $.getJSON ( '/api/v1/apple/albumdetails/' + albumId, function(rawData) {
         // looking up info about current record because this is the connection that we need to remove
         newArtist = rawData.data[0].attributes.artistName;
         newAlbum = rawData.data[0].attributes.name;

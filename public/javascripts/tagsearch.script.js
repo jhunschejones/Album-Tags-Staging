@@ -22,7 +22,7 @@ function populateTags() {
 function getTagedAlbums() {
     
     // this is pulling data from url and checking the database
-    $.getJSON ( '/search/tags/newtags/database/' + cleanSelectedTags).then(function(rawData) {
+    $.getJSON ( '/api/v1/tags/selection/' + cleanSelectedTags).then(function(rawData) {
         
         if (typeof(rawData[0]) != "undefined") {
 
@@ -40,7 +40,7 @@ function getTagedAlbums() {
 function getAlbumsInfo() {
 
     matchingAlbums.forEach(element => {
-        $.getJSON ( '/albumdetails/json/' + element, function(rawData) {
+        $.getJSON ( '/api/v1/apple/albumdetails/' + element, function(rawData) {
             displayAlbum(rawData.data[0].attributes, element);
         });
     });

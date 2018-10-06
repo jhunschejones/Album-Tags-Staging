@@ -1,4 +1,3 @@
-require('newrelic');
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -13,14 +12,15 @@ var redirectToHTTPS = require('express-http-to-https').redirectToHTTPS;
 // var csp = require('express-csp-header');
 var cors = require('cors');
 
-var index = require('./routes/index.rout');
-var about = require('./routes/about.rout')
-var favorites = require('./routes/favorites.rout');
-var myfavorites = require('./routes/myfavorites.rout')
-var search = require('./routes/search.rout');
-var albumdetails = require('./routes/albumdetails.rout');
-var update = require('./routes/update.rout');
-var alltags = require('./routes/alltags.rout');
+var index = require('./routes/index.route');
+var about = require('./routes/about.route')
+var favorites = require('./routes/favorites.route');
+var myfavorites = require('./routes/myfavorites.route')
+var search = require('./routes/search.route');
+var albumdetails = require('./routes/albumdetails.route');
+var update = require('./routes/update.route');
+var alltags = require('./routes/alltags.route');
+var apiRout = require('./routes/api.v1.route')
 
 // Connecting my database
 var mongo = require('mongodb');
@@ -70,6 +70,7 @@ app.use('/search', search);
 app.use('/albumdetails', albumdetails);
 app.use('/update', update);
 app.use('/alltags', alltags);
+app.use('/api/v1', apiRout);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

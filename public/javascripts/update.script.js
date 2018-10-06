@@ -54,7 +54,7 @@ var album
 
 
 function populateAlbumInfo() {
-    $.getJSON ( '/albumdetails/json/' + albumId, function(rawData) {
+    $.getJSON ( '/api/v1/apple/albumdetails/' + albumId, function(rawData) {
         artist = rawData.data[0].attributes.artistName;
         album = rawData.data[0].attributes.name;
         var label = rawData.data[0].attributes.recordLabel;
@@ -80,7 +80,7 @@ function populateAlbumInfo() {
 function populateTags(reason) {
 
     // console.log("populate tags called")
-    $.getJSON ( '/albumdetails/newtags/database/' + albumId, function(rawData) {
+    $.getJSON ( '/api/v1/tags/' + albumId, function(rawData) {
         if (typeof(rawData[0]) != "undefined") {
             $('.tag_results').text('');
             currentTags = [];
@@ -188,7 +188,7 @@ function addTag() {
         }
     
         // PUT TO NEW TAGS
-        $.ajax(`newtags/database/${albumId}`, {
+        $.ajax(`/api/v1/tags/${albumId}`, {
             method: 'PUT',
             contentType: 'application/json',
             processData: false,
@@ -245,7 +245,7 @@ function deleteTag(event) {
             createdByObject.push(newTagAuthorObject)
         }
 
-        $.ajax(`newtags/database/${albumId}`, {
+        $.ajax(`/api/v1/tags/${albumId}`, {
             method: 'PUT',
             contentType: 'application/json',
             processData: false,
@@ -264,7 +264,7 @@ function deleteTag(event) {
 function postTags() {
 
     // Use AJAX to post the new tag in the database   
-    $.ajax(`newtags/database/${albumId}`, {
+    $.ajax(`/api/v1/tags/${albumId}`, {
         method: 'POST',
         contentType: 'application/json',
         processData: false,

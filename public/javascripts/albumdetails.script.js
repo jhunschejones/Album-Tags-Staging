@@ -113,7 +113,7 @@ var tagsForThisAlbum;
 // this populates the page with all the details
 function populateAlbumDetails(albumNumber){
 
-    $.getJSON ( '/albumdetails/json/' + albumNumber, function(rawData) {
+    $.getJSON ( '/api/v1/apple/albumdetails/' + albumNumber, function(rawData) {
         try {
             var artist = rawData.data[0].attributes.artistName;
             var album = rawData.data[0].attributes.name;
@@ -212,7 +212,7 @@ function replaceUnderscoreWithBackSlash(str) {
 function populateTags(albumNumber) {
     var noAuthors = false
 
-    $.getJSON ( '/albumdetails/newtags/database/' + albumNumber, function(rawData) {
+    $.getJSON ( '/api/v1/tags/' + albumNumber, function(rawData) {
         if (typeof(rawData[0]) != "undefined") {
             // clear default no-tags notice if tags exist
             $(".tag_results").text('');
@@ -483,7 +483,7 @@ function addToFavoriteAlbums(newAlbum) {
     let artist
     let album
     let releaseDate
-    $.getJSON ( '/albumdetails/json/' + newAlbum, function(rawData) {
+    $.getJSON ( '/api/v1/apple/albumdetails/' + newAlbum, function(rawData) {
         artist = rawData.data[0].attributes.artistName;
         album = rawData.data[0].attributes.name;
         releaseDate = release = rawData.data[0].attributes.releaseDate;
