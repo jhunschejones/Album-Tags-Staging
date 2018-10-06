@@ -50,14 +50,14 @@
     @media screen and (max-width: 500px) {
         /* song names and tags starting hidden */
         #song_names, 
-        #tag_pile, 
-        #tags_up_arrow,
+        /* #tag_pile,  */
+        /* #tags_up_arrow, */
         #tracks_up_arrow {
             display: none;
         }
-        #tags_down_arrow {
+        /* #tags_down_arrow {
             display: block;
-        }
+        } */
         #tracks_down_arrow {
             display: inline-block;
         }
