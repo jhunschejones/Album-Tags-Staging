@@ -109,7 +109,7 @@ router.get('/tags/:albumId', function (req, res, next) {
 router.get('/tags/selection/:tags', function(req, res, next) {
   const db = req.db
   const collection = db.get('album-tags')
-  const selectedTags = req.params.tags
+  var selectedTags = req.params.tags
 
   // clean up tags pulled out of url
   selectedTags = selectedTags.split(",")
