@@ -225,6 +225,12 @@ function noUserSignedIn() {
     $('.hide_when_logged_out').addClass('hide_me');
 
     showDOMelement("full_menu_login_logout_container");
+
+    try {
+        populateSearchedTags();
+    } catch (error) {
+        // we're not on the tag search page
+    }
 }
 
 function tagUpdatePermissionsGranted() {
