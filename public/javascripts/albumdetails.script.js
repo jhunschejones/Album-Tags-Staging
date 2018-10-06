@@ -210,6 +210,7 @@ function replaceUnderscoreWithBackSlash(str) {
 // this populates the Tags card with any tags stored in the mongodb database
 // and retrieved by the router stored at the URL listed with the album number
 function populateTags(albumNumber) {
+    if (albumNumber === "start") { return; }
     var noAuthors = false
 
     $.getJSON ( '/api/v1/tags/' + albumNumber, function(rawData) {

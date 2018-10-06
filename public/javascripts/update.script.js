@@ -51,6 +51,7 @@ var currentAuthors = [];
 var totalAuthors
 var artist
 var album
+var newEntry = false;
 
 
 function populateAlbumInfo() {
@@ -115,7 +116,8 @@ function populateTags(reason) {
             $(".update_tags").hide();
         } else {
             // create database entry if none exists
-            postTags(); 
+            // postTags();
+            newEntry = true; 
         };
     }).then(function(){
         let tagsForThisAlbum = $(".update_tags")
@@ -149,6 +151,8 @@ function populateTags(reason) {
 function addTag() {
     event.preventDefault();
     totalAuthors = currentAuthors.length
+
+    if (newEntry == true) { postTags() }
 
     if ($('#new_tag').val()) {
         var newTag = $('#new_tag').val();
@@ -264,7 +268,7 @@ function deleteTag(event) {
 function postTags() {
 
     // Use AJAX to post the new tag in the database   
-    $.ajax(`/api/v1/tags/${albumId}`, {
+    $.ajax(`/api/v1/tags`, {
         method: 'POST',
         contentType: 'application/json',
         processData: false,

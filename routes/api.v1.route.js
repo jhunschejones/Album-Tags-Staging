@@ -94,8 +94,8 @@ router.get('/tags/:albumId', function (req, res, next) {
       return
     } else {
       if (docs.length === 0) {
-        console.error(`No result matching query: ${thisAlbum}`)
-        res.send({ "message" : `no result matching query: ${thisAlbum}` })
+        console.error(`No tags result matching query: ${thisAlbum}`)
+        res.send({ "message" : `no tags result matching query: ${thisAlbum}` })
         return
       } else {
         res.json(docs)
@@ -151,12 +151,7 @@ router.post('/tags', function (req, res) {
       res.send({ "error" : err })
       return
   } else {
-    if (docs.length === 0) {
-      res.sendStatus(400)
-      return
-    } else {
-      res.sendStatus(200)
-    }
+    res.sendStatus(200)
   }
   })
 })
