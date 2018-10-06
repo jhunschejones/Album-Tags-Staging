@@ -152,7 +152,10 @@ function addTag() {
     event.preventDefault();
     totalAuthors = currentAuthors.length
 
-    if (newEntry == true) { postTags() }
+    if (newEntry == true) { 
+        postTags();
+        newEntry = false;
+    }
 
     if ($('#new_tag').val()) {
         var newTag = $('#new_tag').val();
