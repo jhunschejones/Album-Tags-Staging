@@ -2,11 +2,21 @@ const express = require('express')
 const router = express.Router()
 const request = require('request') 
 
+// ====== API DESCRIPTOR ENDPOINT ======
 // albumtags.com/api/v1/
 router.get('/', function (req, res, next) {
-  res.send("Welcome to the new API endpoint!")
+  res.send("Welcome to the new Album Tags API endpoint!")
 })
 
+// ====== TEST ENDPOINT TO KILL A WORKER ======
+// albumtags.com/api/v1/kill
+router.get('/kill', function (req, res, next) {
+  res.send("Killing a worker process...")
+  // killing worker to test alerts and recovery
+  process.exit(0)
+})
+
+// ====== APPLE API ALBUM DETAILS ======
 // For retrieving album details from Apple API
 // albumtags.com/api/v1/apple/albumdetails/:albumId
 router.get('/apple/albumdetails/:albumId', function(req, res, next) {
@@ -33,6 +43,7 @@ router.get('/apple/albumdetails/:albumId', function(req, res, next) {
   })
 })
 
+// ====== APPLE API SEARCH BY ALBUM OR ARTIST ======
 // For retrieving search results from Apple API
 // albumtags.com/api/v1/apple/search/:request
 router.get('/apple/search/:request', function(req, res, next) {
@@ -59,6 +70,7 @@ router.get('/apple/search/:request', function(req, res, next) {
   })
 })
 
+// ====== GET ALL TAGS ======
 // For retrieving all data from the Mlab MongoDB tags database
 // albumtags.com/api/v1/tags
 router.get('/tags', function (req, res, next) {
@@ -81,6 +93,7 @@ router.get('/tags', function (req, res, next) {
   })
 })
 
+// ====== FIND TAGS FOR ONE ALBUM ======
 // For retrieving a specific album's data from the Mlab MongoDB tags database
 // albumtags.com/api/v1/tags/:albumId
 router.get('/tags/:albumId', function (req, res, next) {
@@ -104,6 +117,7 @@ router.get('/tags/:albumId', function (req, res, next) {
   })
 })
 
+// ====== SEARCH BY SELECTED TAGS ======
 // For retrieving all albums with a specific set of tags
 // albumtags.com/api/v1/tags/selection/:tags
 router.get('/tags/selection/:tags', function(req, res, next) {
@@ -140,22 +154,26 @@ router.get('/tags/selection/:tags', function(req, res, next) {
   })
 })
 
-// For adding a record for a new album to the Mlab MongoDB tags database
-// albumtags.com/api/v1/tags
-router.post('/tags', function (req, res) {
-  const db = req.db
-  const collection = db.get('album-tags')
-  collection.insert(req.body, function (err, result) {
-    if(err){
-      console.error(err)
-      res.send({ "error" : err })
-      return
-  } else {
-    res.sendStatus(200)
-  }
-  })
-})
+//
+// DECOMISSIONED IN FAVOR OF USING UPSERT IN PUT ENDPOINT
+//// ====== POST A PLACEHOLDER RECORD IN THE DATABASE WITH NO TAGS ======
+// // For adding a record for a new album to the Mlab MongoDB tags database
+// // albumtags.com/api/v1/tags
+// router.post('/tags', function (req, res) {
+//   const db = req.db
+//   const collection = db.get('album-tags')
+//   collection.insert(req.body, function (err, result) {
+//     if(err){
+//       console.error(err)
+//       res.send({ "error" : err })
+//       return
+//   } else {
+//     res.sendStatus(200)
+//   }
+//   })
+// })
 
+// ====== ADD A NEW TAG TO THE DATABASE ======
 // For updating a record for a specific album to the Mlab MongoDB tags database
 // albumtags.com/api/v1/tags/:albumId
 router.put('/tags/:albumId', function(req, res) {
@@ -174,6 +192,7 @@ router.put('/tags/:albumId', function(req, res) {
         "albumName": req.body.albumName
       }
     },
+    { upsert: true },
     // https://stackoverflow.com/questions/24853114/how-to-handle-error-when-mongodb-collection-is-updating-in-javascriptnode-js
     function(err, result) {
       if (err) { 

@@ -152,10 +152,10 @@ function addTag() {
     event.preventDefault();
     totalAuthors = currentAuthors.length
 
-    if (newEntry == true) { 
-        postTags();
-        newEntry = false;
-    }
+    // if (newEntry == true) { 
+    //     postTags();
+    //     newEntry = false;
+    // }
 
     if ($('#new_tag').val()) {
         var newTag = $('#new_tag').val();
@@ -267,25 +267,27 @@ function deleteTag(event) {
     }
 };
 
-
-function postTags() {
-
-    // Use AJAX to post the new tag in the database   
-    $.ajax(`/api/v1/tags`, {
-        method: 'POST',
-        contentType: 'application/json',
-        processData: false,
-        // have to convert albumId to string so it works with the rest of app logic
-        data: JSON.stringify(
-        {
-            "albumId" : albumId.toString(), 
-            "tags" : [], 
-            "createdBy" : [],
-            "artistName" : artist,
-            "albumName" : album
-        })
-    })
-};
+//
+// REMOVING POST FUNCTIONALITY, USING UPSERT 
+// IN PUT REQUEST AT NEW API ROUT INSTEAD
+//
+// function postTags() {
+//     // Use AJAX to post the new record in the database   
+//     $.ajax(`/api/v1/tags`, {
+//         method: 'POST',
+//         contentType: 'application/json',
+//         processData: false,
+//         // have to convert albumId to string so it works with the rest of app logic
+//         data: JSON.stringify(
+//         {
+//             "albumId" : albumId.toString(), 
+//             "tags" : [], 
+//             "createdBy" : [],
+//             "artistName" : artist,
+//             "albumName" : album
+//         })
+//     })
+// };
 
 
 function moreByThisArtist(artist) {
