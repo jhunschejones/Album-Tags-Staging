@@ -1,4 +1,16 @@
-console.log("The custom script for the alltags page is running")
+// ---------- BEGIN UTILITIES ------------
+// console.log("The custom script for the alltags page is running")
+
+function safeParse(content) {
+    // console.log("safeParse called")
+    // replace characters with html equivalents
+    //prevents some basic cross site scripting attacks
+    content = content.replace(/\</g, "&lt;").replace(/\>/g, "&gt;").replace(/\//g, "&#47;").replace(/\\/g, "&#92;").replace(/\(/g, "&#40;").replace(/\)/, "&#41;").replace(/\./g, "&#46;").replace(/\[/g, "&#91;").replace(/\]/g, "&#93;").replace(/\{/g, "&#123;").replace(/\}/g, "&#125;").replace(/\=/g, "&#61;")
+    return content
+}
+
+// ---------------- END UTILITIES ---------------
+
 var allTags = [];
 
 function populateTags() {
@@ -41,7 +53,7 @@ function populateTags() {
 
                 // Here we add the tags as elements on the DOM, with an onclick function that uses a unique
                 // tag to toggle a badge-success class name and change the color
-                $('.all_tags').append(`<a href="" onclick="changeClass(${tagName})" id="${tagName}" class="badge badge-light">${element}</a>  `);    
+                $('.all_tags').append(`<a href="" onclick="changeClass(${tagName})" id="${tagName}" class="badge badge-light">${safeParse(element)}</a>  `);    
             });
         };
     });
@@ -108,4 +120,7 @@ function tagSearch() {
     }
 };
 
-populateTags();
+function populateSearchedTags() {
+    populateTags();
+}
+// populateTags();

@@ -1,1 +1,1 @@
-console.log("The home page custom script is running.");
+// console.log("The home page custom script is running.");

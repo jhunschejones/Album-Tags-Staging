@@ -1,8 +1,5 @@
 // -------- START UTILITIES SECTION --------
-
-console.log("The custom script for the album details page is running")
-
-
+// console.log("The custom script for the album details page is running")
 
 function scrollToTop() {
     document.body.scrollTop = 0; // For Safari
@@ -98,6 +95,14 @@ function countInArray(array, item) {
         }
     }
     return count;
+}
+
+function safeParse(content) {
+    // console.log("safeParse called")
+    // replace characters with html equivalents
+    //prevents some basic cross site scripting attacks
+    content = content.replace(/\</g, "&lt;").replace(/\>/g, "&gt;").replace(/\//g, "&#47;").replace(/\\/g, "&#92;").replace(/\(/g, "&#40;").replace(/\)/, "&#41;").replace(/\./g, "&#46;").replace(/\[/g, "&#91;").replace(/\]/g, "&#93;").replace(/\{/g, "&#123;").replace(/\}/g, "&#125;").replace(/\=/g, "&#61;")
+    return content
 }
 // -------- END UTILITIES SECTION --------
 
@@ -244,7 +249,7 @@ function populateTags(albumNumber) {
 
                     // Here we add the tags as elements on the DOM, with an onclick function that uses a unique
                     // tag to toggle a badge-success class name and change the color
-                    $('.tag_results').append(`<a href="" onclick="changeClass(${tagName})" id="${tagName}" class="badge badge-light album_details_tags author-${author}">${tag}</a>  `);   
+                    $('.tag_results').append(`<a href="" onclick="changeClass(${tagName})" id="${tagName}" class="badge badge-light album_details_tags author-${author}">${safeParse(tag)}</a>  `);   
                 }
                 $('.album_details_tags').hide();
             }  

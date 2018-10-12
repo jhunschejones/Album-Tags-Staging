@@ -1,5 +1,5 @@
 // --------- START UTILITIES --------
-console.log('The custom script for album connections is running');
+// console.log('The custom script for album connections is running');
 
 function hideDOMelement(elementId) {
     try {

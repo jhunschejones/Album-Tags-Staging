@@ -1,5 +1,15 @@
-console.log("The custom script for the tag search page is running");
+// ---------- BEGIN UTILITIES ------------
+// console.log("The custom script for the tag search page is running");
 
+function safeParse(content) {
+    // console.log("safeParse called")
+    // replace characters with html equivalents
+    //prevents some basic cross site scripting attacks
+    content = content.replace(/\</g, "&lt;").replace(/\>/g, "&gt;").replace(/\//g, "&#47;").replace(/\\/g, "&#92;").replace(/\(/g, "&#40;").replace(/\)/, "&#41;").replace(/\./g, "&#46;").replace(/\[/g, "&#91;").replace(/\]/g, "&#93;").replace(/\{/g, "&#123;").replace(/\}/g, "&#125;").replace(/\=/g, "&#61;")
+    return content
+}
+
+// ---------------- END UTILITIES ---------------
 
 var selectedTags = $(".heres_the_selected_tags").text().split(",");
 var cleanSelectedTags = [];
@@ -15,7 +25,7 @@ function populateTags() {
     cleanSelectedTags.forEach(tagElement => {
         // go through my tags and put back in the "/"'s
         tagElement = tagElement.replace(/_/g, "/")
-        $('.tags_searched').append(`<span class="badge badge-primary">${tagElement}</span>  `);
+        $('.tags_searched').append(`<span class="badge badge-primary">${safeParse(tagElement)}</span>  `);
     }); 
 }
 

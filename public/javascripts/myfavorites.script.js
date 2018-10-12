@@ -1,6 +1,5 @@
 // ------- START UTILITIES SECTION ----------
-console.log("The custom script for the 'myfavorites' page is running.");
-
+// console.log("The custom script for the 'myfavorites' page is running.");
 
 function scrollToTop() {
     document.body.scrollTop = 0; // For Safari

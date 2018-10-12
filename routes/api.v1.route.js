@@ -2,6 +2,15 @@ const express = require('express')
 const router = express.Router()
 const request = require('request') 
 
+function safeInput(userInput) {
+  if (userInput.includes("<") && userInput.includes(">") || userInput.includes(".") || userInput.includes("{") || userInput.includes("}")) {
+    // res.status(500).send('Invalid input from client!')
+    return true
+  } else {
+    return false
+  }
+}
+
 // ====== API DESCRIPTOR ENDPOINT ======
 // albumtags.com/api/v1/
 router.get('/', function (req, res, next) {
@@ -181,32 +190,46 @@ router.put('/tags/:albumId', function(req, res) {
   const collection = db.get('album-tags')
   const thisAlbum = req.params.albumId
 
-  collection.update(
-    { "albumId": thisAlbum }, 
-    // https://docs.mongodb.com/manual/reference/operator/update/set/
-    { $set: 
-      { 
-        "tags": req.body.tags,
-        "createdBy": req.body.createdBy,
-        "artistName": req.body.artistName,
-        "albumName": req.body.albumName
-      }
-    },
-    { upsert: true },
-    // https://stackoverflow.com/questions/24853114/how-to-handle-error-when-mongodb-collection-is-updating-in-javascriptnode-js
-    function(err, result) {
-      if (err) { 
-        console.log(err) 
-        res.send(err) 
-        return
-      }
+  // check for unsafe user input from the client
+  var unsafeInputs = 0
+  if (safeInput(req.body.artistName)) { unsafeInputs++ }
+  if (safeInput(req.body.albumName)) { unsafeInputs++ }
+  req.body.createdBy.forEach(element => { if (safeInput(element.tag)) { unsafeInputs++ } })
+  req.body.tags.forEach(element => { if (safeInput(element)) { unsafeInputs++ } })
 
-      if (result) {
-        res.sendStatus(200) 
-        return
-      } 
-    }
-  )
+  if (unsafeInputs === 0) {
+    collection.update(
+      { "albumId": thisAlbum }, 
+      // https://docs.mongodb.com/manual/reference/operator/update/set/
+      { $set: 
+        { 
+          "tags": req.body.tags,
+          "createdBy": req.body.createdBy,
+          "artistName": req.body.artistName,
+          "albumName": req.body.albumName
+        }
+      },
+      { upsert: true },
+      // https://stackoverflow.com/questions/24853114/how-to-handle-error-when-mongodb-collection-is-updating-in-javascriptnode-js
+      function(err, result) {
+        if (err) { 
+          console.log(err) 
+          res.send(err) 
+          return
+        }
+  
+        if (result) {
+          res.sendStatus(200) 
+          return
+        } 
+      }
+    )
+  } else {
+    // newrelic.addCustomAttributes({
+    //   "custom error message": JSON.stringify("invalid user data recieved from the client")
+    // })
+    res.status(500).send({"message": "invalid user data recieved from the client"})
+  }
 })
 
 module.exports = router

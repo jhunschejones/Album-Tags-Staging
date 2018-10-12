@@ -25,7 +25,8 @@ var apiRout = require('./routes/api.v1.route')
 // Connecting my database
 var mongo = require('mongodb');
 var monk = require('monk');
-var db = monk('mongodb://joshua:roofuzz@ds263948.mlab.com:63948/music-tags');
+// var db = monk('mongodb://joshua:roofuzz@ds263948.mlab.com:63948/music-tags');
+var db = monk('mongodb://joshua:roofuzz@album-tags-shard-00-00-qntxy.mongodb.net:27017,album-tags-shard-00-01-qntxy.mongodb.net:27017,album-tags-shard-00-02-qntxy.mongodb.net:27017/Album-Tags?ssl=true&replicaSet=Album-Tags-shard-0&authSource=admin&retryWrites=true');
 
 // Use this to see when the database is connected
 // db.then(() => {

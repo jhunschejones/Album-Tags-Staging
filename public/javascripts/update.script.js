@@ -1,5 +1,5 @@
 // ---------- BEGIN UTILITIES ------------
-console.log('The custom script for the update page is running');
+// console.log('The custom script for the update page is running');
 
 function scrollToTop() {
     document.body.scrollTop = 0; // For Safari
@@ -37,6 +37,14 @@ function makeNiceDate(uglyDate) {
     return(`${niceMonth} ${day}, ${year}`);
 };
 
+function safeParse(content) {
+    // console.log("safeParse called")
+    // replace characters with html equivalents
+    //prevents some basic cross site scripting attacks
+    content = content.replace(/\</g, "&lt;").replace(/\>/g, "&gt;").replace(/\//g, "&#47;").replace(/\\/g, "&#92;").replace(/\(/g, "&#40;").replace(/\)/, "&#41;").replace(/\./g, "&#46;").replace(/\[/g, "&#91;").replace(/\]/g, "&#93;").replace(/\{/g, "&#123;").replace(/\}/g, "&#125;").replace(/\=/g, "&#61;")
+    return content
+}
+
 // ---------------- END UTILITIES ---------------
 
 
@@ -52,6 +60,7 @@ var totalAuthors
 var artist
 var album
 var newEntry = false;
+var reloads = 0;
 
 
 function populateAlbumInfo() {
@@ -111,7 +120,7 @@ function populateTags(reason) {
                 // tag to toggle a badge-success class name and change the color
                 // NOTE: rel is set to the index of this specific element in the author and tag arrays
                 // this update was made to allow deletion of a specific element when there are duplciates
-                $('.tag_results').append(`<tr class="album_details_tags update_tags author-${author}"><td>${tag}</td><td><a href="#" class="deletetaglink" rel="${index}">Delete</a></td></tr>`);              
+                $('.tag_results').append(`<tr class="album_details_tags update_tags author-${author}"><td>${safeParse(tag)}</td><td><a href="#" class="deletetaglink" rel="${index}">Delete</a></td></tr>`);              
             }
             $(".update_tags").hide();
         } else {
@@ -135,11 +144,17 @@ function populateTags(reason) {
         }
     }).then(function() {
         if (reason == "add" & currentAuthors.length != (totalAuthors + 1)){
+            reloads++
+            // if API call goes out more than 15 times, reload the page
+            if (reloads > 15) { location.reload() }
             // console.log("Repeating function to add")
-            populateTags("add");
+            setTimeout(function(){ populateTags("add"); }, 500);
         } else if (reason == "delete" & currentAuthors.length != (totalAuthors - 1)){
+            reloads++
+            // if API call goes out more than 15 times, reload the page
+            if (reloads > 15) { location.reload() }
             // console.log("Repeating function to delete")
-            populateTags("delete");
+            setTimeout(function(){ populateTags("delete"); }, 500);
         } else {
             // this is not a request to update or delete a tag, do not re-run the function
         }
@@ -151,14 +166,21 @@ function populateTags(reason) {
 function addTag() {
     event.preventDefault();
     totalAuthors = currentAuthors.length
+    var newTag = $('#new_tag').val().trim();
 
     // if (newEntry == true) { 
     //     postTags();
     //     newEntry = false;
     // }
 
-    if ($('#new_tag').val()) {
-        var newTag = $('#new_tag').val();
+    if (newTag) {
+
+        if (newTag.includes("<") && newTag.includes(">") || newTag.includes(".") || newTag.includes("{") || newTag.includes("}")) {
+            alert("Some characters are not allowed in tags, sorry!")
+            $('#new_tag').val("");
+            return
+        }
+
         newTag = removeExtraSpace(toTitleCase(replaceBackSlashWithUnderscore(newTag))).trim();
         var newAuthor = userID;
 
@@ -205,10 +227,14 @@ function addTag() {
                 "createdBy" : createdByObject,
                 "artistName" : artist,
                 "albumName" : album
-            })
+            }),
+            error: function (data) {
+                console.log(data.responseJSON);   
+            }
         }).then(populateTags("add"))
     } else {
-        $(".warning_label").text("Please enter a non-empty tag.")
+        // $(".warning_label").text("Please enter a non-empty tag.")
+        alert("Please enter a non-empty tag.")
     } 
 
     $('#new_tag').val('');

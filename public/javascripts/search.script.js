@@ -1,5 +1,5 @@
 // -------- START UTILITIES ---------
-console.log("The custom script for the search page is running");
+// console.log("The custom script for the search page is running");
 
 function hideDOMelement(elementId) {
     try {

@@ -1,5 +1,5 @@
 // --------- START UTILITIES --------
-console.log('The custom script for album connections update page is running');
+// console.log('The custom script for album connections update page is running');
 
 function hideDOMelement(elementId) {
     try {
@@ -143,8 +143,11 @@ var isDelete = false;
 var newAlbumId;
 
 function newConnection() {
-    if ($('#new_connection').val() != ''){
-        newAlbumId = parseInt($('#new_connection').val());
+    var userInput = parseInt($('#new_connection').val().trim())
+
+    // validates if user input is a number, any other value won't pass this point
+    if (userInput){
+        newAlbumId = userInput;
         isDelete = false;
 
         $.getJSON ( '/api/v1/apple/albumdetails/' + parseInt(newAlbumId), function(rawData) {
@@ -168,6 +171,8 @@ function newConnection() {
         $('#new_connection').val('');
     } else {
         // console.log("Connection field is blank")
+        alert("Please enter an Apple album Id value to make a connection.")
+        $('#new_connection').val('');
     }
 }
 

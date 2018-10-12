@@ -1,4 +1,4 @@
-console.log("The custom script for the about page is running");
+// console.log("The custom script for the about page is running");
 
 
 // ------------- start tooltips section -----------

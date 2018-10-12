@@ -1,5 +1,5 @@
 // ------- START UTILITIES SECTION ----------
-console.log('The custom script for the favorites page is running.');
+// console.log('The custom script for the favorites page is running.');
 
 function truncate(str, len){
     // set up the substring

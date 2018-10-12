@@ -1,5 +1,5 @@
 // --------- START UTILITIES --------
-console.log('The custom script for the userauth page is running');
+// console.log('The custom script for the userauth page is running');
 
 function hideDOMelement(elementId) {
     try {
@@ -189,7 +189,7 @@ var sessionId = JSON.parse(sessionStorage.getItem('sessionId'));
 var sessionLogin = false
 if (sessionId != null) {
     sessionLogin = true;
-    console.log("Session storage login");
+    // console.log("Session storage login");
     signInFunctionality(sessionId);
 }
 
@@ -201,7 +201,7 @@ firebase.auth().onAuthStateChanged(function(user) {
         // returns true if user is not null
         if (user) {
             sessionStorage.setItem('sessionId', JSON.stringify(user));
-            console.log("Firebase login")
+            // console.log("Firebase login")
             signInFunctionality(user);
 
         } else {
