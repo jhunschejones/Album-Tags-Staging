@@ -19,6 +19,6 @@ let AlbumSchema = new Schema({
   tags: {type: Array, required: false},
   connectionObjects: {type: Array, required: false},
   favoritedBy: {type: Array, required: false}
-}, { collection : 'new-back-end-test' })
+}, { collection : 'album-collection' })
 
 module.exports = mongoose.model('Album', AlbumSchema)
