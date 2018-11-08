@@ -45,7 +45,7 @@ exports.return_album_details = function (req, res, next) {
   },  
   (err, appleResponse, albumResult) => {  
     if (err) return next(err) 
-    if (albumResult && albumResult.data[0]) {
+    if (albumResult && albumResult.data && albumResult.data[0]) {
       let resultAlbum = {
         appleAlbumID: albumResult.data[0].id,
         appleURL: albumResult.data[0].attributes.url,
@@ -58,6 +58,9 @@ exports.return_album_details = function (req, res, next) {
         cover: albumResult.data[0].attributes.artwork.url
       }
       res.send(resultAlbum)
+      return
+    } else {
+      res.send({ "message" : `unable to find an album with ID ${thisAlbum}` })
     }
   })
 }
@@ -119,6 +122,9 @@ exports.search_by_album_or_artist = function (req, res, next) {
       responseObject.albums = responseAlbums
       responseObject.artists = responseArtists
       res.json(responseObject)
+      return
+    } else {
+      res.send({ "message" :  "Apple was unable to find any data with these search params" })
     }
   })
 }
