@@ -14,7 +14,7 @@
             <div class="row">
                 <div class="col">
                     <div class="albumdetails_details">
-                        <h1 class="albumdetails_artist"></h1> 
+                        <h1 class="albumdetails_artist"></h1>
                         <span class="albumdetails_album"></span>   
                     </div>     
                 </div>    
@@ -39,7 +39,7 @@
             </div>
             <div class="row">
                 <div class="col">
-                    <div id="tags_card" class="card tags_card hide_when_logged_out">
+                    <div id="tags_card" class="card tags_card">
                         <!-- style="width: 18rem;" -->
                         <h6 id="tag_card_header" class="card-header"><span id="tags_modifier"></span>Tags<span id="tags_toggle"></span><span onclick="toggleContentAndArrows('tag_pile','tags_up_arrow','tags_down_arrow')"><img id="tags_up_arrow" class="card_header_arrows float-right" src="/images/up_arrow.png"><img id="tags_down_arrow" class="card_header_arrows float-right" src="/images/down_arrow.png" style="display:none;"></span></h6>
                         <div id="tag_pile" class="card-body tags_body">
@@ -56,7 +56,7 @@
                     <div id="connections_card" class="card connections_card" style="display:none";>
                         <h6 id="connections_card_header" class="card-header"><span id="connections_modifier"></span>Connected Albums<span id="connections_toggle"></span><span onclick="toggleContentAndArrows('connection_pile','connections_up_arrow','connections_down_arrow')"><img  id="connections_up_arrow" class="card_header_arrows float-right" src="/images/up_arrow.png"><img id="connections_down_arrow" class="card_header_arrows float-right" src="/images/down_arrow.png" style="display:none;"></span></h6>
                         <div id="connection_pile" class="card-body connections_body">
-                            <div class="connection_results"><small>There are currently no connections for this album!</small></div>
+                            <div class="connection_results"><small></small></div>
                             <div id="connection_results_message"></div>
                         </div>
                     </div>
@@ -77,10 +77,29 @@
         <!-- Messy way to pull album ID so I can get it in my javascript -->
         <p class="heres_the_album_id" style="display:none;"> <%= albumId %> </p>   
 
-        <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
-        <% include partials/templates/footer.ejs %>
-        <script src="/javascripts/albumdetails.script.js"></script>
-        <script src="/javascripts/albumconnections.script.js"></script>
-        <% include partials/templates/authfooter.ejs %>
+
+        <!-- BEGIN FOOTER -->
+        <hr>
+        <ul class="nav justify-content-end my_footer">
+            <li class="nav-item">
+                <a class="nav-link active" href="/about"><small>About</small></a>
+            </li>
+            <li class="nav_seperator"><small>|</small></li>
+            <li class="nav-item">
+                <a class="nav-link active" href="mailto:joshua@hunschejones.com?subject=Album Tags App"><small>Questions & Support</small></a>
+            </li>
+        </ul>
+        <!-- END FOOTER -->
+
+        <!-- jQuery from CDN -->
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f" crossorigin="anonymous"></script>
+        <!-- local versions of libraries, dowloaded 07/06/18 -->
+        <script src="/javascripts/libraries/popper.1.12.9.min.js"></script>
+        <script src="/javascripts/libraries/bootstrap.4.0.0.min.js"></script>
+        <!-- firebase scripts -->
+        <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase-auth.js"></script>
+        <!-- custom page script -->
+        <script src="/javascripts/albumdetails.script.min.js"></script>
     </body>
 </html>
