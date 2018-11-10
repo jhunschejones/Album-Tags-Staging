@@ -4,29 +4,6 @@
   margin: 3px;
 }
 
-.all_tags_button, .back_button {
-  margin-top: 20px;
-  background-color: rgba(128, 128, 128, 0.25);
-}
-
-  @media screen and (min-width: 500px) {
-    .extra_text {
-      display: inline;
-    }
-  }
-
-  @media screen and (max-width: 500px) {
-    .extra_text {
-        display: none;
-    }
-  }
-
-.warning_label {
-  margin-left: 0px;
-  margin-bottom: 0px;
-  margin-top: 5px;
-}
-
 #background_image_container {
   /* background-position: top; */
   background-position: center;
@@ -41,12 +18,20 @@
   /* filter: blur(5px) brightness(105%); */
 }
 
+.back_button {
+  background-color: rgba(128, 128, 128, 0.25);
+}
+
 #absolute_content {
   position: absolute;
   left: 0%;
   top: 125px;
+}    
+
+.album_results {
+  background-color: rgba(255, 255, 255, 0.75);
   display:inline-block;
-  padding: 15px;
+  padding: 4px;
   border-radius: 5px;
   overflow: auto;
   max-height: 71vh;

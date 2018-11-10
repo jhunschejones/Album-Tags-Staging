@@ -1,62 +1,57 @@
 // ---------- BEGIN UTILITIES ------------
-// console.log("The custom script for the alltags page is running")
-
 function safeParse(content) {
-    // console.log("safeParse called")
-    // replace characters with html equivalents
-    //prevents some basic cross site scripting attacks
-    content = content.replace(/\</g, "&lt;").replace(/\>/g, "&gt;").replace(/\//g, "&#47;").replace(/\\/g, "&#92;").replace(/\(/g, "&#40;").replace(/\)/, "&#41;").replace(/\./g, "&#46;").replace(/\[/g, "&#91;").replace(/\]/g, "&#93;").replace(/\{/g, "&#123;").replace(/\}/g, "&#125;").replace(/\=/g, "&#61;")
-    return content
+  // replace characters with html equivalents
+  // prevents some basic cross site scripting attacks
+  content = content.replace(/\</g, "&lt;").replace(/\>/g, "&gt;").replace(/\//g, "&#47;").replace(/\\/g, "&#92;").replace(/\(/g, "&#40;").replace(/\)/, "&#41;").replace(/\./g, "&#46;").replace(/\[/g, "&#91;").replace(/\]/g, "&#93;").replace(/\{/g, "&#123;").replace(/\}/g, "&#125;").replace(/\=/g, "&#61;")
+  return content
 }
 
+// replaces back slash with html character
+function replaceBackSlashWithHtml(str) {
+  return str.replace(/\//g, '&sol;')
+}
 // ---------------- END UTILITIES ---------------
 
 var allTags = [];
 
 function populateTags() {
-    $.getJSON ( '/api/v1/tags', function(rawData) {
-        if (typeof(rawData[0]) != "undefined") {
-            // clear default no-tags notice if tags exist
-            $(".all_tags").text('');
-            // $(".tag_search_button").html('<a href="" onclick="tagSearch()" class="btn btn-sm btn-outline-primary tag_search_button">Search by Selected Tags</a>');
+  $.getJSON ( '/api/v1/album', function(albums) {
+    if (albums) {
+      $(".all_tags").text('');
 
-            // removing duplicates before populating
-            rawData.forEach(element => {
-                let tags = element.tags;
+      // removing duplicates before populating
+      albums.forEach(albumObject => {
+        let tags = albumObject.tags;
 
-                tags.forEach(element => {
-                    if (allTags.indexOf(element) == -1) {
-                        allTags.push(element);
-                    } 
-                    else {
-                        // duplicate
-                    }; 
-                });            
-            });
+        tags.forEach(tag => {
+          if (allTags.indexOf(tag) == -1) {
+            allTags.push(tag);
+          } 
+          else {
+            // duplicate tag
+          }; 
+        });            
+      });
+      allTags.sort();
+      
+      allTags.forEach(tag => {
+        // tag = tag.replace(/_/g, "/");
+        // creating a unique tag for each element, solving the problem of number tags not allowed
+        // by adding some letters to the start of any tag that can be converted to a number
+        // then using a regular expression to remove all spaces in each tag
+        if (parseInt(tag)) {
+          var addLetters = "tag_";
+          var tagName = addLetters.concat(tag).replace(/[^A-Z0-9]+/ig,'');
+        } else {                  
+          var tagName = tag.replace(/[^A-Z0-9]+/ig,'');
+        }
 
-            
-            allTags.sort();
-            // populating page from array without duplicates
-            
-            allTags.forEach(element => {
-
-                element = element.replace(/_/g, "/");
-                // creating a unique tag for each element, solving the problem of number tags not allowed
-                // by adding some letters to the start of any tag that can be converted to a number
-                // then using a regular expression to remove all spaces in each tag
-                if (parseInt(element)) {
-                    var addLetters = "tag_";
-                    var tagName = addLetters.concat(element).replace(/[^A-Z0-9]+/ig,'');
-                } else {                  
-                    var tagName = element.replace(/[^A-Z0-9]+/ig,'');
-                }
-
-                // Here we add the tags as elements on the DOM, with an onclick function that uses a unique
-                // tag to toggle a badge-success class name and change the color
-                $('.all_tags').append(`<a href="" onclick="changeClass(${tagName})" id="${tagName}" class="badge badge-light">${safeParse(element)}</a>  `);    
-            });
-        };
-    });
+        // Here we add the tags as elements on the DOM, with an onclick function that uses a unique
+        // tag to toggle a badge-success class name and change the color
+        $('.all_tags').append(`<a href="" onclick="changeClass(${tagName})" id="${tagName}" class="badge badge-light tag">${safeParse(tag)}</a>  `);    
+      });
+    };
+  });
 };
 
 // this function is avaiable onclick for all the tags it will toggle
@@ -64,63 +59,58 @@ function populateTags() {
 // it takes in the unique tag ID assigned to eatch badge durring
 // creation so that only the desired badge toggles colors
 function changeClass(tagName) {
-    event.preventDefault();
-    // clear warning label
-    $('.warning_label').text('');
-    var thisTag = document.getElementById(tagName.id);
-    thisTag.classList.toggle("badge-primary");
-    thisTag.classList.toggle("selected_tag");
-    thisTag.classList.toggle("badge-light");
-    // see below
-    addToTagArray(thisTag.innerHTML);
+  event.preventDefault();
+  // clear warning label
+  $('.warning_label').text('');
+  var thisTag = document.getElementById(tagName.id);
+  thisTag.classList.toggle("badge-primary");
+  thisTag.classList.toggle("selected_tag");
+  thisTag.classList.toggle("badge-light");
+  // see below
+  addToTagArray(replaceBackSlashWithHtml(thisTag.innerHTML));
 };
 
 // this function creates an array and adds or removes tags as the
 // applicable tag badges are clicked
 var selectedTags = [];
 function addToTagArray(tag) {
-    tag = tag.replace(/\//g, '_');
-    // this conditional returns -1 value if tag is not in array
-    if ($.inArray(tag, selectedTags) === -1) {
-        selectedTags.push(tag);
-    } else {
-        // cant use pop because it removes last item only
-        // this finds the item being clicked and uses that
-        // index with splice() to remove 1 item only
-        let index = selectedTags.indexOf(tag)
-        selectedTags.splice(index, 1);
-    };
+  // tag = tag.replace(/\//g, '_');
+  // this conditional returns -1 value if tag is not in array
+  if ($.inArray(tag, selectedTags) === -1) {
+    selectedTags.push(tag);
+  } else {
+    // cant use pop because it removes last item only
+    // this finds the item being clicked and uses that
+    // index with splice() to remove 1 item only
+    let index = selectedTags.indexOf(tag)
+    selectedTags.splice(index, 1);
+  };
 };
 
 function clearTagArray() {
-    
-    event.preventDefault();
-    if ($( ".selected_tag" ).length > 0) {
-        $( ".selected_tag" ).toggleClass( "badge-primary" );
-        $( ".selected_tag" ).toggleClass( "badge-light" );
-        $( ".selected_tag" ).toggleClass( "selected_tag" );
-
-        selectedTags = [];
-    }
-    else {
-        $('.warning_label').text('');
-        $('.warning_label').text('No tags have been selected.');
-    }
+  event.preventDefault();
+  if ($( ".selected_tag" ).length > 0) {
+    $( ".selected_tag" ).toggleClass( "badge-primary" );
+    $( ".selected_tag" ).toggleClass( "badge-light" );
+    $( ".selected_tag" ).toggleClass( "selected_tag" );
+    selectedTags = [];
+  }
+  else {
+    $('.warning_label').text('');
+    $('.warning_label').text('No tags have been selected.');
+  }
 };
 
 // called by the search by selected tags button
 function tagSearch() {
-    event.preventDefault();
+  event.preventDefault();
 
-    if (selectedTags.length > 0) {
-        var win = window.location = (`/search/tags/${selectedTags}`);
-    }  else {
-        $('.warning_label').text('');
-        $('.warning_label').text('Select one or more tags to preform a tag-search.');
-    }
+  if (selectedTags.length > 0) {
+    var win = window.location = (`/search/tags/${selectedTags}`);
+  }  else {
+    $('.warning_label').text('');
+    $('.warning_label').text('Select one or more tags to preform a tag-search.');
+  }
 };
 
-function populateSearchedTags() {
-    populateTags();
-}
-// populateTags();
+populateTags();

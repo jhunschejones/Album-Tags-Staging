@@ -2,29 +2,29 @@
 <html lang="en">
     <head>
         <% include partials/templates/head_tags.ejs %>
-        <link rel="stylesheet" href="/stylesheets/alltags.css">
+        <link rel="stylesheet" href="/stylesheets/alltags.min.css">
     </head>
     <body>
 
         <!-- BASIC NAVBAR TEMPLATE -->
         <% include partials/templates/navbar_basic.ejs %>
 
-        <div class="container-fluid">
+        <div id="background_image_container">
+        <!--CSS PUTS BACKGROUND HERE-->
+        </div>
+
+        <div id="absolute_content" class="container-fluid">
             <h4>All Tags:</h4>
-            <span class="all_tags"></span>
+            <div class="all_tags"></div>
 
-            <br />
-            <a href="" onclick="tagSearch()" class="btn btn-sm btn-outline-primary all_tags_button">Search by Selected Tags</a>
-            <a href="" onclick="clearTagArray()" class="btn btn-sm btn-outline-danger all_tags_button">Clear Selected Tags</a>
+            <button class="btn btn-sm btn-outline-light back_button" onclick="window.history.back()">Go Back</button>
+            <a href="" onclick="tagSearch()" class="btn btn-sm btn-outline-light all_tags_button">Search<span class="extra_text"> by Selected Tags</span></a>
+            <a href="" onclick="clearTagArray()" class="btn btn-sm btn-outline-light all_tags_button">Clear Selected<span class="extra_text"> Tags</span></a>
             <p class="warning_label text-danger"></p>
-            <button class="btn btn-sm btn-secondary back_button" onclick="window.history.back()">Go Back</button>
-
         </div>           
 
         <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
         <% include partials/templates/footer.ejs %>
-
-        <script src="/javascripts/alltags.script.js"></script>
-        <% include partials/templates/authfooter.ejs %>
+        <script src="/javascripts/alltags.script.min.js"></script>
     </body>
 </html>

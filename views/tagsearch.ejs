@@ -2,24 +2,27 @@
 <html lang="en">
     <head>
         <% include partials/templates/head_tags.ejs %>
-        <link rel="stylesheet" href="/stylesheets/search.css">
+        <link rel="stylesheet" href="/stylesheets/tagsearch.min.css">
     </head>
     <body>
 
         <!-- BASIC NAVBAR TEMPLATE -->
         <% include partials/templates/navbar_basic.ejs %>
 
-        <div class="container-fluid">
-            <h4>Tags:</h4>
+        <div id="background_image_container">
+        <!--CSS PUTS BACKGROUND HERE-->
+        </div>
+
+        <div id="absolute_content" class="container-fluid">
+            <h4>Searched Tags:</h4>
             <span class="tags_searched"></span>
             <br /> 
             <br />
-            <h4>Albums:</h4>
+            <h4>Matching Albums:</h4>
             <span class="album_results"></span>
             <br />
             <br />
-            <button class="btn btn-sm btn-secondary" onclick="window.history.back()">Go Back</button>
-
+            <button class="btn btn-sm btn-outline-light back_button" onclick="window.history.back()">Go Back</button>
         </div>           
 
         <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
@@ -28,7 +31,6 @@
         <!-- Messy way to pull album ID so I can get it in my javascript -->
         <p class="heres_the_selected_tags" style="display:none;"> <%= selectedTags %> </p>   
 
-        <script src="/javascripts/tagsearch.script.js"></script>
-        <% include partials/templates/authfooter.ejs %>
+        <script src="/javascripts/tagsearch.script.min.js"></script>
     </body>
 </html>
