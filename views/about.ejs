@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <% include partials/templates/head_tags.ejs %>
-		<link rel="stylesheet" href="/stylesheets/about.css">
+		<link rel="stylesheet" href="/stylesheets/about.min.css">
     </head>
     <body>
 
@@ -205,6 +205,19 @@
         <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
 		<% include partials/templates/footer.ejs %>
 		<% include partials/templates/authfooter.ejs %>
-		<script src="/javascripts/about.script.js"></script>
+		<script>
+			var isTouchDevice = false
+			$(function () {
+				setTimeout(function(){ 
+					if ("ontouchstart" in document.documentElement) {
+						isTouchDevice = true
+					}
+					
+					if(isTouchDevice == false) {
+						$('[data-toggle="tooltip"]').tooltip()
+					}
+				}, 1000);
+			})
+		</script>
     </body>
 </html>
