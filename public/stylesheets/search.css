@@ -13,6 +13,13 @@
     top: 125px;
 }    
 
+.result {
+    margin-bottom: 0px;
+}
+    .result li {
+        list-style-type: none;
+        margin-left: 8px;
+    }
 
 .artist_search {
     margin-left: 0px !important;

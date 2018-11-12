@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <% include partials/templates/head_tags.ejs %>
-        <link rel="stylesheet" href="/stylesheets/search.css">
+        <link rel="stylesheet" href="/stylesheets/search.min.css">
         <link rel="stylesheet" href="/stylesheets/spinner.min.css">
         
         <!-- spinner styles just for search page -->
@@ -25,13 +25,12 @@
         </div>
 
         <div id="absolute_content" class="container-fluid">
-            <form class="form-inline">
-                <div class="form-group mx-sm-3 mb-2 artist_search">
-                    <!-- for continuous search, add oninput="populateSearchResults()" to input field -->
-                    <input type="search" class="form-control" id="search_box" placeholder="Try a Search!">
+            <div class="input-group artist_search">
+                <input id="search_box" type="search" class="form-control" placeholder="Search album or artist...">
+                <div class="input-group-append">
+                <input id="search_button" class="btn btn-primary search_button" type="button" value="Search" onclick="populateSearchResults(pageReloaded)">
                 </div>
-                <button onclick="populateSearchResults(pageReloaded)" class="btn btn-primary mb-2 search_button">Search</button>
-            </form>
+            </div>
 
             <span id="warning_label" class="text-danger"></span>
             <div id="loader" style="display:none;"></div>  
@@ -47,7 +46,6 @@
 
         <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
         <% include partials/templates/footer.ejs %>
-        <script src="/javascripts/search.script.js"></script>
-        <% include partials/templates/authfooter.ejs %>
+        <script src="/javascripts/search.script.min.js"></script>
     </body>
 </html>

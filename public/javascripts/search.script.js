@@ -65,9 +65,9 @@ function populateSearchResults(pageReloaded, artist) {
         // this is pulling data from url and populating cards
         $.getJSON ( '/api/v1/apple/search/' + mySearch, function(rawData) {
 
-            if (typeof(rawData.results.artists) != null) {  
+            if (typeof(rawData.artists) != null) {  
                 // this stores an array
-                artists = rawData.results.artists.data;
+                artists = rawData.artists;
                 emptyArtists = false;              
                 populateArtistResults();
 
@@ -78,9 +78,9 @@ function populateSearchResults(pageReloaded, artist) {
                 $('#warning_label').append('<p style="margin:0px;">No artists match this search</p>');
             }
 
-            if (typeof(rawData.results.albums) != "undefined") {
+            if (rawData.albums) {
                 // this stores an array
-                albums = rawData.results.albums.data;
+                albums = rawData.albums;
                 emptyAlbums = false;
                 populateAlbumResults();
 
@@ -115,7 +115,7 @@ function populateArtistResults() {
         $('.artists_label').text("Artists:")
         // iterate over artist results array
         for (let index = 0; index < 5; index++) {
-            $('.artist_results').append(`${artists[index].attributes.name} : <span class="text-secondary">${artists[index].attributes.genreNames[0]} </span> <a href="" rel='${artists[index].attributes.name},, ${artists[index].id}' class="morealbumslink"><img id="albums_arrow" src="/images/down_arrow.png"></a> <span id="i${artists[index].id}"></span> <br />`);
+            $('.artist_results').append(`<p class="result">${artists[index].name} : <span class="text-secondary">${artists[index].genres[0]} </span> <a href="" data-name='${artists[index].name}' data-apple-artist-id='${artists[index].appleArtistID}' class="morealbumslink"><img id="albums_arrow" src="/images/down_arrow.png"></a> <span id="i${artists[index].appleArtistID}"></span></p>`);
         }
         $('.artist_results').append(`<button class="btn btn-outline-primary btn-sm btn_xsm" onClick="expandArtistResults(event)">More Artists</button> <br>`);   
     }
@@ -135,12 +135,12 @@ function populateAlbumResults() {
         // iterate over album results array
         
         for (let index = 0; index < 5; index++) {
-            $('.album_results').append(`<a href="/albumdetails/${albums[index].id}">${albums[index].attributes.name}</a> : <span class="text-secondary">${albums[index].attributes.artistName} (${albums[index].attributes.releaseDate.slice(0, 4)})</span><br>`);  
+            $('.album_results').append(`<p class="result"><a href="/albumdetails/${albums[index].appleAlbumID}">${albums[index].title}</a> : <span class="text-secondary">${albums[index].artist} (${albums[index].releaseDate.slice(0, 4)})</span></p>`);  
         };
         $('.album_results').append(`<button class="btn btn-outline-primary btn-sm btn_xsm" onClick="expandAlbumResults(event)">More Albums</button> <br>`);    
     }
     catch(err) {
-        console.log(err);
+        // console.log(err);
     }
     showDOMelement("albums_label");
     showDOMelement("album_results");
@@ -153,7 +153,7 @@ function expandArtistResults(event) {
 
     // iterate over artist results array
     artists.forEach(element => {
-        $('.artist_results').append(`${element.attributes.name} : <span class="text-secondary">${element.attributes.genreNames[0]} </span> <a href="" rel='${element.attributes.name},, ${element.id}' class="morealbumslink"><img id="albums_arrow" src="/images/down_arrow.png"></a> <span id="i${element.id}"></span> <br />`);
+        $('.artist_results').append(`<p class="result">${element.name} : <span class="text-secondary">${element.genres[0]} </span> <a href="" data-name='${element.name}' data-apple-artist-id='${element.appleArtistID}' class="morealbumslink"><img id="albums_arrow" src="/images/down_arrow.png"></a> <span id="i${element.appleArtistID}"></span></p>`);
     });
     $('.artist_results').append(`<button class="btn btn-outline-primary btn-sm btn_xsm" onClick="populateArtistResults()">Less Artists</button> <br>`);   
 };
@@ -166,7 +166,7 @@ function expandAlbumResults(event) {
              
     // iterate over album results array
     albums.forEach(element => {
-        $('.album_results').append(`<a href="/albumdetails/${element.id}">${element.attributes.name}</a> : <span class="text-secondary">${element.attributes.artistName} (${element.attributes.releaseDate.slice(0, 4)})</span><br>`);
+        $('.album_results').append(`<p class="result"><a href="/albumdetails/${element.appleAlbumID}">${element.title}</a> : <span class="text-secondary">${element.artist} (${element.releaseDate.slice(0, 4)})</span></p>`);
     });   
     $('.album_results').append(`<button class="btn btn-outline-primary btn-sm btn_xsm" onClick="populateAlbumResults()">Less Albums</button> <br>`);         
 };
@@ -176,25 +176,22 @@ function expandAlbumResults(event) {
 function showArtistAlbums(event) {
 
     event.preventDefault();
-    var clickedLink = $(this).attr('rel');
-    clickedLink = clickedLink.split(",,");
     showDOMelement("loader");
 
-    var thisArtistName = clickedLink[0].trim();
-    var thisArtistId = clickedLink[1].trim();
+    var thisArtistName = $(this).attr('data-name'); 
+    var thisArtistId = $(this).attr('data-apple-artist-id');
 
     $.getJSON ( '/api/v1/apple/search/' + thisArtistName, function(rawData) {
 
-        if (typeof(rawData.results.albums) != "undefined") {
+        if (rawData.albums) {
             try {
                 // this stores an array
-                var thisArtistAlbums = rawData.results.albums.data;
+                var thisArtistAlbums = rawData.albums;
                 $(`#i${thisArtistId}`).html('');
                     
                 // iterate over album results array
-                for (let index = 0; index < 5; index++) {
-                    
-                    $(`#i${thisArtistId}`).append(`<li><a href="/albumdetails/${thisArtistAlbums[index].id}">${thisArtistAlbums[index].attributes.name}</a> <span class="text-secondary">(${albums[index].attributes.releaseDate.slice(0, 4)})</span> </li>`);  
+                for (let index = 0; index < 5; index++) {                  
+                    $(`#i${thisArtistId}`).append(`<li><a href="/albumdetails/${thisArtistAlbums[index].appleAlbumID}">${thisArtistAlbums[index].title}</a> <span class="text-secondary">(${thisArtistAlbums[index].releaseDate.slice(0, 4)})</span></li>`);  
                 }
                 hideDOMelement("loader");
             }
@@ -230,4 +227,13 @@ $( document ).ready(function() {
             // no artist searched or loaded in sessionStorage
         }
     }
-});
+})
+
+// trigger search click on enter in input field
+let searchInput = document.getElementById("search_box")
+searchInput.addEventListener("keyup", function(event) {
+  event.preventDefault()
+  if (event.keyCode === 13) {
+    document.getElementById("search_button").click()
+  }
+})
