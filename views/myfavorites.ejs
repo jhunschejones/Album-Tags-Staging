@@ -4,10 +4,9 @@
         <% include partials/templates/head_tags.ejs %>
         <link rel="stylesheet" href="/stylesheets/cards.min.css">
         <link rel="stylesheet" href="/stylesheets/spinner.min.css">
-        <link rel="stylesheet" href="/stylesheets/favoritesfiltering.css">
+        <link rel="stylesheet" href="/stylesheets/favoritesfiltering.min.css">
     </head>
     <body>
-
         <!-- BASIC NAVBAR TEMPLATE -->
         <% include partials/templates/navbar_basic.ejs %>
 
@@ -19,19 +18,37 @@
             <div id="loader"></div>
         </div>
         
-        <span id="log_in_message"></span>
+        <span id="log_in_message" style="display:none;"><div class="text-center"><br/><br/><br/><br/><h4 class="text-secondary">Please <span class="login_button text-primary" style="cursor:pointer;">log in</span> to access your favorites!</h4><br/><br/><br/><br/><br/><div></span>
 
         <div class="container-fluid album_list_instruction">
-            <!-- <span class="text-secondary">Click an Album for More Details</span> -->
             <ul class="album_list" style="list-style-type: none;">
 
             </ul>
         </div>
         <!-- END ALBUM CARDS -->       
 
-        <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
-        <% include partials/templates/footer.ejs %>
-        <script src="/javascripts/myfavorites.script.js"></script>
-        <% include partials/templates/authfooter.ejs %>
+        <!-- BEGIN FOOTER -->
+        <hr>
+        <ul class="nav justify-content-end my_footer">
+            <li class="nav-item">
+                <a class="nav-link active" href="/about"><small>About</small></a>
+            </li>
+            <li class="nav_seperator"><small>|</small></li>
+            <li class="nav-item">
+                <a class="nav-link active" href="mailto:joshua@hunschejones.com?subject=Album Tags App"><small>Questions & Support</small></a>
+            </li>
+        </ul>
+        <!-- END FOOTER -->
+
+        <!-- jQuery from CDN -->
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f" crossorigin="anonymous"></script>
+        <!-- local versions of libraries, dowloaded 07/06/18 -->
+        <script src="/javascripts/libraries/popper.1.12.9.min.js"></script>
+        <script src="/javascripts/libraries/bootstrap.4.0.0.min.js"></script>
+        <!-- firebase scripts -->
+        <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase-auth.js"></script>
+        <!-- custom page script -->
+        <script src="/javascripts/myfavorites.script.min.js"></script>
     </body>
 </html>
