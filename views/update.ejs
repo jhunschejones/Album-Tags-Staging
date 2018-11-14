@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <% include partials/templates/head_tags.ejs %>
-        <link rel="stylesheet" href="/stylesheets/update.css">
+        <link rel="stylesheet" href="/stylesheets/update.min.css">
     </head>
     <body>
 
@@ -12,11 +12,10 @@
         <!-- START PAGE CONTENT -->
         <div id="all_the_things" class="container-fluid hide_when_logged_out">
             <div class="row">
-                <div class="col-md-5">
+                <div class="col-md-6">
                     <div class="row container-fluid">
                         <div class="albumdetails_details">
-                            <h1 class="albumdetails_artist"></h1> 
-                            <br class="slim_br_sm"/>
+                            <h1 class="albumdetails_artist"></h1>
                             <span class="albumdetails_album"></span>
                             <br class="slim_br_sm"/>
                             <img class="img-fluid albumdetails_cover" src="" alt="" onclick="scrollDown()">
@@ -26,46 +25,46 @@
 
                     <div class="row container-fluid">
                         <form>
-                            <div class="form-row">
-                            <div class="form-group mx-sm-3 mb-2 add_tag_text_input">
-                                <input type="search" class="form-control add_tag_field" id="new_tag" placeholder="Add a Tag!" data-toggle="tooltip" data-placement="right" title="Create your own tag!" data-trigger="hover">
-                            </div>
-                            <button type="button" onclick="addTag()" id="add_tag_button" class="btn btn-primary mb-2 add_tag_button float-right">Add</button>
-                            <span class="warning_label text-danger"></span>
+                            <div class="input-group">
+                                <input id="new_tag" type="search" class="form-control add_tag_field" placeholder="Add a tag...">
+                                <div class="input-group-append">
+                                    <input id="add_tag_button" class="btn btn-primary add_tag_button" type="submit" formtarget="_parent" value="Add">
+                                </div>
+                                <span class="warning_label text-danger"></span>
                             </div>
                             
-                            <div class="form-row add_connection_row">
-                            <div class="form-group mx-sm-3 mb-2 add_connection_text_input">
-                                <input type="search" class="form-control add_connection_field" id="new_connection" placeholder="Add a Connection!" data-toggle="tooltip" data-placement="right" title="Add an Apple Album ID to connect to another record!" data-trigger="hover">
-                            </div>
-                            <button type="button" onclick="newConnection()" class="btn btn-primary mb-2 add_connection_button">Add</button>
+                            <div class="input-group add_connection_row">
+                                <input id="new_connection" type="search" class="form-control add_connection_field" placeholder="Add a connection...">
+                                <div class="input-group-append">
+                                    <input id="add_connection_button" class="btn btn-primary add_connection_button" type="submit" formtarget="_parent" value="Add">
+                                </div> 
+                                <span class="warning_label text-danger"></span>
                             </div>
                         </form>
                     </div>
 
                 </div>
 
-                <div class="col-md-7 container-fluid">
-                    <table class="table table-bordered" id="tags_table">
+                <div class="col-md-6 container-fluid">
+                    <table width=100% id="tags_table" class="table table-bordered">
                         <thead class="bg-light">
                             <tr>
-                            <th scope="col">Tag</th>
-                            <th scope="col">Delete</th>
+                                <th width=70% >Tag</th>
+                                <th width=30% >Delete</th>
                             </tr>
                         </thead>
-                        <tbody class="tag_results">                           
+                        <tbody class="tag_results">  
+
                         </tbody>
                     </table>
 
                     <table class="table table-bordered" id="connections_table">
                         <thead class="bg-light">
                             <tr>
-                            <th scope="col">Connection</th>
-                            <th scope="col">Delete</th>
+                                <th scope="col">Connections</th>
                             </tr>
                         </thead>
-                        <tbody id="table_overflow" class="connection_results">                         
-                        </tbody>
+                        <tbody class="connection_results"></tbody>
                     </table>
                 </div>
             </div>
@@ -73,12 +72,13 @@
             <div class="row">
                 <div class="col">
                 <br />
-                <button class="btn btn-sm btn-light" onclick="window.history.back()"><img id="back_arrow" src="/images/back_arrow.png"><span class="button_text">Back</span></button>
+                <button id="back-button" class="btn btn-sm btn-light"><img id="back_arrow" src="/images/back_arrow.png"><span class="button_text">Back</span></button>
                 <button class="btn btn-sm btn-light" onclick="scrollToTop()"><img id="up_arrow" src="/images/up_arrow.png"><span class="button_text">Top</span></button>
                 </div>
             </div>
 
         </div>
+        <div id="login-message" style="display:none;" class="text-center"><br/><br/><br/><br/><h4 class="text-secondary">Please <span class="login_button text-primary" style="cursor:pointer;">log in</span> to access the update page!</h4><br/><br/><br/><br/><br/><div>
 
         <span class="hide_when_logged_in" id="log_in_message"></span>
         <!-- END PAGE CONTENT -->    
@@ -86,10 +86,29 @@
         <!-- Messy way to pull album ID so I can get it in my javascript -->
         <p class="heres_the_album_id" style="display:none;"> <%= albumId %> </p>   
 
-        <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
-        <% include partials/templates/footer.ejs %>
-        <script src="/javascripts/update.script.js"></script>
-        <script src="/javascripts/albumconnections_update.script.js"></script>
-        <% include partials/templates/authfooter.ejs %>
+        <!-- BEGIN FOOTER -->
+        <hr>
+        <ul class="nav justify-content-end my_footer">
+            <li class="nav-item">
+                <a class="nav-link active" href="/about"><small>About</small></a>
+            </li>
+            <li class="nav_seperator"><small>|</small></li>
+            <li class="nav-item">
+                <a class="nav-link active" href="mailto:joshua@hunschejones.com?subject=Album Tags App"><small>Questions & Support</small></a>
+            </li>
+        </ul>
+        <!-- END FOOTER -->
+
+        <!-- jQuery from CDN -->
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f" crossorigin="anonymous"></script>
+        <!-- local versions of libraries, dowloaded 07/06/18 -->
+        <script src="/javascripts/libraries/popper.1.12.9.min.js"></script>
+        <script src="/javascripts/libraries/bootstrap.4.0.0.min.js"></script>
+        <script src="/javascripts/libraries/mousetrap.min.js"></script>
+        <!-- firebase scripts -->
+        <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase-auth.js"></script>
+        <!-- custom page script -->
+        <script src="/javascripts/update.script.min.js"></script>
     </body>
 </html>
