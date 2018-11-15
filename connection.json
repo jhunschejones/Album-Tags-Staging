@@ -1,0 +1,21 @@
+{
+  "connectionObjects": 
+  [
+    {
+      "databaseID" : "database id for the album being connected to",
+      "creator" : "user ID of person who created the connection",
+      "appleAlbumID" : "apple Album ID of the connected album",
+      "title" : "album title of the connected album",
+      "artist" : "artist of the connected album",
+      "cover" : "cover image URL of the connected album"
+    },
+    {
+      "databaseID" : "database id for the album being connected to",
+      "creator" : "user ID of person who created the connection",
+      "appleAlbumID" : "apple Album ID of the connected album",
+      "title" : "album title of the connected album",
+      "artist" : "artist of the connected album",
+      "cover" : "cover image URL of the connected album"
+    }
+  ]
+}

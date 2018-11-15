@@ -1,4 +1,4 @@
-// const newrelic = require('newrelic')
+const newrelic = require('newrelic')
 const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
@@ -19,7 +19,6 @@ app.use(compression())
 
 // security
 app.use(helmet())
-// console.log(process.env.NODE_ENV)
 if (process.env.NODE_ENV === 'production') { app.use(redirectToHTTPS([/localhost:(\d{4})/])) }
 app.use(cors())
 
