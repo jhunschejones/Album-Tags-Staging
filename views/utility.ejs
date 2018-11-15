@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+      <% include partials/templates/head_tags.ejs %>
+      <link rel="stylesheet" href="/stylesheets/alltags.min.css">
+      <style>
+        #page-content{
+          margin-top: 20px;
+          margin-left: 20px;
+          margin-bottom: 90px;
+        }
+      </style>
+  </head>
+  <body>
+
+    <!-- BASIC NAVBAR TEMPLATE -->
+    <% include partials/templates/navbar_basic.ejs %>
+
+    <!-- PAGE CONTENT -->
+    <div class="container-fluid">
+      <div id="page-content">
+        <div class="row">
+          <input id="find-blank-books" class="btn btn-secondary" type="button" value="Find Blank Albums">
+        </div>
+        <div class="row">
+          <p id="blank-books-count">&nbsp;</p>
+        </div>
+        <div class="row">
+          <input id="delete-blank-books" class="btn btn-secondary" type="button" value="Delete Blank Albums">
+        </div>
+        <div class="row">
+          <p id="blank-books-deleted">&nbsp;</p>
+        </div>
+        <div class="row">
+          <input id="find-books-missing-tags" class="btn btn-secondary" type="button" value="Find Albums Missing Tags">
+        </div>
+        <div class="row">
+          <p id="missing-books-count">&nbsp;</p>
+        </div>
+        <div class="row">
+          <input id="update-books-missing-tags" class="btn btn-secondary" type="button" value="Update Albums Missing Tags">
+        </div>
+        <div class="row">
+          <p id="missing-books-modified">&nbsp;</p>
+        </div>
+      </div>
+    </div>
+    <!-- PAGE CONTENT -->
+
+    <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
+    <% include partials/templates/footer.ejs %>
+
+    <script>
+      var blankBooks
+      var missingTagBooks
+
+      function findBlankBooks() {
+        $.ajax({
+          method: "GET",
+          url: "/api/v1/album/utility/blankalbums",
+          success: function(data) {
+            blankBooks = data
+          }
+        }).then(function() {
+          $('#blank-books-count').text(`Blank albums: ${blankBooks.length || 0}`)
+        })
+      }
+
+      function deleteBooks() {
+        if (blankBooks.length > 0) {
+          blankBooks.forEach(book => {
+            $.ajax({
+              method: "DELETE",
+              url: "/api/v1/album/" + book._id,
+            })          
+          })
+          $('#blank-books-deleted').text('Blank albums deleted.')
+          findBlankBooks()
+        } else {
+          $('#blank-books-deleted').text('No blank albums to delete!')
+        }
+      }
+
+      function findMissingTagBooks() {
+        $.ajax({
+          method: "GET",
+          url: "/api/v1/album/utility/missingtags",
+          success: function(data) {
+            missingTagBooks = data
+          }
+        }).then(function() {
+          $('#missing-books-count').text(`Albums missing tags: ${missingTagBooks.length || 0}`)
+        })
+      }
+
+      function updateMissingTagBooks() {
+        if (missingTagBooks.length > 0) {
+          missingTagBooks.forEach(book => {
+            let newTags = []
+            book.tagObjects.forEach(tagObject => {
+              newTags.push(tagObject.tag)
+            })
+            newTags.forEach(tag => {
+              let updateObject = 
+              {
+                "tag": tag
+              }
+              $.ajax({
+                method: "POST",
+                url: '/api/v1/album/tags/' + book._id,
+                data: JSON.stringify(updateObject),
+                contentType: "application/json"
+              })
+            })
+          })
+          $('#missing-books-modified').text('Albums missing tags have been updated.')
+        } else {
+          $('#missing-books-modified').text('There are no albums missing tags!')
+        }
+      }
+
+      // ====== ADD EVENT LISTENERS ======
+      document.getElementById('find-blank-books').addEventListener('click', findBlankBooks)
+      document.getElementById('delete-blank-books').addEventListener('click', deleteBooks)
+      document.getElementById('find-books-missing-tags').addEventListener('click', findMissingTagBooks)
+      document.getElementById('update-books-missing-tags').addEventListener('click', updateMissingTagBooks)    
+    </script>
+  </body>
+</html>
