@@ -1,4 +1,4 @@
-const newrelic = require('newrelic')
+// const newrelic = require('newrelic')
 const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
@@ -37,9 +37,10 @@ app.use('/api/v1/album', albumRoutes)
 app.use('/api/v1/apple', appleAPIRoutes)
 app.use('/', staticRoutes)
 
-const PORT = process.env.PORT || 3000
-app.listen(PORT, () => {
-  // console.log(`Albumtags is running on port ${PORT}.`)
-})
+// This functionality is in `lib/www.js` now
+// const PORT = process.env.PORT || 3000
+// app.listen(PORT, () => {
+//   // console.log(`Albumtags worker ${cluster.worker.id} is running on port ${PORT}.`)
+// })
 
 module.exports = app

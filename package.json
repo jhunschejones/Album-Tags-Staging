@@ -2,10 +2,10 @@
   "name": "album-tags",
   "version": "1.1.0",
   "description": "",
-  "main": "app.js",
+  "main": "lib/www.js",
   "scripts": {
     "test": "mocha",
-    "start": "node app.js"
+    "start": "node lib/www.js"
   },
   "author": "Joshua Hunsche Jones",
   "license": "MIT",
