@@ -67,7 +67,8 @@ exports.return_album_details = function (req, res, next) {
 
 exports.search_by_album_or_artist = function (req, res, next) {
   const jwtToken = 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik05OVpGUEMyR1UifQ.eyJpYXQiOjE1MzExODgwMDQsImV4cCI6MTU0Njc0MDAwNCwiaXNzIjoiUzJaUDI1NlBQSyJ9.drOZUEcvLw_r0NeU_0_HNIWA3RcMLr4rtArUNt0QGmCe2dwXIrSzrUTgpyjcQcpIJob-mYJzVczlunOkvAljDg'
-  const thisSearch = req.params.search
+  const thisSearch = req.params.search.replace(/\'/g, '%27').replace(/\s/g, '%20').replace(/\&/g, '%26').replace(/\,/g, '%2C')
+
   request.get(  
   {  
     url: `https://api.music.apple.com/v1/catalog/us/search?term=${thisSearch}&limit=25&types=artists,albums`, 
