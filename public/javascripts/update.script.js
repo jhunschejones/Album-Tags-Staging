@@ -122,6 +122,11 @@ var isEqual = function (value, other) {
 }
 
 function scrollDown() {
+  let isTouchDevice
+  if ("ontouchstart" in document.documentElement) {
+    isTouchDevice = true
+  }
+
   if (isTouchDevice == true & screen.width < 570) {
     window.scrollTo(0,document.body.scrollHeight)
   }
@@ -365,6 +370,8 @@ function populateConnections(directConnections) {
   })
 
   // ====== turning on tool tips for newly populated connections =====
+  let isTouchDevice
+  if ("ontouchstart" in document.documentElement) { isTouchDevice = true }
   if(isTouchDevice == false) { $('[data-toggle="tooltip"]').tooltip() }
 }
 
