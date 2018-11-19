@@ -44,7 +44,7 @@ function populateSearchResults(pageReloaded, artist) {
     }
   }
   // get the value of the search box  
-  var mySearch = $('#search_box').val();
+  var mySearch = $('#search_box').val().trim();
 
   if (mySearch == '' & artist != undefined) {
     mySearch = artist
@@ -58,7 +58,7 @@ function populateSearchResults(pageReloaded, artist) {
 
   // main functionality is wrapped in some basic error handling
   // dealing with blank results catagories
-  if (mySearch != '') {
+  if (mySearch && mySearch != '') {
     $('#warning_label').html('');
     hideDOMelement("warning_label");
     const cleanSearch = mySearch.replace(/\'/g, '').replace(/\s/g, '%20').replace(/\&/g, '%26').replace(/\,/g, '%2C')
@@ -99,7 +99,7 @@ function populateSearchResults(pageReloaded, artist) {
         }
       },
       error: function(err) {
-        alert(JSON.stringify(err))
+        alert(`ERROR : ${JSON.stringify(err)}, URL : '/api/v1/apple/search/${cleanSearch}'`)
       }
     })
   } else {
