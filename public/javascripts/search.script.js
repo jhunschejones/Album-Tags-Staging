@@ -61,12 +61,14 @@ function populateSearchResults(pageReloaded, artist) {
   if (mySearch && mySearch != '') {
     $('#warning_label').html('');
     hideDOMelement("warning_label");
-    const cleanSearch = mySearch.replace(/'/g, "").replace(/\s/g, '%20').replace(/\&/g, '%26').replace(/\,/g, '%2C')
+    // const cleanSearch = mySearch.replace(/'/g, "").replace(/\s/g, '%20').replace(/\&/g, '%26').replace(/\,/g, '%2C')
+    const cleanSearch = mySearch.replace(/[^A-Za-z0-9]/g, "")
 
     // this is pulling data from url and populating cards
     $.ajax(`/api/v1/apple/search/${cleanSearch}`, {
       method: 'GET',
       success: function(rawData) {
+        // console.log(`/api/v1/apple/search/${cleanSearch}`)
         if (rawData.artists) {  
           // this stores an array
           artists = rawData.artists;
