@@ -62,40 +62,44 @@ function populateSearchResults(pageReloaded, artist) {
     $('#warning_label').html('');
     hideDOMelement("warning_label");
     const cleanSearch = mySearch.replace(/\'/g, '').replace(/\s/g, '%20').replace(/\&/g, '%26').replace(/\,/g, '%2C')
-    alert(cleanSearch)
 
     // this is pulling data from url and populating cards
-    $.getJSON ( '/api/v1/apple/search/' + cleanSearch, function(rawData) {
+    $.ajax(`/api/v1/apple/search/${cleanSearch}`, {
+      method: 'GET',
+      success: function(rawData) {
+        if (rawData.artists) {  
+          // this stores an array
+          artists = rawData.artists;
+          emptyArtists = false;              
+          populateArtistResults();
+        } else {
+          emptyArtists = true;
+          hideDOMelement("artists_label");
+          showDOMelement("warning_label");
+          $('#warning_label').append('<p style="margin:0px;">No artists match this search</p>');
+        }
 
-      if (typeof(rawData.artists) != null) {  
-        // this stores an array
-        artists = rawData.artists;
-        emptyArtists = false;              
-        populateArtistResults();
-      } else {
-        emptyArtists = true;
-        hideDOMelement("artists_label");
-        showDOMelement("warning_label");
-        $('#warning_label').append('<p style="margin:0px;">No artists match this search</p>');
-      }
+        if (rawData.albums) {
+          // this stores an array
+          albums = rawData.albums;
+          emptyAlbums = false;
+          populateAlbumResults();
+        } else {
+          emptyAlbums = true;
+          hideDOMelement("albums_label");
+          showDOMelement("warning_label");
+          $('#warning_label').append('<p style="margin:0px;">No albums match this search</p>');
+        }
 
-      if (rawData.albums) {
-        // this stores an array
-        albums = rawData.albums;
-        emptyAlbums = false;
-        populateAlbumResults();
-      } else {
-        emptyAlbums = true;
-        hideDOMelement("albums_label");
-        showDOMelement("warning_label");
-        $('#warning_label').append('<p style="margin:0px;">No albums match this search</p>');
-      }
-
-      hideDOMelement("loader");
-      if (emptyAlbums == true && emptyArtists == true) {
-        hideDOMelement("results_returned");
-      } else {
-        showDOMelement("results_returned");
+        hideDOMelement("loader");
+        if (emptyAlbums == true && emptyArtists == true) {
+          hideDOMelement("results_returned");
+        } else {
+          showDOMelement("results_returned");
+        }
+      },
+      error: function(err) {
+        alert(err)
       }
     })
   } else {
