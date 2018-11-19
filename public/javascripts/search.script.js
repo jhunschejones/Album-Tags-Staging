@@ -61,7 +61,7 @@ function populateSearchResults(pageReloaded, artist) {
   if (mySearch && mySearch != '') {
     $('#warning_label').html('');
     hideDOMelement("warning_label");
-    const cleanSearch = mySearch.replace(/\'/g, '').replace(/\s/g, '%20').replace(/\&/g, '%26').replace(/\,/g, '%2C')
+    const cleanSearch = mySearch.replace(/'/g, "").replace(/\s/g, '%20').replace(/\&/g, '%26').replace(/\,/g, '%2C')
 
     // this is pulling data from url and populating cards
     $.ajax(`/api/v1/apple/search/${cleanSearch}`, {
