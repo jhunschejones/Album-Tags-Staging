@@ -99,7 +99,7 @@ function populateSearchResults(pageReloaded, artist) {
         }
       },
       error: function(err) {
-        alert(err)
+        alert(JSON.stringify(err))
       }
     })
   } else {
