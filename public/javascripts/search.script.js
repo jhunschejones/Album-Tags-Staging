@@ -63,7 +63,7 @@ function populateSearchResults(pageReloaded, artist) {
         hideDOMelement("warning_label");
 
         // this is pulling data from url and populating cards
-        $.getJSON ( '/api/v1/apple/search/' + mySearch.replace(/\'/g, '%27').replace(/\s/g, '%20').replace(/\&/g, '%26').replace(/\,/g, '%2C'), function(rawData) {
+        $.getJSON ( '/api/v1/apple/search/' + mySearch.replace(/\'/g, '').replace(/\s/g, '%20').replace(/\&/g, '%26').replace(/\,/g, '%2C'), function(rawData) {
 
             if (typeof(rawData.artists) != null) {  
                 // this stores an array
