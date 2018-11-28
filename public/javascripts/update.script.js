@@ -523,10 +523,17 @@ function removeFromFavorites() {
 }
 
 // ----- START FIREBASE AUTH SECTION ------
-var config = {
-  apiKey: "AIzaSyD1Hts7zVBvDXUf-sCb89hcPesJkrUKyUc",
-  authDomain: "album-tag-auth.firebaseapp.com",
-  projectId: "album-tag-auth",
+// === OLD CONFIG ===
+// var config = {
+//   apiKey: "AIzaSyD1Hts7zVBvDXUf-sCb89hcPesJkrUKyUc",
+//   authDomain: "album-tag-auth.firebaseapp.com",
+//   projectId: "album-tag-auth",
+// }
+// == New Config, November 2018 == 
+const config = {
+  apiKey: "AIzaSyAoadL6l7wVMmMcjqqa09_ayEC8zwnTyrc",
+  authDomain: "album-tags-v1d1.firebaseapp.com",
+  projectId: "album-tags-v1d1",
 }
 const defaultApp = firebase.initializeApp(config)
 

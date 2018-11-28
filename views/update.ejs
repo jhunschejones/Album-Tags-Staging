@@ -83,32 +83,9 @@
         <span class="hide_when_logged_in" id="log_in_message"></span>
         <!-- END PAGE CONTENT -->    
 
-        <!-- Messy way to pull album ID so I can get it in my javascript -->
-        <p class="heres_the_album_id" style="display:none;"> <%= albumId %> </p>   
-
-        <!-- BEGIN FOOTER -->
-        <hr>
-        <ul class="nav justify-content-end my_footer">
-            <li class="nav-item">
-                <a class="nav-link active" href="/about"><small>About</small></a>
-            </li>
-            <li class="nav_seperator"><small>|</small></li>
-            <li class="nav-item">
-                <a class="nav-link active" href="mailto:joshua@hunschejones.com?subject=Album Tags App"><small>Questions & Support</small></a>
-            </li>
-        </ul>
-        <!-- END FOOTER -->
-
-        <!-- jQuery from CDN -->
-        <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f" crossorigin="anonymous"></script>
-        <!-- local versions of libraries, dowloaded 07/06/18 -->
-        <script src="/javascripts/libraries/popper.1.12.9.min.js"></script>
-        <script src="/javascripts/libraries/bootstrap.4.0.0.min.js"></script>
+        <% include partials/templates/footer.ejs %>
+        <!-- mousetrap.js is used for keyboard shortcuts and is refrenced in update.script.js -->
         <script src="/javascripts/libraries/mousetrap.min.js"></script>
-        <!-- firebase scripts -->
-        <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase-app.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase-auth.js"></script>
-        <!-- custom page script -->
         <script src="/javascripts/update.script.min.js"></script>
     </body>
 </html>

@@ -104,12 +104,8 @@ function replaceBackSlashWithHtml(str) {
 }
 // -------- END UTILITIES SECTION --------
 
-// This is really messy, but the album Id is stored in the ejs file in a hidden 
-// element. It comes in as a string so I'm converting it to a number to use in
-// my logic below
-var albumId = $(".heres_the_album_id").text()
-albumId = parseInt(albumId)
-var tagsForThisAlbum
+const albumId = window.location.pathname.replace('/albumdetails/', '')
+let tagsForThisAlbum
 let albumResult
 
 // this function actually makes the database calls
@@ -675,10 +671,17 @@ function userIsLoggedOut() {
   $('.update_button').hide()
 }
 
-var config = {
-  apiKey: "AIzaSyD1Hts7zVBvDXUf-sCb89hcPesJkrUKyUc",
-  authDomain: "album-tag-auth.firebaseapp.com",
-  projectId: "album-tag-auth",
+// == OLD FIREBASE CONFIG == 
+// var config = {
+//   apiKey: "AIzaSyD1Hts7zVBvDXUf-sCb89hcPesJkrUKyUc",
+//   authDomain: "album-tag-auth.firebaseapp.com",
+//   projectId: "album-tag-auth",
+// }
+// == New Config, November 2018 == 
+const config = {
+  apiKey: "AIzaSyAoadL6l7wVMmMcjqqa09_ayEC8zwnTyrc",
+  authDomain: "album-tags-v1d1.firebaseapp.com",
+  projectId: "album-tags-v1d1",
 }
 const defaultApp = firebase.initializeApp(config)
 
