@@ -67,7 +67,8 @@ exports.return_album_details = function (req, res, next) {
 
 exports.search_by_album_or_artist = function (req, res, next) {
   const jwtToken = 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik05OVpGUEMyR1UifQ.eyJpYXQiOjE1MzExODgwMDQsImV4cCI6MTU0Njc0MDAwNCwiaXNzIjoiUzJaUDI1NlBQSyJ9.drOZUEcvLw_r0NeU_0_HNIWA3RcMLr4rtArUNt0QGmCe2dwXIrSzrUTgpyjcQcpIJob-mYJzVczlunOkvAljDg'
-  const thisSearch = req.params.search.replace(/\'/g, '%27').replace(/\s/g, '%20').replace(/\&/g, '%26').replace(/\,/g, '%2C')
+  // const thisSearch = req.params.search.replace(/\'/g, '%27').replace(/\s/g, '%20').replace(/\&/g, '%26').replace(/\,/g, '%2C')
+  const thisSearch = req.params.search
 
   request.get(  
   {  
@@ -84,41 +85,45 @@ exports.search_by_album_or_artist = function (req, res, next) {
       let responseAlbums = []
       let responseArtists = []
 
-      resultAlbums.results.albums.data.forEach(album => {
-        let albumObject = {
-          appleAlbumID: album.id,
-          appleURL: album.attributes.url,
-          title: album.attributes.name,
-          artist: album.attributes.artistName,
-          releaseDate: album.attributes.releaseDate,
-          recordCompany: album.attributes.recordLabel,
-          genres: _this.utility_getRealGenresArray(album.attributes.genreNames),
-          cover: album.attributes.artwork.url
-        }
-        responseAlbums.push(albumObject)
-      })
-
-      resultAlbums.results.artists.data.forEach(artist => {
-        let albumArray = []
-        artist.relationships.albums.data.forEach(album => {
-          // ====== MORE DATA ======
-          // if (album.attributes && album.attributes.name) { 
-          //   albumArray.push({ "appleAlbumID": album.id, "title": album.attributes.name, "releaseDate": album.attributes.releaseDate })
-          // }
-
-          // ====== LESS DATA ======
-          albumArray.push(album.id)
+      if (resultAlbums.results.albums) {
+        resultAlbums.results.albums.data.forEach(album => {
+          let albumObject = {
+            appleAlbumID: album.id,
+            appleURL: album.attributes.url,
+            title: album.attributes.name,
+            artist: album.attributes.artistName,
+            releaseDate: album.attributes.releaseDate,
+            recordCompany: album.attributes.recordLabel,
+            genres: _this.utility_getRealGenresArray(album.attributes.genreNames),
+            cover: album.attributes.artwork.url
+          }
+          responseAlbums.push(albumObject)
         })
+      }
 
-        let artistObject = {
-          name: artist.attributes.name,
-          genres: _this.utility_getRealGenresArray(artist.attributes.genreNames),
-          albums: albumArray,
-          // just using to identify elements on the page in case of duplicate names
-          appleArtistID: artist.id
-        }
-        responseArtists.push(artistObject)
-      })
+      if (resultAlbums.results.artists) {
+        resultAlbums.results.artists.data.forEach(artist => {
+          let albumArray = []
+          artist.relationships.albums.data.forEach(album => {
+            // ====== MORE DATA ======
+            // if (album.attributes && album.attributes.name) { 
+            //   albumArray.push({ "appleAlbumID": album.id, "title": album.attributes.name, "releaseDate": album.attributes.releaseDate })
+            // }
+
+            // ====== LESS DATA ======
+            albumArray.push(album.id)
+          })
+
+          let artistObject = {
+            name: artist.attributes.name,
+            genres: _this.utility_getRealGenresArray(artist.attributes.genreNames),
+            albums: albumArray,
+            // just using to identify elements on the page in case of duplicate names
+            appleArtistID: artist.id
+          }
+          responseArtists.push(artistObject)
+        })
+      }
 
       responseObject.albums = responseAlbums
       responseObject.artists = responseArtists

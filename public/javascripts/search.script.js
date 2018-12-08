@@ -69,7 +69,7 @@ function populateSearchResults(pageReloaded, artist) {
       method: 'GET',
       success: function(rawData) {
         // console.log(`/api/v1/apple/search/${cleanSearch}`)
-        if (rawData.artists) {  
+        if (rawData.artists && rawData.artists.length > 0) {  
           // this stores an array
           artists = rawData.artists;
           emptyArtists = false;              
@@ -77,11 +77,11 @@ function populateSearchResults(pageReloaded, artist) {
         } else {
           emptyArtists = true;
           hideDOMelement("artists_label");
-          showDOMelement("warning_label");
-          $('#warning_label').append('<p style="margin:0px;">No artists match this search</p>');
+          // showDOMelement("warning_label");
+          // $('#warning_label').append('<p style="margin:0px;">No artists match this search</p>');
         }
 
-        if (rawData.albums) {
+        if (rawData.albums && rawData.albums.length > 0) {
           // this stores an array
           albums = rawData.albums;
           emptyAlbums = false;
@@ -89,19 +89,22 @@ function populateSearchResults(pageReloaded, artist) {
         } else {
           emptyAlbums = true;
           hideDOMelement("albums_label");
-          showDOMelement("warning_label");
-          $('#warning_label').append('<p style="margin:0px;">No albums match this search</p>');
+          // showDOMelement("warning_label");
+          // $('#warning_label').append('<p style="margin:0px;">No albums match this search</p>');
         }
 
         hideDOMelement("loader");
         if (emptyAlbums == true && emptyArtists == true) {
           hideDOMelement("results_returned");
+          showDOMelement("warning_label");
+          $('#warning_label').append('<br/><p style="margin:0px;">No artists or albums match this search.</p>');
         } else {
           showDOMelement("results_returned");
         }
       },
       error: function(err) {
-        alert(`ERROR : ${JSON.stringify(err)}, URL : '/api/v1/apple/search/${cleanSearch}'`)
+        // alerts errors, used when noticing errors on mobile but not desktop
+        // alert(`ERROR : ${JSON.stringify(err)}, URL : '/api/v1/apple/search/${cleanSearch}'`)
       }
     })
   } else {
