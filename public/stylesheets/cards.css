@@ -81,3 +81,7 @@
   margin: 40px 0px 60px 0px;
   text-align: center;
 }
+
+.year-dropdown-button:hover {
+  text-decoration: none;
+}

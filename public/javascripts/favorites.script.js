@@ -21,7 +21,7 @@ function bubbleSort(arr, prop)
   do {
     swapped = false
     for (var i = 0; i < arr.length - 1; i++) {
-      if (parseInt(removeDash(arr[i][prop])) > parseInt(removeDash(arr[i + 1][prop]))) {
+      if (parseInt(removeDash(arr[i][prop])) < parseInt(removeDash(arr[i + 1][prop]))) {
         var temp = arr[i]
         arr[i] = arr[i + 1]
         arr[i + 1] = temp
@@ -32,22 +32,7 @@ function bubbleSort(arr, prop)
 }
 // ------- END UTILITIES SECTION ----------
 
-// function getAlbumInfo(albumNumber, cardNumber) {
-  
-//   $.getJSON( '/api/v1/apple/details/' + albumNumber)
-//   .done(function(rawData) {
-
-//   // if the album is from this year, populate the page, otherwise remove the card
-
-//     if(rawData.releaseDate.slice(0,4) == `${(new Date()).getFullYear()}`){
-//       populateCard(albumNumber, rawData, cardNumber)
-//     }
-//     else {
-//       let emptyCard = document.getElementById(`card${cardNumber}`)
-//       emptyCard.remove()
-//     }
-//   })
-// }
+let myFavoriteAlbums
 
 // creates the album card with loading message and no details
 function createCard(cardNumber) {
@@ -56,8 +41,10 @@ function createCard(cardNumber) {
 
 // populates the album card
 function populateCard(album, cardNumber) {
+  
+  const selectedYear = (new URL(document.location)).searchParams.get("year")
 
-  if(album.releaseDate.slice(0,4) != `${(new Date()).getFullYear()}`){
+  if (album.releaseDate.slice(0,4) != `${selectedYear || (new Date()).getFullYear()}`){
     const emptyCard = document.getElementById(`card${cardNumber}`)
     emptyCard.remove()
     return
@@ -97,10 +84,21 @@ function getFavoriteAlbums() {
   })
 }
 
+let allYears = []
+function addToYears(album) {
+  let releaseYear = album.releaseDate.slice(0,4)
+  if (allYears.indexOf(releaseYear) == -1) {
+    $('.year-dropdown').append(`<a class="dropdown-item release-year" data-release="${releaseYear}" href="">${releaseYear}</a>`)
+    allYears.push(releaseYear)
+  }
+}
+
 
 function startFavoritesPage() {
   // clear any warnings
   $('#favorites_all_cards').html("")
+  $('.year-dropdown').html("")
+  allYears = []
 
   bubbleSort(myFavoriteAlbums, "releaseDate")
 
@@ -111,7 +109,33 @@ function startFavoritesPage() {
     
     createCard(card)
     populateCard(album, card)
+    addToYears(album)
+  }
+
+  $(".release-year").on("click", function(e) {
+    let year = $(this).attr("data-release")
+    let newUrl = "/favorites?year=" + year
+
+    window.history.pushState({}, null, newUrl)
+    $('.year-dropdown-button').text(year)
+    document.title = `Album Tags : ${year}`
+
+    startFavoritesPage()
+    e.preventDefault()
+  })
+
+  if ($('#favorites_all_cards')[0].childElementCount === 0) {
+    $('#favorites_all_cards').html(`<div class="col" style="text-align:center;margin-top:100px;margin-bottom:100px;"><p class="text-danger">Sorry, we don't have any favorite albums from year "${(new URL(document.location)).searchParams.get("year")}. Try a different year from the dropdown!"</p></div>`)
   }
 }
 
 getFavoriteAlbums()
+
+const dropdownYear = `<div class="dropdown" style="display:inline;"><a class="dropdown-toggle text-secondary year-dropdown-button" href="" role="button" id="dropdownYearLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${(new URL(document.location)).searchParams.get("year") || (new Date()).getFullYear()}</a><div class="year-dropdown dropdown-menu" aria-labelledby="dropdownYearLink" style="max-height:41vh;overflow-y:scroll;"></div></div>`
+
+$('.subtitle').html(`Our Favorite Albums of <span>${dropdownYear}</span>`)
+
+// closes filter dropdown menu's when page is scrolling
+$(document).on( 'scroll', function(){
+  $(".year-dropdown").removeClass('show')
+})
