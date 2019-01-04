@@ -116,7 +116,9 @@ function startFavoritesPage() {
     let year = $(this).attr("data-release")
     let newUrl = "/favorites?year=" + year
 
-    window.history.pushState({}, null, newUrl)
+    // window.history.pushState({}, null, newUrl)
+    // need to write it this way for page update on `back` to work
+    history.pushState({}, '', newUrl)
     $('.year-dropdown-button').text(year)
     document.title = `Album Tags : ${year}`
 
@@ -125,7 +127,17 @@ function startFavoritesPage() {
   })
 
   if ($('#favorites_all_cards')[0].childElementCount === 0) {
-    $('#favorites_all_cards').html(`<div class="col" style="text-align:center;margin-top:100px;margin-bottom:100px;"><p class="text-danger">Sorry, we don't have any favorite albums from year "${(new URL(document.location)).searchParams.get("year")}. Try a different year from the dropdown!"</p></div>`)
+    let chosenYear = (new URL(document.location)).searchParams.get("year")
+
+    if ((new URL(document.location)).pathname == '/favorites' && !(new URL(document.location)).searchParams.get("year")) {
+      chosenYear = (new Date()).getFullYear()
+    }
+
+    if ((new URL(document.location)).searchParams.get("year") == "") {
+      chosenYear = "blank"
+    }
+
+    $('#favorites_all_cards').html(`<div class="col" style="text-align:center;margin-top:100px;margin-bottom:100px;"><p class="text-danger">Sorry, we don't have any favorite albums from year "${chosenYear || "blank"}." Try a different year from the dropdown!</p></div>`)
   }
 }
 
@@ -138,4 +150,13 @@ $('.subtitle').html(`Our Favorite Albums of <span>${dropdownYear}</span>`)
 // closes filter dropdown menu's when page is scrolling
 $(document).on( 'scroll', function(){
   $(".year-dropdown").removeClass('show')
+})
+
+// this updates the page when the back button is pressed
+$(document).ready(function( $ ) {
+  $(window).on('popstate', function() {
+    //  location.reload(true)
+    startFavoritesPage()
+    $('.year-dropdown-button').text(`${(new URL(document.location)).searchParams.get("year") || (new Date()).getFullYear()}`)
+  })
 })
