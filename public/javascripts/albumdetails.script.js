@@ -222,7 +222,7 @@ function populateTags(albumNumber) {
 
       // Here we add the tags as elements on the DOM, with an onclick function that uses a unique
       // tag to toggle a badge-success class name and change the color
-      $('.tag_results').append(`<a href="" onclick="changeClass(${tagName})" id="${tagName}" class="badge badge-light album_details_tags author-${author}">${safeParse(tag)}</a>  `)   
+      $('.tag_results').append(`<a href="" onclick="changeClass(${tagName}, event)" id="${tagName}" class="badge badge-light album_details_tags author-${author}">${safeParse(tag)}</a>  `)   
     }
     $('.album_details_tags').hide()
   }  
@@ -236,8 +236,8 @@ function populateTags(albumNumber) {
 // between two boostrap classes to change the color of selected tags
 // it takes in the unique tag ID assigned to eatch badge durring
 // creation so that only the desired badge toggles colors
-function changeClass(tagName) {
-  event.preventDefault()
+function changeClass(tagName, event) {
+  if (event) { event.preventDefault() }
   // clear warning label
   $('.warning_label').text('')
   var thisTag = document.getElementById(tagName.id)
@@ -290,8 +290,8 @@ function putConnectionsOnPage() {
   }
 }
 
-function showAllTags() {
-  event.preventDefault()   
+function showAllTags(event) {
+  if (event) { event.preventDefault() }
 
   allTagsNoFilter()
   $('#show_all_tags').show()
@@ -301,8 +301,8 @@ function showAllTags() {
   clearTagArray()
 }
 
-function showOnlyMyTags() {
-  event.preventDefault()  
+function showOnlyMyTags(event) {
+  if (event) { event.preventDefault() }
 
   filterDisplayedTags()
   $('#show_all_tags').hide()
@@ -312,8 +312,8 @@ function showOnlyMyTags() {
   clearTagArray()
 }
 
-function clearTagArray() {
-  event.preventDefault()
+function clearTagArray(event) {
+  if (event) { event.preventDefault() }
   $('.warning_label').html('')
   
   if ($( ".selected_tag" ).length > 0) {
@@ -473,8 +473,8 @@ function checkConnectionDisplayPrefrences() {
 }
 
 // called by the search button on tags card
-function tagSearch() {
-  event.preventDefault()
+function tagSearch(event) {
+  if (event) { event.preventDefault() }
 
   if (selectedTags.length > 0) {
     var win = window.location = (`/search/tags/${selectedTags}`)
@@ -596,8 +596,8 @@ function allConnectionsNoFilter() {
 }
 
 // directs user to update page for this album
-function goToUpdatePage() {
-  event.preventDefault()
+function goToUpdatePage(event) {
+  if (event) { event.preventDefault() }
   var url = window.location.href
   url = url.replace("albumdetails", "update")
   window.location = url
