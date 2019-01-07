@@ -196,7 +196,6 @@ function populateTags(albumNumber) {
   if (albumNumber === "start") { return; }
   var noAuthors = false
   $("#tags_toggle").html('<img src="/images/toggle_off.png" id="show_only_my_tags" class="hide_when_logged_out" style="height:22px;margin-left:10px;" onclick="showAllTags()" data-toggle="tooltip" data-placement="right" title="Show All Tags" data-trigger="hover"><img src="/images/toggle_on.png" class="hide_when_logged_out" id="show_all_tags" style="height:22px;margin-left:10px;" onclick="showOnlyMyTags()" data-toggle="tooltip" data-placement="right" title="Only Show My Tags" data-trigger="hover">')
-  checkUserDisplayPrefrences()
 
   if (albumResult.tagObjects && albumResult.tagObjects.length > 0) {
     // clear default no-tags notice if tags exist
@@ -226,6 +225,7 @@ function populateTags(albumNumber) {
     }
     $('.album_details_tags').hide()
   }  
+  checkUserDisplayPrefrences()
   // call this whether or not there are tags
   putConnectionsOnPage()
 }
@@ -291,7 +291,7 @@ function putConnectionsOnPage() {
 }
 
 function showAllTags(event) {
-  if (event) { event.preventDefault() }
+  if (event) { event.preventDefault(); }
 
   allTagsNoFilter()
   $('#show_all_tags').show()
@@ -608,13 +608,13 @@ var isTouchDevice = false
 
 $(function () {
   setTimeout(function(){ 
-      if ("ontouchstart" in document.documentElement) {
-          isTouchDevice = true
-      }
-      
-      if(isTouchDevice == false) {
-          $('[data-toggle="tooltip"]').tooltip()
-      }
+    if ("ontouchstart" in document.documentElement) {
+      isTouchDevice = true
+    }
+    
+    if(isTouchDevice == false) {
+      $('[data-toggle="tooltip"]').tooltip()
+    }
   }, 1000)
 })
 // -------------- end tooltips section --------------
