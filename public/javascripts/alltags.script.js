@@ -97,7 +97,7 @@ function clearTagArray(event) {
   }
   else {
     $('.warning_label').text('');
-    $('.warning_label').text('No tags have been selected.');
+    // $('.warning_label').text('No tags have been selected.');
   }
 };
 
