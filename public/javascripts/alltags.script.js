@@ -48,7 +48,7 @@ function populateTags() {
 
         // Here we add the tags as elements on the DOM, with an onclick function that uses a unique
         // tag to toggle a badge-success class name and change the color
-        $('.all_tags').append(`<a href="" onclick="changeClass(${tagName})" id="${tagName}" class="badge badge-light tag">${safeParse(tag)}</a>  `);    
+        $('.all_tags').append(`<a href="" onclick="changeClass(${tagName}, event)" id="${tagName}" class="badge badge-light tag">${safeParse(tag)}</a>  `);    
       });
     };
   });
@@ -58,8 +58,8 @@ function populateTags() {
 // between two boostrap classes to change the color of selected tags
 // it takes in the unique tag ID assigned to eatch badge durring
 // creation so that only the desired badge toggles colors
-function changeClass(tagName) {
-  event.preventDefault();
+function changeClass(tagName, event) {
+  if (event) { event.preventDefault(); }
   // clear warning label
   $('.warning_label').text('');
   var thisTag = document.getElementById(tagName.id);
@@ -87,8 +87,8 @@ function addToTagArray(tag) {
   };
 };
 
-function clearTagArray() {
-  event.preventDefault();
+function clearTagArray(event) {
+  if (event) { event.preventDefault(); }
   if ($( ".selected_tag" ).length > 0) {
     $( ".selected_tag" ).toggleClass( "badge-primary" );
     $( ".selected_tag" ).toggleClass( "badge-light" );
@@ -102,8 +102,8 @@ function clearTagArray() {
 };
 
 // called by the search by selected tags button
-function tagSearch() {
-  event.preventDefault();
+function tagSearch(event) {
+  if (event) { event.preventDefault(); }
 
   if (selectedTags.length > 0) {
     var win = window.location = (`/search/tags/${selectedTags}`);
