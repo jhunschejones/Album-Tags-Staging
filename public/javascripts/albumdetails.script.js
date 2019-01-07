@@ -201,7 +201,7 @@ function populateTags(albumNumber) {
   if (albumResult.tagObjects && albumResult.tagObjects.length > 0) {
     // clear default no-tags notice if tags exist
     $(".tag_results").text('')
-    $(".tag_search_button").html('<a href="" onclick="tagSearch()" class="btn btn-sm btn-outline-secondary tag_search_button hide_when_logged_out" style="display:none;">Search<span class="button_text"> by Selected Tags</span></a>')
+    $(".tag_search_button").html('<a href="" onclick="tagSearch(event)" class="btn btn-sm btn-outline-secondary tag_search_button hide_when_logged_out" style="display:none;">Search<span class="button_text"> by Selected Tags</span></a>')
     currentTags = []
     currentAuthors = []
 
@@ -628,8 +628,8 @@ function userIsLoggedIn() {
   $('#full_menu_login_button').hide()
   $('#logout_button').show()
   $('#full_menu_logout_button').show()
-  $("#update_button_container").html('<a href="" onclick="goToUpdatePage()" class="btn btn-sm btn-outline-secondary update_button hide_when_logged_out">Update<span class="button_text"> Tags</span></a>')
-  $("#connection_button_container").html('<a href="" onclick="goToUpdatePage()" class="btn btn-sm btn-outline-secondary update_button hide_when_logged_out">Update Connections</a>')
+  $("#update_button_container").html('<a href="" onclick="goToUpdatePage(event)" class="btn btn-sm btn-outline-secondary update_button hide_when_logged_out">Update<span class="button_text"> Tags</span></a>')
+  $("#connection_button_container").html('<a href="" onclick="goToUpdatePage(event)" class="btn btn-sm btn-outline-secondary update_button hide_when_logged_out">Update Connections</a>')
   $('#connections_card').show()
 
   var whatTagsToShow = sessionStorage.getItem('tags')

@@ -639,13 +639,13 @@ $(function () {
 // getAlbumDetails()
 
 // ====== ADD GENERAL EVENT LISTENERS ======
-document.getElementById("back-button").addEventListener("click", function(event) {
-  // note: the update page should only be reachable from the album details page
-  // the `back` button on this page redirects to album details with a page refresh
-  // instead of window.location.back() so it can load the newly updated album information
-  const newURL = window.location.href.replace('update', 'albumdetails')
-  window.location.replace(newURL) 
-})
+// document.getElementById("back-button").addEventListener("click", function(event) {
+//   // note: the update page should only be reachable from the album details page
+//   // the `back` button on this page redirects to album details with a page refresh
+//   // instead of window.location.back() so it can load the newly updated album information
+//   const newURL = window.location.href.replace('update', 'albumdetails')
+//   window.location.replace(newURL) 
+// })
 document.getElementById("add_tag_button").addEventListener("click", function(event) {
   event.preventDefault()
   addTag()
