@@ -20,6 +20,7 @@
 
 .back_button {
   background-color: rgba(128, 128, 128, 0.25);
+  margin-top: 5px;
 }
 
 #absolute_content {
@@ -34,7 +35,7 @@
   padding: 4px;
   border-radius: 5px;
   overflow: auto;
-  max-height: 71vh;
+  max-height: 52vh;
 }
 
 /* -------- ADJUSTED FOOTER STYLES --------- */
