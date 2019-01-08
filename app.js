@@ -31,9 +31,11 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'))
 
 // ====== Set up routes ======
 const albumRoutes = require('./routes/album.routes')
+const listRoutes = require('./routes/list.routes')
 const appleAPIRoutes = require('./routes/appleAPI.routes')
 const staticRoutes = require('./routes/static.routes')
 app.use('/api/v1/album', albumRoutes)
+app.use('/api/v1/list', listRoutes)
 app.use('/api/v1/apple', appleAPIRoutes)
 app.use('/', staticRoutes)
 
