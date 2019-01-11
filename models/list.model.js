@@ -6,8 +6,27 @@ let ListSchema = new Schema({
   displayName: {type: String, required: false},
   title: {type: String, required: true},
   notes: {type: String, required: false},
-  albums: {type: Array, required: false},
+  albums: [{
+    _id:false,
+    id:false,
+    appleAlbumID: {type: String, required: true},
+    title: {type: String, required: true},
+    artist: {type: String, required: true},
+    releaseDate: {type: String, required: true},
+    cover: {type: String, required: true},
+  }],
   attributes: {type: Array, required: false}
-}, { collection : 'album-lists' })
+}, { collection : 'album-lists' } )
+
+ListSchema.path('albums').schema.virtual('album', {
+  ref: 'Album',
+  localField: 'appleAlbumID',
+  foreignField: 'appleAlbumID',
+  justOne: true, 
+})
+
+// virtuals are not returned by mongoose schemas by default
+const options = { virtuals: true }
+ListSchema.paths.albums.schema.set('toJSON', options)
 
 module.exports = mongoose.model('List', ListSchema)

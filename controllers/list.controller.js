@@ -2,7 +2,7 @@ const List = require('../models/list.model')
 
 exports.find_all_user_lists = function (req, res, next) {
   const userID = req.params.id
-  List.find({ "user" :  userID }, function (err, lists) {
+  List.find({ "user" :  userID }).populate('albums.album').exec(function (err, lists) {
     if (err) { return next(err) }
     if (lists.length === 0) { 
       res.send({"message" : 'No lists for this user.'}) 
@@ -13,6 +13,8 @@ exports.find_all_user_lists = function (req, res, next) {
   })
 }
 
+// there is no call to populate virtual `album` document
+// before returning the new list
 exports.new_list = function (req, res, next) {
   let list = new List(
     {
@@ -20,7 +22,7 @@ exports.new_list = function (req, res, next) {
       displayName: req.body.displayName || "",
       title: req.body.title,
       notes: req.body.notes || "",
-      albums: []
+      albums: req.body.albums || []
     }
   )
   list.save(function(err, list) {
@@ -31,7 +33,7 @@ exports.new_list = function (req, res, next) {
 
 exports.get_list = function (req, res, next) {
   const listID = req.params.id
-  List.findById(listID, function (err, list) {
+  List.findById(listID).populate('albums.album').exec(function (err, list) {
     if (err) { 
       if (err.message.slice(0,23) === "Cast to ObjectId failed") {
         // handle most common error with more helpful response
@@ -52,7 +54,7 @@ exports.get_list = function (req, res, next) {
 
 exports.delete_list = function (req, res, next) {
   const listID = req.params.id
-  List.findByIdAndRemove(listID, function (err, deletedList) {
+  List.findByIdAndRemove(listID).populate('albums.album').exec(function (err, deletedList) {
     if (err) { 
       if (err.message.slice(0,23) === "Cast to ObjectId failed") {
         // handle most common error with more helpful response
@@ -72,7 +74,7 @@ exports.update_list = function (req, res, next) {
   const listID = req.params.id
   const method = req.body.method
 
-  if (method && method == "add album") {
+  if (method && method === "add album") {
     let addAlbum = {
       appleAlbumID: req.body.appleAlbumID,
       title: req.body.title,
@@ -82,7 +84,7 @@ exports.update_list = function (req, res, next) {
     }
     // $push just adds it, $addToSet adds if there are no duplicates
     // {new: true} required in order to return the updated object
-    List.findByIdAndUpdate(listID, { $addToSet: { albums: addAlbum }}, {new: true}, function (err, list) {
+    List.findByIdAndUpdate(listID, { $addToSet: { albums: addAlbum }}, {new: true}).populate('albums.album').exec(function (err, list) {
       if (err) { 
         if (err.message.slice(0,23) === "Cast to ObjectId failed") {
           // handle most common error with more helpful response
@@ -104,7 +106,7 @@ exports.update_list = function (req, res, next) {
       cover: req.body.cover
     }
     // {new: true} required in order to return the updated object
-    List.findByIdAndUpdate(listID, { $pull: { albums: removeAlbum }}, {new: true}, function (err, list) {
+    List.findByIdAndUpdate(listID, { $pull: { albums: removeAlbum }}, {new: true}).populate('albums.album').exec(function (err, list) {
       if (err) { 
         if (err.message.slice(0,23) === "Cast to ObjectId failed") {
           // handle most common error with more helpful response
@@ -119,7 +121,7 @@ exports.update_list = function (req, res, next) {
     })
   } else if (method && method === "change title") {
     newTitle = req.body.title
-    List.findByIdAndUpdate(listID, { $set: { title: newTitle } }, {new: true}, function (err, list) {
+    List.findByIdAndUpdate(listID, { $set: { title: newTitle } }, {new: true}).populate('albums.album').exec(function (err, list) {
       if (err) { 
         if (err.message.slice(0,23) === "Cast to ObjectId failed") {
           // handle most common error with more helpful response
@@ -134,7 +136,7 @@ exports.update_list = function (req, res, next) {
     })
   } else if (method && method === "change display name") {
     newDisplayName = req.body.displayName
-    List.findByIdAndUpdate(listID, { $set: { displayName: newDisplayName } }, {new: true}, function (err, list) {
+    List.findByIdAndUpdate(listID, { $set: { displayName: newDisplayName } }, {new: true}).populate('albums.album').exec(function (err, list) {
       if (err) { 
         if (err.message.slice(0,23) === "Cast to ObjectId failed") {
           // handle most common error with more helpful response
