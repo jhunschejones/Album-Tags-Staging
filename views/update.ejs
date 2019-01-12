@@ -40,9 +40,17 @@
                                 </div> 
                                 <span class="warning_label text-danger"></span>
                             </div>
+
+                            <div id="list-input-group" class="input-group">
+                                <select class="custom-select" id="list-options">
+                                    <option selected>Add to a list...</option>
+                                </select>
+                                <div class="input-group-append">
+                                    <button id="add-to-list-button" class="btn btn-primary" type="button">Add</button>
+                                </div>
+                            </div>
                         </form>
                     </div>
-
                 </div>
 
                 <div class="col-md-6 container-fluid">
@@ -81,7 +89,7 @@
         <div id="login-message" style="display:none;" class="text-center"><br/><br/><br/><br/><h4 class="text-secondary">Please <span class="login_button text-primary" style="cursor:pointer;">log in</span> to access the update page!</h4><br/><br/><br/><br/><br/><div>
 
         <span class="hide_when_logged_in" id="log_in_message"></span>
-        <!-- END PAGE CONTENT -->    
+        <!-- END PAGE CONTENT -->  
 
         <% include partials/templates/footer.ejs %>
         <!-- mousetrap.js is used for keyboard shortcuts and is refrenced in update.script.js -->

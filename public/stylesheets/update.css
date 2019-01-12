@@ -20,9 +20,14 @@
   display: inline-flex
 }
 
-.add_connection_row {
-  margin-bottom: 10px;
+.add_connection_row,
+#list-input-group {
   margin-top: 10px;
+}
+
+#list-input-group {
+  margin-bottom: 10px;
+  max-width: 340px;
 }
 /* This overrides bootstrap's style for the text input
  box so that it will display the 'x' in chrome */
@@ -31,12 +36,14 @@
   }
 
 #new_tag,
-#new_connection {
+#new_connection,
+#list-input-group {
   min-width: 300px;
 }
 
 #add_tag_button,
-#add_connection_button {
+#add_connection_button,
+#add-to-list-button {
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
   padding: 5px;
@@ -70,7 +77,6 @@ td, th {
 }
 
 .warning_label {
-  /* margin-left: 0px; */
   margin-bottom: 10px;
 }
 
@@ -129,28 +135,38 @@ td, th {
 @media screen and (max-width: 350px) {
   #new_tag,
   #new_connection {
-      min-width: 210px;
+    min-width: 210px;
   }
-  .add_connection_row {
-    margin-bottom: 10px;
+  .add_connection_row,
+  #list-input-group {
     margin-top: 0px;
+  }
+  #list-input-group {
+    margin-bottom: 10px;
   }
 }
 
 @media screen and (max-width: 400px) {
   #new_tag,
   #new_connection {
-      min-width: 250px;
+    min-width: 250px;
   }
-  .add_connection_row {
-    margin-bottom: 10px;
+  .add_connection_row,
+  #list-input-group {
     margin-top: 0px;
+  }
+  #list-input-group {
+    margin-bottom: 10px;
   }
 }
 
 @media screen and (max-width: 500px) {
-  .add_connection_row {
-    margin-bottom: 10px;
+  .add_connection_row,
+  #list-input-group {
     margin-top: 0px;
+  }
+  #list-input-group {
+    margin-bottom: 10px;
+    max-width: 360px;
   }
 }

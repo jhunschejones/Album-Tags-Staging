@@ -522,6 +522,64 @@ function removeFromFavorites() {
   })
 }
 
+// ====== START LIST FUNCTIONALITY ======
+function getAllLists() {
+  $.ajax({
+    method: "GET",
+    // url: "/api/v1/list/user/" + userID,
+    url: "/api/v1/list/user/Ol5d5mjWi9eQ7HoANLhM4OFBnso2",
+    success: function(data) {
+      allLists = data
+      $('#loader').hide()
+      populateAllLists()
+    }
+  })
+}
+
+function populateAllLists() {
+  $('#all-lists').html('')
+  allLists.forEach(list => {
+    $( `<option value="${list._id}">${list.title}</option>` ).appendTo( "#list-options" )
+  })
+  $( '<option value="create new list">Add to a new list...</option>' ).appendTo( "#list-options" )
+}
+
+function addToList(chosenList, album) {
+  if (chosenList && album) {
+    let addAlbumToListBody = {
+      method: "add album",
+      appleAlbumID: album.appleAlbumID,
+      title: album.title,
+      artist: album.artist,
+      releaseDate: album.releaseDate,
+      cover: album.cover
+    }
+    $.ajax({
+      method: "PUT",
+      url: "/api/v1/list/" + chosenList,
+      contentType: 'application/json',
+      data: JSON.stringify(addAlbumToListBody),
+      success: function(data) {
+        alert(`Successfully added this album to your list: "${data.title}"`)
+      }
+    })
+  }
+}
+
+document.getElementById("add-to-list-button").addEventListener("click", function() {
+  let listOptions = document.getElementById("list-options")
+  let chosenList = listOptions[listOptions.selectedIndex].value
+  if (chosenList === "Add to a list...") {
+    //
+  } else if (chosenList === "create new list") {
+    //
+  } else {
+    addToList(chosenList, albumResult)
+  }
+})
+// ====== END LIST FUNCTIONALITY ======
+
+
 // ----- START FIREBASE AUTH SECTION ------
 // === OLD CONFIG ===
 // var config = {
@@ -542,6 +600,7 @@ firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
     userID = firebase.auth().currentUser.uid
     getAlbumDetails()
+    getAllLists()
     // populateTags(albumResult)
     // findDirectConnections()
 
