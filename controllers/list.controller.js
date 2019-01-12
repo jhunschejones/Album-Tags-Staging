@@ -74,83 +74,91 @@ exports.update_list = function (req, res, next) {
   const listID = req.params.id
   const method = req.body.method
 
-  if (method && method === "add album") {
-    let addAlbum = {
-      appleAlbumID: req.body.appleAlbumID,
-      title: req.body.title,
-      artist: req.body.artist,
-      releaseDate: req.body.releaseDate,
-      cover: req.body.cover
+  if (listID) {
+    if (method && method === "add album") {
+      if (req.body.appleAlbumID && req.body.title && req.body.artist && req.body.releaseDate && req.body.cover) {
+        let addAlbum = {
+          appleAlbumID: req.body.appleAlbumID,
+          title: req.body.title,
+          artist: req.body.artist,
+          releaseDate: req.body.releaseDate,
+          cover: req.body.cover
+        }
+        // $push just adds it, $addToSet adds if there are no duplicates
+        // {new: true} required in order to return the updated object
+        List.findByIdAndUpdate(listID, { $addToSet: { albums: addAlbum }}, {new: true}).populate('albums.album').exec(function (err, list) {
+          if (err) { 
+            if (err.message.slice(0,23) === "Cast to ObjectId failed") {
+              // handle most common error with more helpful response
+              res.send({"message" : `No list found with ID '${listID}'.`}) 
+              return
+            } else {
+              return next(err) 
+            }
+          }
+          res.send(list)
+          return
+        })
+      } else {
+        res.send({"message" : "You are missing some required information: appleAlbumID, title, artist, releaseDate, and cover are required to add an album"})
+      }
+    } else if (method && method === "remove album") {
+      const removeAlbum = {
+        appleAlbumID: req.body.appleAlbumID,
+        title: req.body.title,
+        artist: req.body.artist,
+        releaseDate: req.body.releaseDate,
+        cover: req.body.cover
+      }
+      // {new: true} required in order to return the updated object
+      List.findByIdAndUpdate(listID, { $pull: { albums: removeAlbum }}, {new: true}).populate('albums.album').exec(function (err, list) {
+        if (err) { 
+          if (err.message.slice(0,23) === "Cast to ObjectId failed") {
+            // handle most common error with more helpful response
+            res.send({"message" : `No list found with ID '${listID}'.`}) 
+            return
+          } else {
+            return next(err) 
+          }
+        }
+        res.send(list)
+        return
+      })
+    } else if (method && method === "change title") {
+      newTitle = req.body.title
+      List.findByIdAndUpdate(listID, { $set: { title: newTitle } }, {new: true}).populate('albums.album').exec(function (err, list) {
+        if (err) { 
+          if (err.message.slice(0,23) === "Cast to ObjectId failed") {
+            // handle most common error with more helpful response
+            res.send({"message" : `No list found with ID '${listID}'.`}) 
+            return
+          } else {
+            return next(err) 
+          }
+        }
+        res.send(list)
+        return
+      })
+    } else if (method && method === "change display name") {
+      newDisplayName = req.body.displayName
+      List.findByIdAndUpdate(listID, { $set: { displayName: newDisplayName } }, {new: true}).populate('albums.album').exec(function (err, list) {
+        if (err) { 
+          if (err.message.slice(0,23) === "Cast to ObjectId failed") {
+            // handle most common error with more helpful response
+            res.send({"message" : `No list found with ID '${listID}'.`}) 
+            return
+          } else {
+            return next(err) 
+          }
+        }
+        res.send(list)
+        return
+      })
+    } else {
+      res.send({"message" : "body requires a 'method' parameter with a value of 'add album', 'remove album', 'change title', or 'change display name'"}) 
+      return
     }
-    // $push just adds it, $addToSet adds if there are no duplicates
-    // {new: true} required in order to return the updated object
-    List.findByIdAndUpdate(listID, { $addToSet: { albums: addAlbum }}, {new: true}).populate('albums.album').exec(function (err, list) {
-      if (err) { 
-        if (err.message.slice(0,23) === "Cast to ObjectId failed") {
-          // handle most common error with more helpful response
-          res.send({"message" : `No list found with ID '${listID}'.`}) 
-          return
-        } else {
-          return next(err) 
-        }
-      }
-      res.send(list)
-      return
-    })
-  } else if (method && method === "remove album") {
-    const removeAlbum = {
-      appleAlbumID: req.body.appleAlbumID,
-      title: req.body.title,
-      artist: req.body.artist,
-      releaseDate: req.body.releaseDate,
-      cover: req.body.cover
-    }
-    // {new: true} required in order to return the updated object
-    List.findByIdAndUpdate(listID, { $pull: { albums: removeAlbum }}, {new: true}).populate('albums.album').exec(function (err, list) {
-      if (err) { 
-        if (err.message.slice(0,23) === "Cast to ObjectId failed") {
-          // handle most common error with more helpful response
-          res.send({"message" : `No list found with ID '${listID}'.`}) 
-          return
-        } else {
-          return next(err) 
-        }
-      }
-      res.send(list)
-      return
-    })
-  } else if (method && method === "change title") {
-    newTitle = req.body.title
-    List.findByIdAndUpdate(listID, { $set: { title: newTitle } }, {new: true}).populate('albums.album').exec(function (err, list) {
-      if (err) { 
-        if (err.message.slice(0,23) === "Cast to ObjectId failed") {
-          // handle most common error with more helpful response
-          res.send({"message" : `No list found with ID '${listID}'.`}) 
-          return
-        } else {
-          return next(err) 
-        }
-      }
-      res.send(list)
-      return
-    })
-  } else if (method && method === "change display name") {
-    newDisplayName = req.body.displayName
-    List.findByIdAndUpdate(listID, { $set: { displayName: newDisplayName } }, {new: true}).populate('albums.album').exec(function (err, list) {
-      if (err) { 
-        if (err.message.slice(0,23) === "Cast to ObjectId failed") {
-          // handle most common error with more helpful response
-          res.send({"message" : `No list found with ID '${listID}'.`}) 
-          return
-        } else {
-          return next(err) 
-        }
-      }
-      res.send(list)
-      return
-    })
   } else {
-    res.send({"message" : "body requires a 'message' parameter with a value of 'add album', 'remove album', 'change title', or 'change display name'"}) 
-    return
+    res.send({"message" : "please provide the list _id value with your PUT request"})
   }
 }
