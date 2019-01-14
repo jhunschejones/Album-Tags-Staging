@@ -84,7 +84,32 @@
                 <button class="btn btn-sm btn-light" onclick="scrollToTop()"><img id="up_arrow" src="/images/up_arrow.png"><span class="button_text">Top</span></button>
                 </div>
             </div>
+        </div>
 
+        <!-- Modal -->
+        <div class="modal fade" id="newListModal" tabindex="-1" role="dialog" aria-labelledby="newListModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="newListModalLabel">Add To A New List</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="input-group mb-3">
+                            <input id="new-list-title" type="text" class="form-control" placeholder="New list name...">
+                        </div>
+                        <div class="input-group mb-3">
+                            <input id="new-display-name" type="text" class="form-control" placeholder="User display name...">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button id="create-new-list-button" type="button" class="btn btn-primary">Create list and add</button>
+                    </div>
+                </div>
+            </div>
         </div>
         <div id="login-message" style="display:none;" class="text-center"><br/><br/><br/><br/><h4 class="text-secondary">Please <span class="login_button text-primary" style="cursor:pointer;">log in</span> to access the update page!</h4><br/><br/><br/><br/><br/><div>
 

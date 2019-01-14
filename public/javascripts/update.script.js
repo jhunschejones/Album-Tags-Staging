@@ -566,15 +566,47 @@ function addToList(chosenList, album) {
   }
 }
 
+function addToNewList(album, listTitle, displayName) {
+  // create new list with attached album here
+  console.log(listTitle, displayName)
+}
+
+// ====== EVENT LISTENERS FOR LIST FUNCTIONALITY =====
 document.getElementById("add-to-list-button").addEventListener("click", function() {
   let listOptions = document.getElementById("list-options")
   let chosenList = listOptions[listOptions.selectedIndex].value
   if (chosenList === "Add to a list...") {
-    //
+    // nothing should happen in this case
   } else if (chosenList === "create new list") {
-    //
+    $('#newListModal').modal('show')
   } else {
     addToList(chosenList, albumResult)
+  }
+})
+
+document.getElementById("create-new-list-button").addEventListener("click", function() {
+  let listTitle = document.getElementById("new-list-title").value.trim()
+  let displayName = document.getElementById("new-display-name").value.trim() || "Unknown"
+  
+  if (listTitle) {
+    addToNewList(albumResult, listTitle, displayName)
+    $('#newListModal').modal('hide')
+    document.getElementById("new-display-name").value = ""
+    document.getElementById("new-list-title").value = ""
+  } else {
+    alert("All lists require a title!")
+  }
+})
+
+$("#new-list-title").keyup(function(event) {
+  if (event.keyCode === 13) {
+    $("#create-new-list-button").click()
+  }
+})
+
+$("#new-display-name").keyup(function(event) {
+  if (event.keyCode === 13) {
+    $("#create-new-list-button").click()
   }
 })
 // ====== END LIST FUNCTIONALITY ======
