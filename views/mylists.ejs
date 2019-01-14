@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <% include partials/templates/head_tags.ejs %>
+    <link rel="stylesheet" href="/stylesheets/cards.min.css">
+    <link rel="stylesheet" href="/stylesheets/spinner.min.css">
+    <link rel="stylesheet" href="/stylesheets/mylists.css">
+  </head>
+  <body>
+    <!-- BASIC NAVBAR TEMPLATE -->
+    <% include partials/templates/navbar_basic.ejs %>
+
+    <div id="background_image_container">
+    <!--CSS PUTS BACKGROUND HERE-->
+    </div>
+
+    <!-- BEGIN LISTS -->
+    <div class="container-fluid">
+    </br>
+      <h3 class="text-secondary">Album Lists:</h3>
+      <div id="loader"></div>
+      <ul id="all-lists">
+        <!-- lists go here -->
+      </ul>
+    </div>
+    <!-- END LISTS -->       
+
+    <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
+    <% include partials/templates/footer.ejs %>
+    <script src="/javascripts/mylists.script.js"></script>
+  </body>
+</html>

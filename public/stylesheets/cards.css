@@ -1,12 +1,14 @@
 /* ====== custom styling for cards ======= */
 #all_cards,
-#favorites_all_cards {
+#favorites_all_cards,
+#albums {
   margin: 0px 8px 0px 8px;
   padding: 0px;
 }
 
 #all_cards .card,
-#favorites_all_cards .card {
+#favorites_all_cards .card,
+#albums .card {
   width: 16rem;
 }
 
@@ -21,7 +23,8 @@
 
 @media screen and (max-width: 800px) {
   #all_cards .card,
-  #favorites_all_cards .card {
+  #favorites_all_cards .card,
+  #albums .card {
     width: 10.8rem;
   }
   .large_artist,

@@ -1,0 +1,16 @@
+#list-title {
+  margin: 18px 15px 0px 15px;
+}
+
+#list-creator {
+  margin: 2px 15px 10px 15px;
+  line-height: 1em;
+}
+
+#back-button {
+  margin-left: 12px;
+}
+#back_arrow {
+  height: 22px;
+  padding: 0px 6px 2px 3px;
+}

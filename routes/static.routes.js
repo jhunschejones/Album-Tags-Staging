@@ -81,8 +81,23 @@ router.get('/update/:albumId', function(req, res) {
   })
 })
 
-// GET utility page
+// GET my-lists page
+router.get('/mylists', function(req, res) {
+  res.render('mylists', {
+    pageTitle: ': My Lists',
+    subTitle: 'Create & Manage Album Lists'
+  })
+})
 
+// GET specific lists page
+router.get('/list/:id', function(req, res) {
+  res.render('list', {
+    pageTitle: ': My Lists',
+    subTitle: 'Create & Manage Album Lists'
+  })
+})
+
+// GET utility page
 router.get('/utility', function(req, res) {
   res.render('utility', {
     pageTitle: ': Utility',
