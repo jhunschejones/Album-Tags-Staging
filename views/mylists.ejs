@@ -4,7 +4,7 @@
     <% include partials/templates/head_tags.ejs %>
     <link rel="stylesheet" href="/stylesheets/cards.min.css">
     <link rel="stylesheet" href="/stylesheets/spinner.min.css">
-    <link rel="stylesheet" href="/stylesheets/mylists.css">
+    <link rel="stylesheet" href="/stylesheets/mylists.min.css">
   </head>
   <body>
     <!-- BASIC NAVBAR TEMPLATE -->
@@ -17,16 +17,25 @@
     <!-- BEGIN LISTS -->
     <div class="container-fluid">
     </br>
-      <h3 class="text-secondary">Album Lists:</h3>
+      <h3 id="page-title" class="text-secondary">My Album Lists:</h3>
       <div id="loader"></div>
+      <p id="no-lists-message" class="text-secondary">You do not have any custom album lists. <a href="/search">Search</a> for an album and add it to a new list on the <i>Update</i> page.</p>
       <ul id="all-lists">
         <!-- lists go here -->
       </ul>
     </div>
-    <!-- END LISTS -->       
+    <!-- END LISTS -->  
+    <div id="login-message" style="display:none;" class="text-center">
+      <br/><br/><br/><br/>
+      <h4 class="text-secondary">Please <span class="login_button text-primary" style="cursor:pointer;">log in</span> to access your custom album lists!</h4>
+      <br/><br/><br/><br/><br/>
+    </div>
+
+    </br>
+    <button id="back-button" class="btn btn-sm btn-light" onclick="window.history.back()"><img id="back_arrow" src="/images/back_arrow.png"><span class="button_text">Back</span></button>     
 
     <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
     <% include partials/templates/footer.ejs %>
-    <script src="/javascripts/mylists.script.js"></script>
+    <script src="/javascripts/mylists.script.min.js"></script>
   </body>
 </html>

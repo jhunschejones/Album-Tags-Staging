@@ -1,10 +1,19 @@
+// ====== START UTILITY FUNCTIONS ======
+function removeByID(arr, ID) {
+  return arr.filter(function(ele){
+    return ele._id != ID
+  })
+}
+
+// ====== END UTILITY FUNCTIONS ======
+
 let allLists
 
 function getAllLists() {
   $.ajax({
     method: "GET",
-    // url: "/api/v1/list/user/" + userID,
-    url: "/api/v1/list/user/Ol5d5mjWi9eQ7HoANLhM4OFBnso2",
+    url: "/api/v1/list/user/" + userID,
+    // url: "/api/v1/list/user/Ol5d5mjWi9eQ7HoANLhM4OFBnso2",
     success: function(data) {
       allLists = data
       $('#loader').hide()
@@ -13,13 +22,39 @@ function getAllLists() {
   })
 }
 
+function removeList(listID) {
+  let thisList = allLists.find(x => x._id === listID)
+  let confirmed = confirm(`Are you sure you want to delete your list "${thisList.title}"? You cannot undo this operation.`)
+
+  if (confirmed) {
+    $.ajax({
+      method: "DELETE",
+      url: "/api/v1/list/" + listID,
+      success: function() {
+        allLists = removeByID(allLists, listID)
+        populateAllLists()
+      }
+    })
+  } 
+}
+
 function populateAllLists() {
+  $("#no-lists-message").hide()
   $('#all-lists').html('')
-  allLists.forEach(list => {
-    let listCreator = list.displayName
-    if (listCreator.trim === "") { listCreator = "Unknown" }
-    $('#all-lists').append(`<li><a href="/list/${list._id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span></li>`)
-  })
+  if (allLists.length > 0) {
+    allLists.forEach(list => {
+      let listCreator = list.displayName
+      if (listCreator.trim === "") { listCreator = "Unknown" }
+      $('#all-lists').append(`<li class="list"><a href="/list/${list._id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span><span class="list-delete-button" data-list-id="${list._id}" data-toggle="tooltip" data-placement="right" title="Delete this list" data-trigger="hover">&#10005;</span></li>`)
+    })
+  
+    // ====== add event listener to delete buttons =====
+    $(".list-delete-button").on("click", function() { 
+      removeList($(this).attr("data-list-id")) 
+    })
+  } else {
+    $("#no-lists-message").show()
+  }
 }
 // ----- START FIREBASE AUTH SECTION ------
 const config = {
@@ -40,17 +75,20 @@ firebase.auth().onAuthStateChanged(function(user) {
     $('#full_menu_login_button').hide()
     $('#logout_button').show()
     $('#full_menu_logout_button').show()
-    $('#log_in_message').hide()
+
+    $('#page-title').show()
+    $('#login-message').hide()
   } else {   
     // no user logged in
-    $('#all_cards').html('')
     $('#full_menu_login_logout_container').show()
     $('#login_button').show()
     $('#full_menu_login_button').show()
     $('#logout_button').hide()
     $('#full_menu_logout_button').hide()
-    $('#loader').hide()
-    $('#log_in_message').show()   
+
+    $('#loader').hide()  
+    $('#login-message').show()
+    $('#page-title').hide()
   }
 })
 
@@ -65,6 +103,9 @@ function logIn() {
   .then(function(result) {
     userID = user.uid
     getAllLists()
+
+    $('#login-message').hide()
+    $('#page-title').show()
 
     $('#full_menu_login_logout_container').show()
     $('#login_button').hide()
@@ -85,6 +126,9 @@ function logOut() {
     $('#full_menu_login_button').show()
     $('#logout_button').hide()
     $('#full_menu_logout_button').hide()
+
+    $('#login-message').show()
+    $('#page-title').hide()
 
   }).catch(function(error) {
   // An error happened.
