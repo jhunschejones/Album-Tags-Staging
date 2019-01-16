@@ -4,7 +4,7 @@
     <% include partials/templates/head_tags.ejs %>
     <link rel="stylesheet" href="/stylesheets/cards.min.css">
     <link rel="stylesheet" href="/stylesheets/spinner.min.css">
-    <link rel="stylesheet" href="/stylesheets/list.css">
+    <link rel="stylesheet" href="/stylesheets/list.min.css">
   </head>
   <body>
     <!-- BASIC NAVBAR TEMPLATE -->
@@ -18,15 +18,51 @@
     <h3 id="list-title"></h3>
     <p id="list-creator" class="text-secondary"></p>
     <div id="loader"></div>
+    <p id="no-albums-message" class="text-secondary">There are currently no albums in this list. <a href="/search">Search</a> for an album and add it to a list on the <i>Update</i> page.</p>
     <div id="albums" class="row container-fluid">
       <!-- lists go here -->
     </div>
     </br>
     <button id="back-button" class="btn btn-sm btn-light" onclick="window.history.back()"><img id="back_arrow" src="/images/back_arrow.png"><span class="button_text">Back</span></button>
+    <button id="edit-button" class="btn btn-sm btn-light">Edit List</button>
     <!-- END LISTS -->       
+
+    <!-- Modal -->
+    <div class="modal fade" id="editListModal" tabindex="-1" role="dialog" aria-labelledby="editListModalTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editListModalTitle">Edit List Information</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <label for="list-title-input" class="text-secondary">List title:</label>
+            <div class="input-group mb-3">
+              <input id="list-title-input" type="text" class="form-control">
+              <div class="input-group-append">
+                <button id="update-list-title" class="btn btn-outline-primary" type="button">Update</button>
+              </div>
+            </div>
+            <label for="list-display-name-input" class="text-secondary">List display name:</label>
+            <div class="input-group mb-3">
+              <input id="list-display-name-input" type="text" class="form-control">
+              <div class="input-group-append">
+                <button id="update-list-display-name" class="btn btn-outline-primary" type="button">Update</button>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
     <% include partials/templates/footer.ejs %>
-    <script src="/javascripts/list.script.js"></script>
+    <script src="/javascripts/list.script.min.js"></script>
   </body>
 </html>

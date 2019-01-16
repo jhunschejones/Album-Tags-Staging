@@ -1,11 +1,43 @@
 #list-title {
-  margin: 18px 15px 0px 15px;
+  margin: 18px 5px 0px 15px;
 }
 
 #list-creator {
-  margin: 2px 15px 10px 15px;
+  margin: 2px 5px 15px 15px;
   line-height: 1em;
 }
+
+#no-albums-message {
+  display: none;
+  text-align: center;
+  margin-top: 60px;
+  margin-bottom: 50px;
+}
+
+.album-delete-button {
+  cursor: pointer;
+  margin-left: 232px;
+  margin-top: -3px;
+  background-color: rgba(245, 245, 245, 0.7);
+  display: block;
+  border-radius: 12px;
+  padding-left: 6px;
+  padding-right: 6px;
+  padding-top: 0px;
+  padding-bottom: 1px;
+  font-size: 1em;
+  position: absolute;
+  color: darkslategrey;
+}
+  .album-delete-button:hover {
+    background-color: rgba(245, 245, 245, 0.9);
+  }
+
+  @media screen and (max-width: 800px) {
+    .album-delete-button {
+      margin-left: 150px;
+    }
+  }
 
 #back-button {
   margin-left: 12px;
@@ -14,3 +46,9 @@
   height: 22px;
   padding: 0px 6px 2px 3px;
 }
+#edit-button {
+  padding: 5px 10px;
+  display: none;
+}
+
+
