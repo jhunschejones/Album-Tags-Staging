@@ -523,25 +523,31 @@ function removeFromFavorites() {
 }
 
 // ====== START LIST FUNCTIONALITY ======
+let allLists
+
 function getAllLists() {
   $.ajax({
     method: "GET",
-    // url: "/api/v1/list/user/" + userID,
-    url: "/api/v1/list/user/Ol5d5mjWi9eQ7HoANLhM4OFBnso2",
+    url: "/api/v1/list/user/" + userID,
+    // url: "/api/v1/list/user/Ol5d5mjWi9eQ7HoANLhM4OFBnso2",
     success: function(data) {
-      allLists = data
-      $('#loader').hide()
+      if (data.message) {
+        allLists = []
+      } else {
+        allLists = data
+      }
       populateAllLists()
     }
   })
 }
 
 function populateAllLists() {
-  $('#all-lists').html('')
+  $('#list-options').html('')
+  $("<option selected>Add to a list...</option>").appendTo("#list-options")
   allLists.forEach(list => {
-    $( `<option value="${list._id}">${list.title}</option>` ).appendTo( "#list-options" )
+    $(`<option value="${list._id}">${list.title}</option>`).appendTo("#list-options")
   })
-  $( '<option value="create new list">Add to a new list...</option>' ).appendTo( "#list-options" )
+  $('<option value="create new list">Add to a new list...</option>').appendTo("#list-options")
 }
 
 function addToList(chosenList, album) {
@@ -567,8 +573,26 @@ function addToList(chosenList, album) {
 }
 
 function addToNewList(album, listTitle, displayName) {
-  // create new list with attached album here
-  console.log(listTitle, displayName)
+  if (album && listTitle && displayName) {
+    let newList = {
+      user: userID,
+      displayName: displayName,
+      title: listTitle,
+      albums: [album]
+    }
+    $.ajax({
+      method: "POST",
+      url: "/api/v1/list/",
+      contentType: 'application/json',
+      data: JSON.stringify(newList),
+      success: function(data) {
+        alert(`Successfully added list: "${data.title}"`)
+        // update the UI without making any additional API calls
+        allLists.push(data)
+        populateAllLists()
+      }
+    })
+  }
 }
 
 // ====== EVENT LISTENERS FOR LIST FUNCTIONALITY =====
@@ -757,6 +781,9 @@ $('input[type=search]').on('keydown', function(e) {
     }
     if ($("#new_tag").is(":focus")) {
       addTag()
+    }
+    if ($("#list-options").is(":focus")) {
+      validateNewConnection()
     }
   }
 })
