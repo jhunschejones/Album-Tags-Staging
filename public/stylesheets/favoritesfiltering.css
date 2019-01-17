@@ -33,6 +33,17 @@
     margin: 2px 0px 0px 3px;
 }
 
+#share-favorites-button {
+    margin: 2px;
+}
+
+#copied-message {
+    margin-left: 17px;
+    margin-bottom: 8px;
+    margin-top: -25px;
+    display: none;
+}
+
 @media screen and (min-width: 500px) {
 
     .button_text {

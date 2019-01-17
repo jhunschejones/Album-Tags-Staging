@@ -1,4 +1,7 @@
 const List = require('../models/list.model')
+const request = require('request')
+const Cryptr = require('cryptr')
+const cryptr = new Cryptr('AlbumTagsSecretKey')
 
 exports.find_all_user_lists = function (req, res, next) {
   const userID = req.params.id
@@ -161,4 +164,42 @@ exports.update_list = function (req, res, next) {
   } else {
     res.send({"message" : "please provide the list _id value with your PUT request"})
   }
+}
+
+exports.get_user_virtual_favorites_list = function (req, res, next) {
+  const message = {
+    user: req.params.id,
+    displayName: req.body.displayName || ""
+    // notes: req.body.notes || ""
+  }
+  const urlToken = cryptr.encrypt(JSON.stringify(message))
+  res.send(urlToken)
+}
+
+exports.get_user_favorites = function (req, res, next) {
+  const favoritesListID = req.params.id
+  const message = JSON.parse(cryptr.decrypt(favoritesListID))
+
+  request.get(  
+    {  
+      url: 'https://www.albumtags.com/api/v1/album/favorites/' + message.user,  
+      json: true  
+    },  
+    (err, favoritesResponse, albumResult) => {  
+      if (err) return next(err) 
+      if (albumResult) {
+        let resultList = {
+          title: "My Favorites",
+          displayName: message.displayName || "",
+          notes: message.notes || "",
+          albums: albumResult
+        }
+        res.send(resultList)
+        return
+
+      } else {
+        res.send({ "message" : `unable to find favorites for user "${message.displayName || "Unknown"}"` })
+        return
+      }
+    })
 }

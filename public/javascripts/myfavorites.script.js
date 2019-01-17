@@ -156,6 +156,37 @@ function populateCard(album, cardNumber) {
   artistsList.push(album.artist)
 }
 
+document.getElementById("share-favorites-button").addEventListener("click", function() {
+  $('#shareFavoritesModal').modal('show')
+})
+
+document.getElementById("get-shareable-link").addEventListener("click", function() {
+  let displayName = $('#display-name-input').val()
+
+  $.ajax(`/api/v1/list/favorites/${userID}`, {
+    method: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify({
+      "displayName": displayName
+    }),
+    success: function (data) {
+      const myFavoritesURL = window.location.protocol + "//" + window.location.host + "/list/" + data
+
+      const urlBox = document.getElementById("shareable-url")
+      urlBox.value = myFavoritesURL
+      urlBox.select()
+
+      navigator.clipboard.writeText(myFavoritesURL).then(function() {
+        // show message if clipboard write succeeded
+        $('#copied-message').show()
+        setTimeout(function(){ $('#copied-message').hide(); }, 3000)
+      }, function() {
+        // clipboard write failed
+      })
+    }
+  })
+})
+
 // ----- START FIREBASE AUTH SECTION ------
 // === OLD CONFIG ===
 // var config = {
@@ -291,7 +322,7 @@ function clearFilters() {
   filterYear = 'none'
   filterGenre = 'none'
   filterArtist = 'none'
-  if (filterTopTen == true) {
+  if (filterTopTen) {
     toggleStar()
   }
   restoreCards()
@@ -393,7 +424,7 @@ function whatsOnThePage_Top10() {
     }
   }
 
-  if (top10 == true) {
+  if (top10) {
     $('#top_10_button').show()
   } else {
     $('#top_10_button').hide()
@@ -458,7 +489,7 @@ function getGenreTags(album, cardNumber) {
       var tag = tagObject.tag
       // tag = replaceUnderscoreWithBackSlash(tag)
 
-      if(isGenre(tag) == true){
+      if(isGenre(tag)){
         genresList.push(tag)             
           
         // add genre as a class on the card
