@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <% include partials/templates/head_tags.ejs %>
+    <link rel="stylesheet" href="/stylesheets/album.css">
+  </head>
+  <body>
+
+    <!-- BASIC NAVBAR TEMPLATE -->
+    <% include partials/templates/navbar_basic.ejs %>
+
+    <!-- START PAGE CONTENT -->
+    <div class="container-fluid">
+      <!-- top main row -->
+      <div class="row">
+        <!-- left main column -->
+        <div class="col">
+          <h2 id="album-title"></h2>
+          <p id="band-name" class="text-secondary"></p>
+          <img src="" id="album-cover" class="img-fluid">
+        </div>
+        <!-- right main column -->
+        <div class="col-md-7">
+          <div id="info-card" class="card">
+            <div class="card-header">
+              <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item">
+                  <a id="info-info-card-tab" data-card="info" class="nav-link active" href="">Info</a>
+                </li>
+                <li class="nav-item">
+                  <a id="tags-info-card-tab" data-card="tags" class="nav-link inactive-info-tab" href="">Tags</a>
+                </li>
+                <li class="nav-item">
+                  <a id="connections-info-card-tab" data-card="connections" class="nav-link inactive-info-tab" href="">Connections</a>
+                </li>
+                <li class="nav-item">
+                  <a id="lists-info-card-tab" data-card="lists" class="nav-link inactive-info-tab" href="">Lists</a>
+                </li>
+              </ul>
+            </div>
+            <!-- ====== start info-card body elements ====== -->
+            <div id="info-info-card-body" class="card-body info-card-body">
+              <h5 class="card-title">Album information:</h5>
+              <strong class="card-text mb-0 mt-2">Tracks:</strong>
+              <ol id="track-titles" class="card-text text-secondary"></ol>
+              <p id="release-date" class="card-text mt-2"><strong>Released: </strong><span class="text-secondary"></span></p>
+              <p id="record-company" class="card-text"><strong>Record Label: </strong><span class="text-secondary"><span></p>
+              <p id="apple-album-id" class="card-text mb-0"><strong>Apple album ID: </strong><span class="text-secondary"></span></p>
+              <a id="more-by-this-artist"" href="">More by this artist</a>
+            </div>
+            <div id="tags-info-card-body" class="card-body info-card-body">
+              <h5 class="card-title">Tags by <span>all </span>users:</h5>
+              <div id="current-tags" class="card-text"></div>
+              <!-- Note: bootstrap float-right class causes these to reverse order -->
+              <a href="#" class="btn btn-sm btn-outline-primary ml-1 float-right">Update</a>
+              <a href="#" class="btn btn-sm btn-outline-primary ml-1 float-right">Clear</a>
+              <a href="#" class="btn btn-sm btn-outline-primary ml-1 float-right">Search by selection</a>
+            </div>
+            <div id="connections-info-card-body" class="card-body info-card-body">
+              <h5 class="card-title">Connections by <span>all </span>users:</h5>
+              <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+              <a href="#" class="btn btn-sm  btn-outline-primary float-right">Update</a>
+            </div>
+            <div id="lists-info-card-body" class="card-body info-card-body">
+              <h5 class="card-title"><span>User </span>lists with this album:</h5>
+              <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+              <a href="#" class="btn btn-sm btn-outline-primary float-right">Update</a>
+            </div>  
+            <!-- ====== end info-card body elements ====== -->                                  
+          </div>
+        </div>
+      </div>
+      <!-- bottom row -->
+      <div class="row">
+      </div>
+    </div>
+    <!-- END PAGE CONTENT -->    
+
+    <% include partials/templates/footer.ejs %>
+    <script src="/javascripts/album.script.js"></script>
+  </body>
+</html>

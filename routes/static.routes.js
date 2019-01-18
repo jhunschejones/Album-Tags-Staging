@@ -28,6 +28,14 @@ router.get('/albumdetails/:albumId', function(req, res, next) {
   })
 })
 
+// GET album page
+router.get('/album/:albumId', function(req, res, next) {
+  res.render('album', {
+    pageTitle: ': Details',
+    subTitle: 'Album Details'
+  })
+})
+
 // GET alltags page 
 router.get('/alltags', function(req, res, next) {
   res.render('alltags', {
