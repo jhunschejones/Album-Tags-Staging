@@ -18,6 +18,18 @@ function safeParse(content) {
 function replaceBackSlashWithHtml(str) {
   return str.replace(/\//g, '&sol;')
 }
+
+function truncate(str, len){
+  // set up the substring
+  var subString = str.substr(0, len-1)
+  
+  return (
+    // add elipse after last complete word
+    subString.substr(0, subString.lastIndexOf(' '))
+    // trim trailing comma
+    .replace(/(^[,\s]+)|([,\s]+$)/g, '') + '...'
+  )
+}
 // ====== END UTILITY SECTION ======
 
 const albumID = window.location.pathname.replace('/album/', '')
@@ -55,6 +67,36 @@ function populateAlbumPage() {
   })
 
   addTags()
+  populateConnections()
+}
+
+function populateConnections() {
+  if (albumResult.connectionObjects && albumResult.connectionObjects.length > 0) {
+    $('#connected-albums').html('')
+
+    for (let index = 0; index < albumResult.connectionObjects.length; index++) {
+      let connectedAlbum = albumResult.connectionObjects[index]
+
+      if (connectedAlbum.appleAlbumID != albumResult.appleAlbumID) {
+        const cover = connectedAlbum.cover.replace('{w}', 105).replace('{h}', 105)
+        let smallTitle
+        if (connectedAlbum.title.length > 20) { 
+          smallTitle = truncate(connectedAlbum.title, 20) 
+        } else {
+          smallTitle = connectedAlbum.title
+        }
+
+        $('#connected-albums').append(`<a href="/album/${connectedAlbum.appleAlbumID}" id="${connectedAlbum.appleAlbumID}" class="connection" data-creator="${connectedAlbum.creator}"><img class="connection-cover" src="${cover}" data-toggle="tooltip" data-placement="top" title="${smallTitle}" data-trigger="hover"></a>`)
+      }
+    } 
+
+    // ------------- enable tooltips -----------
+    var isTouchDevice = false
+    if ("ontouchstart" in document.documentElement) { isTouchDevice = true; }
+    if (!isTouchDevice) { $('[data-toggle="tooltip"]').tooltip(); }
+  } else {
+    //there are no connected albums
+  }
 }
 
 function addTags() {
@@ -106,9 +148,33 @@ function toggleActiveInfoTab(element) {
   $(`#${selectedCard}-info-card-body`).show()
 }
 
+function clearTagArray(event) {
+  if (event) { event.preventDefault() }
+  
+  if ($(".selected-tag").length > 0) {
+    $(".selected-tag").toggleClass( "badge-primary" )
+    $(".selected-tag").toggleClass( "badge-light" )
+    $(".selected-tag").toggleClass( "selected-tag" )
+
+    selectedTags = []
+  }
+}
+
 $('#info-card .nav-link').click(function(event) {
   event.preventDefault()
   toggleActiveInfoTab($(this))
+})
+$('#tag-search-button').click(function(event) {
+  event.preventDefault()
+  if (selectedTags.length > 0) {
+    var win = window.location = (`/search/tags/${selectedTags}`)
+  }  else {
+    alert("Select one or more tags to preform a tag search")
+  }
+})
+$('#clear-tag-button').click(function(event) {
+  event.preventDefault()
+  clearTagArray(event)
 })
 
 getAlbumDetails()
@@ -122,6 +188,11 @@ function userIsLoggedIn() {
   $('#full_menu_login_button').hide()
   $('#logout_button').show()
   $('#full_menu_logout_button').show()
+
+  $('.info-card-login-button').hide()
+  $('#tag-update-button').show()
+  $('#connection-update-button').show()
+  $('#list-update-button').show()
 }
 
 function userIsLoggedOut() {
@@ -132,6 +203,11 @@ function userIsLoggedOut() {
   $('#full_menu_login_button').show()
   $('#logout_button').hide()
   $('#full_menu_logout_button').hide()
+
+  $('.info-card-login-button').show()
+  $('#tag-update-button').hide()
+  $('#connection-update-button').hide()
+  $('#list-update-button').hide()
 }
 
 // == New Config, November 2018 == 
@@ -182,13 +258,9 @@ function logOut() {
 }
 
 // add event listener to log in and out buttons
-const loginButton = document.getElementById("login_button")
-const loginButton2 = document.getElementById("full_menu_login_button")
-const logoutButton = document.getElementById("logout_button")
-const logoutButton2 = document.getElementById("full_menu_logout_button")
-loginButton.addEventListener("click", logIn)
-loginButton2.addEventListener("click", logIn)
-logoutButton.addEventListener("click", logOut)
-logoutButton2.addEventListener("click", logOut)
-
+document.getElementById("login_button").addEventListener("click", logIn)
+document.getElementById("full_menu_login_button").addEventListener("click", logIn)
+document.getElementById("logout_button").addEventListener("click", logOut)
+document.getElementById("full_menu_logout_button").addEventListener("click", logOut)
+$(".info-card-login-button").on("click", logIn)
 // ----- END FIREBASE AUTH SECTION ------

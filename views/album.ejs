@@ -52,21 +52,122 @@
               <h5 class="card-title">Tags by <span>all </span>users:</h5>
               <div id="current-tags" class="card-text"></div>
               <!-- Note: bootstrap float-right class causes these to reverse order -->
-              <a href="#" class="btn btn-sm btn-outline-primary ml-1 float-right">Update</a>
-              <a href="#" class="btn btn-sm btn-outline-primary ml-1 float-right">Clear</a>
-              <a href="#" class="btn btn-sm btn-outline-primary ml-1 float-right">Search by selection</a>
+              <button type="button" class="btn btn-sm btn-outline-primary ml-1 float-right info-card-login-button">Log In</button>
+              <button id="tag-update-button" type="button" class="btn btn-sm btn-outline-primary ml-1 float-right" data-toggle="modal" data-target="#updateTagModal">Update</button>
+              <a id="clear-tag-button" href="" class="btn btn-sm btn-outline-primary ml-1 float-right">Clear</a>
+              <a id="tag-search-button" href="" class="btn btn-sm btn-outline-primary ml-1 float-right">Search by selection</a>
             </div>
             <div id="connections-info-card-body" class="card-body info-card-body">
               <h5 class="card-title">Connections by <span>all </span>users:</h5>
-              <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-              <a href="#" class="btn btn-sm  btn-outline-primary float-right">Update</a>
+              <div id="connected-albums" class="card-text"></div>
+              <button type="button" class="btn btn-sm btn-outline-primary ml-1 float-right info-card-login-button">Log In</button>
+              <button type="button" id="connection-update-button" class="btn btn-sm  btn-outline-primary float-right" data-toggle="modal" data-target="#updateConnectionModal">Update</button>
             </div>
             <div id="lists-info-card-body" class="card-body info-card-body">
               <h5 class="card-title"><span>User </span>lists with this album:</h5>
               <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-              <a href="#" class="btn btn-sm btn-outline-primary float-right">Update</a>
+              <button type="button" class="btn btn-sm btn-outline-primary ml-1 float-right info-card-login-button">Log In</button>
+              <button type="button" id="list-update-button" class="btn btn-sm  btn-outline-primary float-right" data-toggle="modal" data-target="#updateListModal">Update</button>
             </div>  
-            <!-- ====== end info-card body elements ====== -->                                  
+            <!-- ====== end info-card body elements ====== -->   
+            
+            <!-- ====== start update tag modal ====== -->
+            <div class="modal fade" id="updateTagModal" tabindex="-1" role="dialog" aria-labelledby="updateTagModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="updateTagModalLabel">Update Tags</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="input-group mb-3">
+                      <input id="add-tag-input" type="text" class="form-control" placeholder="Add a new tag...">
+                      <div class="input-group-append">
+                        <button id="add-tag-button" class="btn btn-primary" type="button">Add</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Done</button>
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- ====== end update tag modal ====== -->
+
+            <!-- ====== start update connection modal ====== -->
+            <div class="modal fade" id="updateConnectionModal" tabindex="-1" role="dialog" aria-labelledby="updateConnectionModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="updateConnectionModalLabel">Update Tags</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="input-group mb-3">
+                      <input id="add-tag-input" type="text" class="form-control" placeholder="Add a new connection...">
+                      <div class="input-group-append">
+                        <button id="add-tag-button" class="btn btn-primary" type="button">Add</button>
+                      </div>
+                    </div>
+                    <small class="text-secondary font-italic">To add a connection:</small><br/>
+                    <small>1. Copy the apple album ID from the info tab of another album</small><br/>
+                    <small>2. Paste the album ID into the input field above</small><br/>
+                    <small>3. Click 'add'!</small><br/>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Done</button>
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- ====== end update connection modal ====== -->    
+            
+            <!-- ====== start update list modal ====== -->
+            <div class="modal fade" id="updateListModal" tabindex="-1" role="dialog" aria-labelledby="updateListModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="updateListModalLabel">Update Tags</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <p class="text-secondary mb-1"><small>Add to an existing list:</small></p>
+                    <div id="list-input-group mb-3" class="input-group">
+                      <select class="custom-select" id="list-options">
+                        <!-- javascript adds lists here -->
+                        <option selected>Select a list...</option>
+                      </select>
+                      <div class="input-group-append">
+                        <button id="add-to-list-button" class="btn btn-primary" type="button">Add</button>
+                      </div>
+                    </div>
+                    <p class="text-secondary mb-1 mt-4"><small>Add to a new list:</small></p>
+                    <div class="input-group mb-2">
+                      <input id="new-list-title" type="text" class="form-control" placeholder="New list name...">
+                    </div>
+                    <div class="input-group mb-1">
+                      <input id="new-display-name" type="text" class="form-control" placeholder="User display name...">
+                    </div>
+                    <button type="button" class="btn btn-sm btn-primary float-right">Add to new list</button>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Done</button>
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- ====== end update list modal ====== -->            
+
           </div>
         </div>
       </div>

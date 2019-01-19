@@ -52,6 +52,18 @@
   margin-right: 10px;
 }
 
+.connection {
+  margin: 5px 10px 5px 5px;
+  display: inline-flex;
+}
+
+.connection-cover {
+  border-radius: 5px;
+  box-shadow: 2px 2px 5px grey;
+  margin-right: 8px;
+  margin-bottom: 10px;
+}
+
 /* ====== MEDIA BREAKPOINTS ===== */
 @media screen and (max-width: 500px) {
   #info-card { 
