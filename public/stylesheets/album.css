@@ -52,6 +52,14 @@
   margin-right: 10px;
 }
 
+.delete-tag-button {
+  opacity: 0.3;
+}
+
+  .delete-tag-button:hover {
+    opacity: 0.9;
+  }
+
 .connection {
   margin: 5px 10px 5px 5px;
   display: inline-flex;
@@ -64,21 +72,31 @@
   margin-bottom: 10px;
 }
 
+#all-lists {
+  list-style-type: none;
+  padding: 0;
+}
+
+.list {
+  margin: 0px, 0px, 5px, 0px;
+}
+
 /* ====== MEDIA BREAKPOINTS ===== */
-@media screen and (max-width: 500px) {
+/* replaced with bootstrap classes */
+/* @media screen and (max-width: 500px) {
   #info-card { 
     margin-top: 20px;
   }
   #album-cover {
     margin-bottom: 0px;
   }
-}
-
-@media screen and (min-width: 500px) {
+} */
+/* replaced with bootstrap classes */
+/* @media screen and (min-width: 500px) {
   #info-card { 
     margin-top: 80px;
   }
   #album-cover {
     margin-bottom: 15px;
   }
-}
+} */

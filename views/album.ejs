@@ -12,15 +12,15 @@
     <!-- START PAGE CONTENT -->
     <div class="container-fluid">
       <!-- top main row -->
-      <div class="row">
+      <div class="row no-gutters">
         <!-- left main column -->
-        <div class="col">
+        <div class="col col-xl-4 mr-md-4 mb-md-5">
           <h2 id="album-title"></h2>
           <p id="band-name" class="text-secondary"></p>
           <img src="" id="album-cover" class="img-fluid">
         </div>
         <!-- right main column -->
-        <div class="col-md-7">
+        <div class="col-md-6 mr-md-2 mt-md-5 mt-3">
           <div id="info-card" class="card">
             <div class="card-header">
               <ul class="nav nav-tabs card-header-tabs">
@@ -50,23 +50,23 @@
             </div>
             <div id="tags-info-card-body" class="card-body info-card-body">
               <h5 class="card-title">Tags by <span>all </span>users:</h5>
-              <div id="current-tags" class="card-text"></div>
+              <div id="current-tags" class="card-text mb-4"></div>
               <!-- Note: bootstrap float-right class causes these to reverse order -->
-              <button type="button" class="btn btn-sm btn-outline-primary ml-1 float-right info-card-login-button">Log In</button>
-              <button id="tag-update-button" type="button" class="btn btn-sm btn-outline-primary ml-1 float-right" data-toggle="modal" data-target="#updateTagModal">Update</button>
-              <a id="clear-tag-button" href="" class="btn btn-sm btn-outline-primary ml-1 float-right">Clear</a>
-              <a id="tag-search-button" href="" class="btn btn-sm btn-outline-primary ml-1 float-right">Search by selection</a>
+              <button type="button" class="btn btn-sm btn-outline-primary ml-1 float-right info-card-login-button">Log in to Update</button>
+              <button id="tag-update-button" type="button" class="btn btn-sm btn-outline-primary ml-1 float-right" data-toggle="modal" data-target="#updateTagModal">Add Tags</button>
+              <a id="clear-tag-button" href="" class="btn btn-sm btn-outline-primary ml-1 float-right">Clear Selection</a>
+              <a id="tag-search-button" href="" class="btn btn-sm btn-outline-primary ml-1 float-right">Search</a>
             </div>
             <div id="connections-info-card-body" class="card-body info-card-body">
               <h5 class="card-title">Connections by <span>all </span>users:</h5>
               <div id="connected-albums" class="card-text"></div>
-              <button type="button" class="btn btn-sm btn-outline-primary ml-1 float-right info-card-login-button">Log In</button>
-              <button type="button" id="connection-update-button" class="btn btn-sm  btn-outline-primary float-right" data-toggle="modal" data-target="#updateConnectionModal">Update</button>
+              <button type="button" class="btn btn-sm btn-outline-primary ml-1 float-right info-card-login-button">Log in to Update</button>
+              <button type="button" id="connection-update-button" class="btn btn-sm  btn-outline-primary float-right" data-toggle="modal" data-target="#updateConnectionModal">Add Connections</button>
             </div>
             <div id="lists-info-card-body" class="card-body info-card-body">
               <h5 class="card-title"><span>User </span>lists with this album:</h5>
-              <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-              <button type="button" class="btn btn-sm btn-outline-primary ml-1 float-right info-card-login-button">Log In</button>
+              <ul id="all-lists" class="card-text"></ul>
+              <button type="button" class="btn btn-sm btn-outline-primary ml-1 float-right info-card-login-button">Log in to Update</button>
               <button type="button" id="list-update-button" class="btn btn-sm  btn-outline-primary float-right" data-toggle="modal" data-target="#updateListModal">Update</button>
             </div>  
             <!-- ====== end info-card body elements ====== -->   
@@ -76,7 +76,7 @@
               <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="updateTagModalLabel">Update Tags</h5>
+                    <h5 class="modal-title" id="updateTagModalLabel">Add New Tags</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                     </button>
@@ -157,7 +157,17 @@
                     <div class="input-group mb-1">
                       <input id="new-display-name" type="text" class="form-control" placeholder="User display name...">
                     </div>
-                    <button type="button" class="btn btn-sm btn-primary float-right">Add to new list</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary float-right">Add to new list</button>
+                    <p class="text-secondary mb-1 mt-5"><small>Remove from a current list:</small></p>
+                    <div id="list-input-group2 mb-3" class="input-group">
+                      <select class="custom-select" id="list-options2">
+                        <!-- javascript adds lists here -->
+                        <option selected>Select a list...</option>
+                      </select>
+                      <div class="input-group-append">
+                        <button id="remove-from-list-button" class="btn btn-primary" type="button">Remove</button>
+                      </div>
+                    </div>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Done</button>
@@ -170,6 +180,8 @@
 
           </div>
         </div>
+        <!-- empty right column on xl screen size -->
+        <!-- <div class="col-xl-1"></div> -->
       </div>
       <!-- bottom row -->
       <div class="row">

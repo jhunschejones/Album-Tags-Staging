@@ -15,8 +15,24 @@ function safeParse(content) {
   return content
 }
 
+function escapeHtml(text) {
+  var map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  }
+  return text.replace(/[&<>"']/g, function(m) { return map[m]; })
+}
+
 function replaceBackSlashWithHtml(str) {
   return str.replace(/\//g, '&sol;')
+}
+
+// removes accidental double spaces
+function removeExtraSpace(str) {
+  return str.replace(/\s\s+/g, ' ')
 }
 
 function truncate(str, len){
@@ -30,11 +46,81 @@ function truncate(str, len){
     .replace(/(^[,\s]+)|([,\s]+$)/g, '') + '...'
   )
 }
+// using regular expression to make first letter of each
+// word upper case, even if it is seperated with a "-"
+function toTitleCase(str) {
+  return str.replace(/\b\w+/g, function(txt){
+    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+  })
+}
+
+var isEqual = function (value, other) {
+  // source: https://gomakethings.com/check-if-two-arrays-or-objects-are-equal-with-javascript/
+  // Get the value type
+  var type = Object.prototype.toString.call(value)
+
+  // If the two objects are not the same type, return false
+  if (type !== Object.prototype.toString.call(other)) return false
+
+  // If items are not an object or array, return false
+  if (['[object Array]', '[object Object]'].indexOf(type) < 0) return false
+
+  // Compare the length of the length of the two items
+  var valueLen = type === '[object Array]' ? value.length : Object.keys(value).length
+  var otherLen = type === '[object Array]' ? other.length : Object.keys(other).length
+  if (valueLen !== otherLen) return false
+
+  // Compare two items
+  var compare = function (item1, item2) {
+
+    // Get the object type
+    var itemType = Object.prototype.toString.call(item1)
+
+    // If an object or array, compare recursively
+    if (['[object Array]', '[object Object]'].indexOf(itemType) >= 0) {
+      if (!isEqual(item1, item2)) return false
+    }
+
+    // Otherwise, do a simple comparison
+    else {
+
+      // If the two items are not the same type, return false
+      if (itemType !== Object.prototype.toString.call(item2)) return false
+
+      // Else if it's a function, convert to a string and compare
+      // Otherwise, just compare
+      if (itemType === '[object Function]') {
+        if (item1.toString() !== item2.toString()) return false
+      } else {
+        if (item1 !== item2) return false
+      }
+
+    }
+  }
+
+  // Compare properties
+  if (type === '[object Array]') {
+    for (var i = 0; i < valueLen; i++) {
+      if (compare(value[i], other[i]) === false) return false
+    }
+  } else {
+    for (var key in value) {
+      if (value.hasOwnProperty(key)) {
+        if (compare(value[key], other[key]) === false) return false
+      }
+    }
+  }
+
+  // If nothing failed, return true
+  return true
+}
 // ====== END UTILITY SECTION ======
 
 const albumID = window.location.pathname.replace('/album/', '')
 let albumResult
 let selectedTags = []
+let userLists = []
+let listsWithAlbum = []
 
 function getAlbumDetails() {
   $.ajax('/api/v1/album/albumid/' + albumID, {
@@ -42,14 +128,19 @@ function getAlbumDetails() {
     success: function(album) {
       if (!album.message) {
         albumResult = album
-        console.log(albumResult)
         populateAlbumPage()
+      } else {
+        $.getJSON ( '/api/v1/apple/details/' + albumID, function(album) { 
+          albumResult = album
+          populateAlbumPage()
+        })
       }
     }
   })
 }
 
 function populateAlbumPage() {
+  // ------ put info on page ------
   $('#album-title').text(albumResult.title)
   $('#band-name').text(albumResult.artist)
   $('#album-cover').attr('src', albumResult.cover.replace('{w}', 450).replace('{h}', 450))
@@ -65,9 +156,58 @@ function populateAlbumPage() {
     sessionStorage.setItem('artist', albumResult.artist)
     window.location.href = '/search'
   })
-
-  addTags()
+  // ------ fill cards ------
+  populateTags()
   populateConnections()
+  getListsWithAlbum()
+  getUserLists()
+}
+
+function getUserLists() {
+  $.ajax({
+    method: "GET",
+    url: "/api/v1/list/user/" + userID,
+    // url: "/api/v1/list/user/Ol5d5mjWi9eQ7HoANLhM4OFBnso2",
+    success: function(data) {
+      if (data.message) { userLists = []; } 
+      else { userLists = data; }
+      populateUserLists()
+    }
+  })
+}
+
+function getListsWithAlbum() {
+  $.ajax({
+    method: "GET",
+    url: "/api/v1/list/album/" + albumResult.appleAlbumID,
+    success: function(data) {
+      if (data.message) { listsWithAlbum = []; } 
+      else { listsWithAlbum = data; }
+      populateListsWithAlbum()
+    }
+  })
+}
+
+function populateListsWithAlbum() {
+  $('#list-options2').html('')
+  $("<option selected>Remove from a list...</option>").appendTo("#list-options2")
+  $('#all-lists').html('')
+  listsWithAlbum.forEach(list => {
+    if(!list.isPrivate) {
+      let listCreator = list.displayName
+      if (listCreator.trim === "") { listCreator = "Unknown" }
+      $(`<option value="${list._id}">${list.title}</option>`).appendTo("#list-options2")
+      $('#all-lists').append(`<li class="list" data-creator="${list.user}"><a href="/list/${list._id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span></li>`)
+    }
+  })
+}
+
+function populateUserLists() {
+  $('#list-options').html('')
+  $("<option selected>Add to a list...</option>").appendTo("#list-options")
+  userLists.forEach(list => {
+    $(`<option value="${list._id}">${list.title}</option>`).appendTo("#list-options")
+  })
 }
 
 function populateConnections() {
@@ -90,7 +230,7 @@ function populateConnections() {
       }
     } 
 
-    // ------------- enable tooltips -----------
+    // ------ enable tooltips ------
     var isTouchDevice = false
     if ("ontouchstart" in document.documentElement) { isTouchDevice = true; }
     if (!isTouchDevice) { $('[data-toggle="tooltip"]').tooltip(); }
@@ -99,20 +239,35 @@ function populateConnections() {
   }
 }
 
-function addTags() {
-  for (let index = 0; index < albumResult.tagObjects.length; index++) {
-    let tag = albumResult.tagObjects[index].tag
-    const creator = albumResult.tagObjects[index].creator
+function populateTags() {
+  if (albumResult.tagObjects) {
+    $('#current-tags').html('')
+    for (let index = 0; index < albumResult.tagObjects.length; index++) {
+      let tag = albumResult.tagObjects[index].tag
+      const creator = albumResult.tagObjects[index].creator
+      
+      // add tags
+      if (parseInt(tag)) {
+        const addLetters = "tag_"
+        var tagName = addLetters.concat(tag).replace(/[^A-Z0-9]+/ig,'')
+      } else {                  
+        var tagName = tag.replace(/[^A-Z0-9]+/ig,'')
+      }
     
-    // add tags
-    if (parseInt(tag)) {
-      const addLetters = "tag_"
-      var tagName = addLetters.concat(tag).replace(/[^A-Z0-9]+/ig,'')
-    } else {                  
-      var tagName = tag.replace(/[^A-Z0-9]+/ig,'')
+      if (creator == userID) {
+        // ------ tag delete button with tooltip ------
+        // $('#current-tags').append(`<a href="" id="${tagName}" class="badge badge-light album-tag" data-creator="${creator}" data-raw-tag="${albumResult.tagObjects[index].tag}"><span onclick="selectTag(${tagName}, event)">${safeParse(tag)}</span><span class="delete-tag-button ml-1" data-tag-id="${tagName}" data-toggle="tooltip" data-placement="right" title="Delete" data-trigger="hover">&#10005;</span></a>`) 
+        // ------ tag delete button, no tooltip ------
+        $('#current-tags').append(`<a href="" id="${tagName}" class="badge badge-light album-tag" data-creator="${creator}" data-raw-tag="${escapeHtml(albumResult.tagObjects[index].tag)}"><span onclick="selectTag(${tagName}, event)">${safeParse(tag)}</span><span class="delete-tag-button ml-1" data-tag-id="${tagName}">&#10005;</span></a>`) 
+      } else {
+        $('#current-tags').append(`<a href="" onclick="selectTag(${tagName}, event)" id="${tagName}" class="badge badge-light album-tag" data-creator="${creator}">${safeParse(tag)}</a>`) 
+      }
     }
-  
-    $('#current-tags').append(`<a href="" onclick="selectTag(${tagName}, event)" id="${tagName}" class="badge badge-light album-tag" data-creator="creator-${creator}">${safeParse(tag)}</a>`) 
+    // ------ tag delete button event listener -----
+    $('.delete-tag-button').click(function(event) {
+      event.preventDefault()
+      deleteTag($(this).data('tag-id'))
+    })
   }
 }
 
@@ -140,6 +295,76 @@ function modifySelectedTags(tag) {
   }
 }
 
+function deleteTag(tagID) {
+  const creator = $(`#${tagID}`).data('creator')
+  const tag = $(`#${tagID}`).data('raw-tag')
+
+  let confirmation = confirm(`Are you sure you want to delete the "${tag}" tag? You cannot undo this operation.`)
+
+  console.log(JSON.stringify({ 
+    "tag": tag,
+    "creator": creator
+  }))
+  if (confirmation) {
+    $.ajax(`/api/v1/album/tags/${albumResult._id}`, {
+      method: 'DELETE',
+      contentType: 'application/json',
+      data: JSON.stringify({ 
+        "tag": tag,
+        "creator": creator
+      }),
+      success: function(album) {
+        albumResult = album
+        populateTags()
+      }
+    })
+  }
+}
+
+function addTag() {
+  let newTag = $('#add-tag-input').val().trim()
+
+  if (newTag) {
+    if (newTag.includes("<") && newTag.includes(">") || newTag.includes(".") || newTag.includes("{") || newTag.includes("}")) {
+      alert("Some characters are not allowed in tags, sorry!")
+      $('#add-tag-input').val("")
+      return
+    }
+    newTag = removeExtraSpace(replaceBackSlashWithHtml(toTitleCase(newTag))).trim()
+    newTag = escapeHtml(newTag)
+
+    let duplicates = 0
+    albumResult.tagObjects.forEach(tagObject => {
+      if (isEqual(tagObject, { "tag": newTag, "creator": userID })) { duplicates++ }
+    })
+
+    if (duplicates > 0) {
+      alert(`You already added the "${newTag}" tag to this album!`)
+      $('#add-tag-input').val("")
+      return
+    }     
+
+    // ADD NEW TAG OR NEW ALBUM TO THE DATABASE
+    $.ajax(`/api/v1/album/tags/${albumResult._id || "new"}`, {
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({
+        "album": albumResult,
+        "creator": userID,
+        "tag": newTag
+      }),
+      success: function (album) {
+        albumResult = album
+        populateTags()
+      }
+    })
+  } else {
+    alert("Please enter a non-empty tag.")
+  } 
+
+  $('#add-tag-input').val("")
+}
+
 function toggleActiveInfoTab(element) {
   $('#info-card .active').removeClass("active").addClass("inactive-info-tab")
   $(element).removeClass("inactive-info-tab").addClass("active")
@@ -149,7 +374,7 @@ function toggleActiveInfoTab(element) {
 }
 
 function clearTagArray(event) {
-  if (event) { event.preventDefault() }
+  if (event) { event.preventDefault(); }
   
   if ($(".selected-tag").length > 0) {
     $(".selected-tag").toggleClass( "badge-primary" )
@@ -160,6 +385,7 @@ function clearTagArray(event) {
   }
 }
 
+// ------ START GENERAL EVENT LISTENERS ------
 $('#info-card .nav-link').click(function(event) {
   event.preventDefault()
   toggleActiveInfoTab($(this))
@@ -168,7 +394,7 @@ $('#tag-search-button').click(function(event) {
   event.preventDefault()
   if (selectedTags.length > 0) {
     var win = window.location = (`/search/tags/${selectedTags}`)
-  }  else {
+  } else {
     alert("Select one or more tags to preform a tag search")
   }
 })
@@ -176,9 +402,16 @@ $('#clear-tag-button').click(function(event) {
   event.preventDefault()
   clearTagArray(event)
 })
+$('#add-tag-button').click(function(event) {
+  event.preventDefault()
+  addTag()
+})
 
-getAlbumDetails()
-
+$("#add-tag-input").keyup(function(event) {
+  if (event.keyCode === 13) {
+    $("#add-tag-button").click()
+  }
+})
 // ----- START FIREBASE AUTH SECTION ------
 function userIsLoggedIn() {
   $('.hide_when_logged_in').addClass('hide_me')
@@ -193,6 +426,8 @@ function userIsLoggedIn() {
   $('#tag-update-button').show()
   $('#connection-update-button').show()
   $('#list-update-button').show()
+
+  getAlbumDetails()
 }
 
 function userIsLoggedOut() {
@@ -208,6 +443,8 @@ function userIsLoggedOut() {
   $('#tag-update-button').hide()
   $('#connection-update-button').hide()
   $('#list-update-button').hide()
+
+  getAlbumDetails()
 }
 
 // == New Config, November 2018 == 
@@ -240,8 +477,8 @@ function logIn() {
   })
   .then(function(result) {
     userID = user.uid
-
     userIsLoggedIn()
+
   }).catch(function(error) {
     // Handle Errors here.
   })
