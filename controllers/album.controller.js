@@ -408,7 +408,8 @@ exports.add_connection = function (req, res, next) {
 }
 
 exports.delete_connection = function (req, res, next) {
-  const albumOneID = req.params.id.trim().toString()
+  // const albumOneID = req.params.id.trim().toString()
+  const albumOneID = req.body.albumOne.trim().toString()
   const albumTwoID = req.body.albumTwo.trim().toString()
   const user = req.body.creator
 

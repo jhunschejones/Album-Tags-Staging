@@ -17,13 +17,14 @@ function safeParse(content) {
 
 function escapeHtml(text) {
   var map = {
-    '&': '&amp;',
+    // '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
     '"': '&quot;',
-    "'": '&#039;'
+    "'": '&#039;',
+    '/': '&sol;'
   }
-  return text.replace(/[&<>"']/g, function(m) { return map[m]; })
+  return text.replace(/[<>"'/]/g, function(m) { return map[m]; })
 }
 
 function replaceBackSlashWithHtml(str) {
@@ -226,8 +227,17 @@ function populateConnections() {
           smallTitle = connectedAlbum.title
         }
 
-        $('#connected-albums').append(`<a href="/album/${connectedAlbum.appleAlbumID}" id="${connectedAlbum.appleAlbumID}" class="connection" data-creator="${connectedAlbum.creator}"><img class="connection-cover" src="${cover}" data-toggle="tooltip" data-placement="top" title="${smallTitle}" data-trigger="hover"></a>`)
+        if (connectedAlbum.creator == userID) {
+          $('#connected-albums').append(`<a href="/album/${connectedAlbum.appleAlbumID}" id="${connectedAlbum.appleAlbumID}" class="connection" data-creator="${connectedAlbum.creator}"><img class="connection-cover" src="${cover}" data-toggle="tooltip" data-placement="top" title="${smallTitle}" data-trigger="hover"><span class="delete-connection-button" data-connected-album-id="${connectedAlbum.databaseID}">&#10005;</span></a>`)
+        } else {
+          $('#connected-albums').append(`<a href="/album/${connectedAlbum.appleAlbumID}" id="${connectedAlbum.appleAlbumID}" class="connection" data-creator="${connectedAlbum.creator}"><img class="connection-cover" src="${cover}" data-toggle="tooltip" data-placement="top" title="${smallTitle}" data-trigger="hover"></a>`)
+        }
       }
+
+      $('.delete-connection-button').click(function(event) {
+        event.preventDefault()
+        deleteConnection($(this).data("connected-album-id"))
+      })
     } 
 
     // ------ enable tooltips ------
@@ -236,6 +246,74 @@ function populateConnections() {
     if (!isTouchDevice) { $('[data-toggle="tooltip"]').tooltip(); }
   } else {
     //there are no connected albums
+  }
+}
+
+function addConnection(newAlbumID) {
+  $.getJSON ('/api/v1/apple/details/' + newAlbumID, function(appleAlbum) {
+    // check if this is a valid album id
+    if (!appleAlbum.message) {
+      $.getJSON ('/api/v1/album/albumid/' + newAlbumID, function(databaseAlbum) {
+        if (!databaseAlbum.message) {
+          // ALBUM EXISTS IN DATABASE, SEND PUT REQUEST WITH BOTH ALBUM OBJECTS
+          $.ajax(`/api/v1/album/connections/${albumResult._id || "new"}`, {
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+              "albumOne": albumResult,
+              "albumTwo": databaseAlbum,
+              "creator": userID
+            }),
+            success: function(album) {
+              // returns just this album with updates
+              albumResult = album
+              populateConnections()
+            }
+          })
+        } else {
+          // ALBUM DOES NOT EXIST IN THE DATABASE POST A NEW ALBUM WITH THE CONNECTION IN IT
+          $.ajax(`/api/v1/album/connections/${albumResult._id || "new"}`, {
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+              "albumOne": albumResult,
+              "albumTwo": appleAlbum,
+              "creator": userID
+            }),
+            success: function(album) {
+              // returns just this album with updates
+              albumResult = album
+              populateConnections()
+            }
+          })
+        }
+      })
+    } else {
+      alert("Sorry, Apple says that's not an album ID.")
+    }
+    $('#add-connection-input').val('')
+  })
+}
+
+function deleteConnection(connectedAlbum) {
+  const confirmation = confirm('Are you sure you want to delete a connection? You cannot undo this operation.')
+  if (confirmation === true) {
+    // connectedAlbum is a database ID
+    // DELETE CONNECTION FROM CURRENT ALBUM
+    // DELETE CURRENT ALBUM FROM CONNECTED ALBUM
+    $.ajax(`/api/v1/album/connections/${albumResult._id}`, {
+      method: 'DELETE',
+      contentType: 'application/json',
+      data: JSON.stringify({ 
+        "albumTwo" : connectedAlbum.toString(),
+        "albumOne": albumResult._id.toString(),
+        "creator": userID
+      }),
+      success: function(album) {
+        albumResult = album
+        populateConnections()
+      }
+    })
   }
 }
 
@@ -256,17 +334,25 @@ function populateTags() {
     
       if (creator == userID) {
         // ------ tag delete button with tooltip ------
-        // $('#current-tags').append(`<a href="" id="${tagName}" class="badge badge-light album-tag" data-creator="${creator}" data-raw-tag="${albumResult.tagObjects[index].tag}"><span onclick="selectTag(${tagName}, event)">${safeParse(tag)}</span><span class="delete-tag-button ml-1" data-tag-id="${tagName}" data-toggle="tooltip" data-placement="right" title="Delete" data-trigger="hover">&#10005;</span></a>`) 
+        // $('#current-tags').append(`<a href="" id="${tagName}" class="badge badge-light album-tag" data-creator="${creator}" data-rawtag="${albumResult.tagObjects[index].tag}"><span onclick="selectTag(${tagName}, event)">${safeParse(tag)}</span><span class="delete-tag-button ml-1" data-tag-id="${tagName}" data-toggle="tooltip" data-placement="right" title="Delete" data-trigger="hover">&#10005;</span></a>`) 
         // ------ tag delete button, no tooltip ------
-        $('#current-tags').append(`<a href="" id="${tagName}" class="badge badge-light album-tag" data-creator="${creator}" data-raw-tag="${escapeHtml(albumResult.tagObjects[index].tag)}"><span onclick="selectTag(${tagName}, event)">${safeParse(tag)}</span><span class="delete-tag-button ml-1" data-tag-id="${tagName}">&#10005;</span></a>`) 
+        // tags are stored escaped and displayed raw
+        $('#current-tags').append(`<a href="" id="${tagName}" class="badge badge-light album-tag" data-creator="${creator}" data-rawtag="${escapeHtml(albumResult.tagObjects[index].tag)}"><span>${tag}</span><span class="delete-tag-button ml-1" data-tag-id="${tagName}">&#10005;</span></a>`) 
       } else {
-        $('#current-tags').append(`<a href="" onclick="selectTag(${tagName}, event)" id="${tagName}" class="badge badge-light album-tag" data-creator="${creator}">${safeParse(tag)}</a>`) 
+        // tags are stored escaped and displayed raw
+        $('#current-tags').append(`<a href="" id="${tagName}" class="badge badge-light album-tag" data-creator="${creator}" data-rawtag="${escapeHtml(albumResult.tagObjects[index].tag)}"><span>${tag}</span></a>`) 
       }
     }
     // ------ tag delete button event listener -----
     $('.delete-tag-button').click(function(event) {
       event.preventDefault()
       deleteTag($(this).data('tag-id'))
+    })
+
+    // in case the user misses the delete button on the right edge
+    $('.album-tag').click(function(event) {
+      event.preventDefault()
+      selectTag(document.getElementById($(this).attr('id')), event)
     })
   }
 }
@@ -279,7 +365,8 @@ function selectTag(tagName, event) {
   thisTag.classList.toggle("selected-tag")
   thisTag.classList.toggle("badge-light")
 
-  modifySelectedTags(replaceBackSlashWithHtml(thisTag.innerHTML))
+  // tags are stored escaped and displayed raw
+  modifySelectedTags(escapeHtml(thisTag.dataset.rawtag))
 }
 
 function modifySelectedTags(tag) {
@@ -297,20 +384,17 @@ function modifySelectedTags(tag) {
 
 function deleteTag(tagID) {
   const creator = $(`#${tagID}`).data('creator')
-  const tag = $(`#${tagID}`).data('raw-tag')
+  const tag = $(`#${tagID}`).data('rawtag')
 
   let confirmation = confirm(`Are you sure you want to delete the "${tag}" tag? You cannot undo this operation.`)
 
-  console.log(JSON.stringify({ 
-    "tag": tag,
-    "creator": creator
-  }))
   if (confirmation) {
     $.ajax(`/api/v1/album/tags/${albumResult._id}`, {
       method: 'DELETE',
       contentType: 'application/json',
       data: JSON.stringify({ 
-        "tag": tag,
+        // tags are stored escaped and displayed raw
+        "tag": escapeHtml(tag),
         "creator": creator
       }),
       success: function(album) {
@@ -330,7 +414,8 @@ function addTag() {
       $('#add-tag-input').val("")
       return
     }
-    newTag = removeExtraSpace(replaceBackSlashWithHtml(toTitleCase(newTag))).trim()
+    // tags are stored escaped and displayed raw
+    newTag = removeExtraSpace(toTitleCase(newTag)).trim()
     newTag = escapeHtml(newTag)
 
     let duplicates = 0
@@ -406,10 +491,23 @@ $('#add-tag-button').click(function(event) {
   event.preventDefault()
   addTag()
 })
-
 $("#add-tag-input").keyup(function(event) {
   if (event.keyCode === 13) {
     $("#add-tag-button").click()
+  }
+})
+$("#add-connection-button").click(function(event) {
+  event.preventDefault()
+  const newAlbum = $('#add-connection-input').val().trim()
+  if (newAlbum.length > 0) {
+    addConnection(newAlbum)
+  } else {
+    alert("Add an apple album ID to connect two albums.")
+  }
+})
+$("#add-connection-input").keyup(function(event) {
+  if (event.keyCode === 13) {
+    $("#add-connection-button").click()
   }
 })
 // ----- START FIREBASE AUTH SECTION ------
