@@ -6,6 +6,7 @@ let ListSchema = new Schema({
   displayName: {type: String, required: false},
   title: {type: String, required: true},
   notes: {type: String, required: false},
+  isPrivate: {type: Boolean, required: false}, 
   albums: [{
     _id:false,
     id:false,

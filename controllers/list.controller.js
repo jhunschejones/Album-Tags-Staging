@@ -16,6 +16,19 @@ exports.find_all_user_lists = function (req, res, next) {
   })
 }
 
+exports.find_lists_with_album = function (req, res, next) {
+  const albumID = req.params.id
+  List.find({ "albums.appleAlbumID" :  albumID }).populate('albums.album').exec(function (err, lists) {
+    if (err) { return next(err) }
+    if (lists.length === 0) { 
+      res.send({"message" : 'This album is not in any lists.'}) 
+      return
+    }
+    res.send(lists)
+    return
+  })
+}
+
 // there is no call to populate virtual `album` document
 // before returning the new list
 exports.new_list = function (req, res, next) {
