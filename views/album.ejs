@@ -64,6 +64,7 @@
               <button type="button" id="connection-update-button" class="btn btn-sm  btn-outline-primary float-right" data-toggle="modal" data-target="#updateConnectionModal">Add Connections</button>
             </div>
             <div id="lists-info-card-body" class="card-body info-card-body">
+              <h5 id="favorite-title" class="card-title mt-1 mb-3">Favorite this album: <span id="favorited-icon"></span></h5>
               <h5 class="card-title"><span>User </span>lists with this album:</h5>
               <ul id="all-lists" class="card-text"></ul>
               <button type="button" class="btn btn-sm btn-outline-primary ml-1 float-right info-card-login-button">Log in to Update</button>
@@ -116,9 +117,10 @@
                       </div>
                     </div>
                     <small class="text-secondary font-italic">To add a connection:</small><br/>
-                    <small>1. Copy the apple album ID from the info tab of another album</small><br/>
-                    <small>2. Paste the album ID into the input field above</small><br/>
-                    <small>3. Click 'add'!</small><br/>
+                    <small>1. <span class="text-primary" id="search-for-second-album">Search</span> for the album you want to connect to</small><br/>
+                    <small>2. Copy the apple album ID from the info tab of another album</small><br/>
+                    <small>3. Paste the album ID into the input field above</small><br/>
+                    <small>4. Click 'add'!</small><br/>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Done</button>

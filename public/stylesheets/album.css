@@ -6,7 +6,6 @@
   max-height: 65vh;
 }
 
-
 #album-title {
   margin-bottom: 0px;
   margin-top: 10px;
@@ -100,6 +99,10 @@
     background-color: rgba(245, 245, 245, 0.9);
     box-shadow: 2px 2px 5px lightgray;
   }
+
+#search-for-second-album {
+  cursor: pointer;
+}
 
 #all-lists {
   list-style-type: none;

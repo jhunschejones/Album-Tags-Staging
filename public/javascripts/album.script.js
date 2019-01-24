@@ -165,6 +165,65 @@ function populateAlbumPage() {
   populateConnections();
   getListsWithAlbum();
   getUserLists();
+  checkFavorites ();
+}
+
+function checkFavorites () {
+  if (userID) {
+    $('#favorite-title').show();
+    if (albumResult.favoritedBy.indexOf(userID) === -1) {
+      $('#favorited-icon').html(`<img src="../images/heart-unliked.png" height="30" id="add-to-favorites" style="cursor:pointer;margin-left:10px;">`);
+      addToFavoritesEventListener();
+    } else {
+      $('#favorited-icon').html(`<img src="../images/heart-liked.png" height="30" id="remove-from-favorites" style="cursor:pointer;margin-left:10px;">`);
+      removeFromFavoritesEventListener();
+    }
+  } else {
+    $('#favorite-title').hide();
+  }
+}
+
+function addToFavorites() {
+  $.ajax(`/api/v1/album/favorites/${albumResult._id || "new"}`, {
+    method: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify({ 
+      "user" : userID,
+      "albumData" : albumResult
+    }),
+    success: function(album) {
+      albumResult = album;
+    }
+  });
+}
+
+function removeFromFavorites() {
+  $.ajax(`/api/v1/album/favorites/${albumResult._id}`, {
+    method: 'DELETE',
+    contentType: 'application/json',
+    data: JSON.stringify({ "user" : userID }),
+    success: function(album) {
+      albumResult = album;
+    }
+  });
+}
+
+function removeFromFavoritesEventListener() {
+  $('#remove-from-favorites').click(function(event) {
+    event.preventDefault();
+    removeFromFavorites();
+    $('#favorited-icon').html(`<img src="../images/heart-unliked.png" height="30" id="add-to-favorites" style="cursor:pointer;margin-left:10px;">`);
+    addToFavoritesEventListener();
+  });
+}
+
+function addToFavoritesEventListener() {
+  $('#add-to-favorites').click(function(event) {
+    event.preventDefault();
+    addToFavorites();
+    $('#favorited-icon').html(`<img src="../images/heart-liked.png" height="30" id="remove-from-favorites" style="cursor:pointer;margin-left:10px;">`);
+    removeFromFavoritesEventListener();
+  });
 }
 
 function getUserLists() {
@@ -212,8 +271,8 @@ function populateListsWithAlbum() {
   });
   $('.remove-from-list-button').click(function(event) {
     event.preventDefault();
-    removeFromList($(this).data('list-id'))
-  })
+    removeFromList($(this).data('list-id'));
+  });
 }
 
 function populateUserLists() {
@@ -301,19 +360,6 @@ function removeFromList(listID) {
   }
 }
 
-function isFavorite() {
-  // checks if the album was favorited by this user
-  // updates the UI accordingly
-}
-
-function addToFavorites() {
-  // add an album to this users favorites
-}
-
-function removeFromFavorites() {
-  // remove an album from this users favorites
-}
-
 function populateConnections() {
   if (albumResult.connectionObjects && albumResult.connectionObjects.length > 0) {
     $('#connected-albums').html('');
@@ -370,6 +416,7 @@ function addConnection(newAlbumID) {
               // returns just this album with updates
               albumResult = album;
               populateConnections();
+              $('#updateConnectionModal').modal('hide')
             }
           });
         } else {
@@ -386,6 +433,7 @@ function addConnection(newAlbumID) {
               // returns just this album with updates
               albumResult = album;
               populateConnections();
+              $('#updateConnectionModal').modal('hide')
             }
           });
         }
@@ -571,6 +619,26 @@ function clearTagArray(event) {
 }
 
 // ------ START GENERAL EVENT LISTENERS ------
+$("#new-list-title").keyup(function(event) {
+  if (event.keyCode === 13) {
+    $("#add-to-new-list-button").click();
+  }
+});
+$("#new-display-name").keyup(function(event) {
+  if (event.keyCode === 13) {
+    $("#add-to-new-list-button").click();
+  }
+});
+$("#list-options").keyup(function(event) {
+  if (event.keyCode === 13) {
+    $("#add-to-list-button").click();
+  }
+});
+$('#search-for-second-album').click(function () {
+  const searchURL = window.location.protocol + "//" + window.location.host + "/search";
+  const redirectWindow = window.open(searchURL, '_blank');
+  redirectWindow.location;
+});
 $('#info-card .nav-link').click(function(event) {
   event.preventDefault();
   toggleActiveInfoTab($(this));

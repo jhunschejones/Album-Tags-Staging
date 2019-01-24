@@ -21,11 +21,12 @@ router.get('/about', function(req, res, next) {
 
 // GET album details page
 router.get('/albumdetails/:albumId', function(req, res, next) {
-  res.render('albumdetails', {
-    pageTitle: ': Details',
-    subTitle: 'Album Details',
-    albumId: req.params.albumId
-  })
+  // res.render('albumdetails', {
+  //   pageTitle: ': Details',
+  //   subTitle: 'Album Details',
+  //   albumId: req.params.albumId
+  // })
+  res.redirect('/album/' + req.params.albumId)
 })
 
 // GET album page

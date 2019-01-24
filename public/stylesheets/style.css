@@ -1,21 +1,22 @@
 /* ======== styling for navbar ========= */
-.jumbotron {
-  padding-top: 10px !important;
-  padding-bottom: 0px !important;
-  padding-left: 17px !important;
-  text-align: left !important;
+#main-menu {
+  padding-top: 10px;
+  padding-bottom: 0px;
+  padding-left: 17px;
+  text-align: left;
   margin-bottom: 7px;
 }
 
-.jumbotron h1 {
+#main-menu h1 {
   padding-bottom: 0px;
   margin-bottom: 0px;
 }
-  #brand_home:hover {
-    text-decoration: none;
-  }
 
-.jumbotron p {
+#brand_home:hover {
+  text-decoration: none;
+}
+
+#main-menu p {
   padding-top: 2px;
   margin-top: 0px;
   margin-bottom: 0px;
@@ -23,7 +24,7 @@
 
 .my_dropdown {
   padding-top: 0px;
-  padding-bottom: 12px;
+  padding-bottom: 10px;
   padding-left: 0px;
   padding-right: 12px;
 }
@@ -77,11 +78,17 @@
   #full_menu_login_logout_container {
       display: none !important;
   }
+  #brand_home {
+    font-size: 0.8em;
+  }
+  #main-menu {
+    padding-top: 3px;
+  }
 }
 
 @media screen and (min-width: 751px) {
   #compact_menu {
-      display: none;
+    display: none;
   }
 }
 
