@@ -49,23 +49,23 @@
               <a id="more-by-this-artist"" href="">More by this artist</a>
             </div>
             <div id="tags-info-card-body" class="card-body info-card-body">
-              <h5 class="card-title">Tags by <span>all </span>users:</h5>
+              <h5 class="card-title">Tags by <span id="tag-title-modifier">all users:</span><span id="tags-toggle" class="float-right"></span></h5>
               <div id="current-tags" class="card-text mb-4"></div>
               <!-- Note: bootstrap float-right class causes these to reverse order -->
               <button type="button" class="btn btn-sm btn-outline-primary ml-1 float-right info-card-login-button">Log in to Update</button>
               <button id="tag-update-button" type="button" class="btn btn-sm btn-outline-primary ml-1 float-right" data-toggle="modal" data-target="#updateTagModal">Add Tags</button>
-              <a id="clear-tag-button" href="" class="btn btn-sm btn-outline-primary ml-1 float-right">Clear Selection</a>
+              <a id="clear-tag-button" href="" class="btn btn-sm btn-outline-primary ml-1 float-right">Clear<span class="large-button-text"> Selection</span></a>
               <a id="tag-search-button" href="" class="btn btn-sm btn-outline-primary ml-1 float-right">Search</a>
             </div>
             <div id="connections-info-card-body" class="card-body info-card-body">
-              <h5 class="card-title">Connections by <span>all </span>users:</h5>
+              <h5 class="card-title">Connections by <span id="connection-title-modifier">all users:</span><span id="connections-toggle" class="float-right"></span></h5>
               <div id="connected-albums" class="card-text"></div>
               <button type="button" class="btn btn-sm btn-outline-primary ml-1 float-right info-card-login-button">Log in to Update</button>
               <button type="button" id="connection-update-button" class="btn btn-sm  btn-outline-primary float-right" data-toggle="modal" data-target="#updateConnectionModal">Add Connections</button>
             </div>
             <div id="lists-info-card-body" class="card-body info-card-body">
-              <h5 id="favorite-title" class="card-title mt-1 mb-3">Favorite this album: <span id="favorited-icon"></span></h5>
-              <h5 class="card-title"><span>User </span>lists with this album:</h5>
+              <h5 id="favorite-title" class="card-title text-secondary text-center"><span id="favorited-icon"></span> + <span id="favorites-link">your favorites</span></h5>
+              <h5 class="card-title"><span id="list-title-modifier">All <span class="large-button-text">user </span></span>lists with this album:<span id="lists-toggle" class="float-right"></span></h5>
               <ul id="all-lists" class="card-text"></ul>
               <button type="button" class="btn btn-sm btn-outline-primary ml-1 float-right info-card-login-button">Log in to Update</button>
               <button type="button" id="list-update-button" class="btn btn-sm  btn-outline-primary float-right" data-toggle="modal" data-target="#updateListModal">Add to a List</button>

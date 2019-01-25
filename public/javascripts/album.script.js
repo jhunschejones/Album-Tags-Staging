@@ -126,24 +126,24 @@ let selectedTags = [];
 let userLists = [];
 let listsWithAlbum = [];
 
-function getAlbumDetails() {
+function getAlbumDetails(userLoggedIn) {
   $.ajax('/api/v1/album/albumid/' + albumID, {
     method: 'GET',
     success: function(album) {
       if (!album.message) {
         albumResult = album;
-        populateAlbumPage();
+        populateAlbumPage(userLoggedIn);
       } else {
         $.getJSON ( '/api/v1/apple/details/' + albumID, function(album) { 
           albumResult = album;
-          populateAlbumPage();
+          populateAlbumPage(userLoggedIn);
         });
       }
     }
   });
 }
 
-function populateAlbumPage() {
+function populateAlbumPage(userLoggedIn) {
   // ------ put info on page ------
   $('#album-title').text(albumResult.title);
   $('#band-name').text(albumResult.artist);
@@ -163,21 +163,42 @@ function populateAlbumPage() {
   // ------ fill cards ------
   populateTags();
   populateConnections();
-  getListsWithAlbum();
+  getListsWithAlbum(userLoggedIn);
   getUserLists();
-  checkFavorites ();
+  checkFavorites();
+  if (userLoggedIn) { 
+    updateTagDisplay(); 
+    updateConnectionDisplay();
+  } else {
+    if ($('.album-tag').length === 0) { $('#current-tags').html('<div class="text-primary text-center"><small>There are currently no tags for this album. Log in to start adding your own tags!</small></div>'); }
+    if ($('.connection').length === 0) { $('#connected-albums').html('<div class="text-primary text-center"><small>There are currently no connections for this album. Log in to start adding your own connections!</small><br/><br/></div>'); }
+  }
 }
 
 function checkFavorites () {
   if (userID) {
     $('#favorite-title').show();
-    if (albumResult.favoritedBy.indexOf(userID) === -1) {
-      $('#favorited-icon').html(`<img src="../images/heart-unliked.png" height="30" id="add-to-favorites" style="cursor:pointer;margin-left:10px;">`);
-      addToFavoritesEventListener();
+    // checks if album has a database result and if it has been favorited by this user
+    if (!albumResult._id || albumResult.favoritedBy.indexOf(userID) === -1) {
+      $('#favorited-icon').html(`<img src="../images/heart-unliked.png" height="30" id="add-to-favorites"><img src="../images/heart-liked.png" height="30" id="remove-from-favorites" style="display:none;">`);
     } else {
-      $('#favorited-icon').html(`<img src="../images/heart-liked.png" height="30" id="remove-from-favorites" style="cursor:pointer;margin-left:10px;">`);
-      removeFromFavoritesEventListener();
+      $('#favorited-icon').html(`<img src="../images/heart-liked.png" height="30" id="remove-from-favorites"><img src="../images/heart-unliked.png" height="30" id="add-to-favorites" style="display:none;">`);
     }
+
+    // ------ start event listeners for favorite buttons ------
+    $('#remove-from-favorites').click(function(event) {
+      event.preventDefault();
+      removeFromFavorites();
+      $('#remove-from-favorites').hide();
+      $('#add-to-favorites').show();
+    });
+    $('#add-to-favorites').click(function(event) {
+      event.preventDefault();
+      addToFavorites();
+      $('#add-to-favorites').hide();
+      $('#remove-from-favorites').show();
+    });
+    // ------ end event listeners for favorite buttons ------
   } else {
     $('#favorite-title').hide();
   }
@@ -208,24 +229,6 @@ function removeFromFavorites() {
   });
 }
 
-function removeFromFavoritesEventListener() {
-  $('#remove-from-favorites').click(function(event) {
-    event.preventDefault();
-    removeFromFavorites();
-    $('#favorited-icon').html(`<img src="../images/heart-unliked.png" height="30" id="add-to-favorites" style="cursor:pointer;margin-left:10px;">`);
-    addToFavoritesEventListener();
-  });
-}
-
-function addToFavoritesEventListener() {
-  $('#add-to-favorites').click(function(event) {
-    event.preventDefault();
-    addToFavorites();
-    $('#favorited-icon').html(`<img src="../images/heart-liked.png" height="30" id="remove-from-favorites" style="cursor:pointer;margin-left:10px;">`);
-    removeFromFavoritesEventListener();
-  });
-}
-
 function getUserLists() {
   $.ajax({
     method: "GET",
@@ -239,33 +242,34 @@ function getUserLists() {
   });
 }
 
-function getListsWithAlbum() {
+function getListsWithAlbum(userLoggedIn) {
   $.ajax({
     method: "GET",
     url: "/api/v1/list/album/" + albumResult.appleAlbumID,
     success: function(data) {
       if (data.message) { listsWithAlbum = []; } 
       else { listsWithAlbum = data; }
-      populateListsWithAlbum();
+      populateListsWithAlbum(userLoggedIn);
     }
   });
 }
 
-function populateListsWithAlbum() {
+function populateListsWithAlbum(userLoggedIn) {
   $('#list-options2').html('');
   $("<option selected>Remove from a list...</option>").appendTo("#list-options2");
   $('#all-lists').html('');
+  $('.list-message').remove();
   listsWithAlbum.forEach(list => {
     if(!list.isPrivate) {
       let listCreator = list.displayName;
       if (listCreator.trim === "") { listCreator = "Unknown"; }
 
-      if (list.user == userID) {
+      if (list.user === userID) {
         $(`<option value="${list._id}">${list.title}</option>`).appendTo("#list-options2");
-        $('#all-lists').append(`<li class="list" data-creator="${list.user}"><a href="/list/${list._id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span><span class="remove-from-list-button" data-list-id="${list._id}">&#10005;</span></li>`);
+        $('#all-lists').append(`<li class="list my-list" data-creator="${list.user}"><a href="/list/${list._id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span><span class="remove-from-list-button" data-list-id="${list._id}">&#10005;</span></li>`);
       } else {
         $(`<option value="${list._id}">${list.title}</option>`).appendTo("#list-options2");
-        $('#all-lists').append(`<li class="list" data-creator="${list.user}"><a href="/list/${list._id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span></li>`);
+        $('#all-lists').append(`<li class="list other-list" data-creator="${list.user}"><a href="/list/${list._id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span></li>`);
       }
     }
   });
@@ -273,6 +277,13 @@ function populateListsWithAlbum() {
     event.preventDefault();
     removeFromList($(this).data('list-id'));
   });
+  if (userLoggedIn) { updateListDisplay(); }
+  else {
+    if ($('.list').length === 0) { 
+      $('.list-message').remove();
+      $('#all-lists').after('<div class="text-primary text-center list-message"><small>This album is not in any public user lists yet. Log in to get started working with lists!</small><br/><br/></div>'); 
+    }
+  }
 }
 
 function populateUserLists() {
@@ -360,6 +371,49 @@ function removeFromList(listID) {
   }
 }
 
+function updateListDisplay() {
+  const whatListsToShow = sessionStorage.getItem('lists');
+  if (whatListsToShow === 'My Lists') {
+    displayMyLists();
+  } else {
+    displayAllLists();
+  }
+}
+
+function displayAllLists() {
+  $("#lists-toggle").html('<img src="/images/toggle_on.png" id="show-all-lists" style="height:22px;margin-left:10px;">');
+  $('.my-list').show();
+  $('.other-list').show();
+  $('#list-title-modifier').html('All <span class="large-button-text">user </span>');
+  if ($('.list').length === 0) { 
+    $('.list-message').remove();
+    $('#all-lists').after('<div class="text-primary text-center list-message"><small>This album is not in any public user lists. Click "Add to a list" below to get started!</small><br/><br/></div>'); 
+  }
+
+  $('#show-all-lists').click(function(event) {
+    event.preventDefault();
+    sessionStorage.setItem('lists', 'My Lists');
+    updateListDisplay();
+  });
+}
+
+function displayMyLists() {
+  $("#lists-toggle").html('<img src="/images/toggle_off.png" id="show-my-lists" style="height:22px;margin-left:10px;">');
+  $('.my-lists').show();
+  $('.other-lists').hide();
+  $('#list-title-modifier').text('Your ');
+  if ($('.my-list').length === 0) { 
+    $('.list-message').remove();
+    $('#all-lists').after('<div class="text-primary text-center list-message"><small>You have added this album to any lists. Click "Add to a list" below to get started!</small><br/><br/></div>'); 
+  }
+
+  $('#show-my-lists').click(function(event) {
+    event.preventDefault();
+    sessionStorage.setItem('lists', 'All Lists');
+    updateListDisplay();
+  });
+}
+
 function populateConnections() {
   if (albumResult.connectionObjects && albumResult.connectionObjects.length > 0) {
     $('#connected-albums').html('');
@@ -376,10 +430,10 @@ function populateConnections() {
           smallTitle = connectedAlbum.title;
         }
 
-        if (connectedAlbum.creator == userID) {
-          $('#connected-albums').append(`<a href="/album/${connectedAlbum.appleAlbumID}" id="${connectedAlbum.appleAlbumID}" class="connection" data-creator="${connectedAlbum.creator}"><img class="connection-cover" src="${cover}" data-toggle="tooltip" data-placement="top" title="${smallTitle}" data-trigger="hover"><span class="delete-connection-button" data-connected-album-id="${connectedAlbum.databaseID}">&#10005;</span></a>`);
+        if (connectedAlbum.creator === userID) {
+          $('#connected-albums').append(`<a href="/album/${connectedAlbum.appleAlbumID}" id="${connectedAlbum.appleAlbumID}" class="connection my-connection" data-creator="${connectedAlbum.creator}"><img class="connection-cover" src="${cover}" data-toggle="tooltip" data-placement="top" title="${smallTitle}" data-trigger="hover"><span class="delete-connection-button" data-connected-album-id="${connectedAlbum.databaseID}">&#10005;</span></a>`);
         } else {
-          $('#connected-albums').append(`<a href="/album/${connectedAlbum.appleAlbumID}" id="${connectedAlbum.appleAlbumID}" class="connection" data-creator="${connectedAlbum.creator}"><img class="connection-cover" src="${cover}" data-toggle="tooltip" data-placement="top" title="${smallTitle}" data-trigger="hover"></a>`);
+          $('#connected-albums').append(`<a href="/album/${connectedAlbum.appleAlbumID}" id="${connectedAlbum.appleAlbumID}" class="connection other-connection" data-creator="${connectedAlbum.creator}"><img class="connection-cover" src="${cover}" data-toggle="tooltip" data-placement="top" title="${smallTitle}" data-trigger="hover"></a>`);
         }
       }
     }
@@ -416,7 +470,7 @@ function addConnection(newAlbumID) {
               // returns just this album with updates
               albumResult = album;
               populateConnections();
-              $('#updateConnectionModal').modal('hide')
+              $('#updateConnectionModal').modal('hide');
             }
           });
         } else {
@@ -433,7 +487,7 @@ function addConnection(newAlbumID) {
               // returns just this album with updates
               albumResult = album;
               populateConnections();
-              $('#updateConnectionModal').modal('hide')
+              $('#updateConnectionModal').modal('hide');
             }
           });
         }
@@ -467,6 +521,43 @@ function deleteConnection(connectedAlbum) {
   }
 }
 
+function updateConnectionDisplay() {
+  const whatConnectionsToShow = sessionStorage.getItem('connections');
+  if (whatConnectionsToShow === 'My Connections') {
+    displayMyConnections();
+  } else {
+    displayAllConnections();
+  }
+}
+
+function displayAllConnections() {
+  $("#connections-toggle").html('<img src="/images/toggle_on.png" id="show-all-connections" style="height:22px;margin-left:10px;">');
+  $('.my-connection').show();
+  $('.other-connection').show();
+  $('#connection-title-modifier').text('all users:');
+  if ($('.connection').length === 0) { $('#connected-albums').html('<div class="text-primary text-center"><small>There are currently no connections for this album. Click "Add connections" below to get started!</small><br/><br/></div>'); }
+
+  $('#show-all-connections').click(function(event) {
+    event.preventDefault();
+    sessionStorage.setItem('connections', 'My Connections');
+    updateConnectionDisplay();
+  });
+}
+
+function displayMyConnections() {
+  $("#connections-toggle").html('<img src="/images/toggle_off.png" id="show-my-connections" style="height:22px;margin-left:10px;">');
+  $('.my-connections').show();
+  $('.other-connections').hide();
+  $('#connection-title-modifier').text('you:');
+  if ($('.my-connection').length === 0) { $('#connected-albums').html('<div class="text-primary text-center"><small>You have not created any connections for this album. Click "Add connections" below to get started!</small><br/><br/></div>'); }
+
+  $('#show-my-connections').click(function(event) {
+    event.preventDefault();
+    sessionStorage.setItem('connections', 'All Connections');
+    updateConnectionDisplay();
+  });
+}
+
 function populateTags() {
   if (albumResult.tagObjects) {
     $('#current-tags').html('');
@@ -483,12 +574,12 @@ function populateTags() {
         tagName = tag.replace(/[^A-Z0-9]+/ig,'');
       }
     
-      if (creator == userID) {
+      if (creator === userID) {
         // tags are stored escaped and displayed raw
-        $('#current-tags').append(`<a href="" id="${tagName}" class="badge badge-light album-tag" data-creator="${creator}" data-rawtag="${escapeHtml(albumResult.tagObjects[index].tag)}"><span>${tag}</span><span class="delete-tag-button ml-1" data-tag-id="${tagName}">&#10005;</span></a>`);
+        $('#current-tags').append(`<a href="" id="${tagName}" class="badge badge-light album-tag my-tag" data-creator="${creator}" data-rawtag="${escapeHtml(albumResult.tagObjects[index].tag)}"><span>${tag}</span><span class="delete-tag-button ml-1" data-tag-id="${tagName}">&#10005;</span></a>`);
       } else {
         // tags are stored escaped and displayed raw
-        $('#current-tags').append(`<a href="" id="${tagName}" class="badge badge-light album-tag" data-creator="${creator}" data-rawtag="${escapeHtml(albumResult.tagObjects[index].tag)}"><span>${tag}</span></a>`);
+        $('#current-tags').append(`<a href="" id="${tagName}" class="badge badge-light album-tag other-tag" data-creator="${creator}" data-rawtag="${escapeHtml(albumResult.tagObjects[index].tag)}"><span>${tag}</span></a>`);
       }
     }
     // ------ tag delete button event listener -----
@@ -618,7 +709,50 @@ function clearTagArray(event) {
   }
 }
 
+function updateTagDisplay() {
+  const whatTagsToShow = sessionStorage.getItem('tags');
+  if (whatTagsToShow === 'My Tags') {
+    displayMyTags();
+  } else {
+    displayAllTags();
+  }
+}
+
+function displayAllTags() {
+  $("#tags-toggle").html('<img src="/images/toggle_on.png" id="show-all-tags" style="height:22px;margin-left:10px;">');
+  $('.my-tag').show();
+  $('.other-tag').show();
+  $('#tag-title-modifier').text('all users:');
+  if ($('.album-tag').length === 0) { $('#current-tags').html('<div class="text-primary text-center"><small>There are currently no tags for this album. Click "Add tags" below to get started!</small></div>'); }
+
+  $('#show-all-tags').click(function(event) {
+    event.preventDefault();
+    sessionStorage.setItem('tags', 'My Tags');
+    updateTagDisplay();
+  });
+}
+
+function displayMyTags() {
+  $("#tags-toggle").html('<img src="/images/toggle_off.png" id="show-my-tags" style="height:22px;margin-left:10px;">');
+  $('.my-tag').show();
+  $('.other-tag').hide();
+  $('#tag-title-modifier').text('you:');
+  if ($('.my-tag').length === 0) { $('#current-tags').html('<div class="text-primary text-center"><small>You have not created any tags for this album. Click "Add tags" below to get started!</small></div>'); }
+
+  $('#show-my-tags').click(function(event) {
+    event.preventDefault();
+    sessionStorage.setItem('tags', 'All Tags');
+    updateTagDisplay();
+  });
+}
+
 // ------ START GENERAL EVENT LISTENERS ------
+$('#favorites-link').click(function(event) {
+  event.preventDefault();
+  const favoritesURL = window.location.protocol + "//" + window.location.host + "/myfavorites";
+  const redirectWindow = window.open(favoritesURL, '_blank');
+  redirectWindow.location;
+});
 $("#new-list-title").keyup(function(event) {
   if (event.keyCode === 13) {
     $("#add-to-new-list-button").click();
@@ -716,7 +850,7 @@ function userIsLoggedIn() {
   $('#connection-update-button').show();
   $('#list-update-button').show();
 
-  getAlbumDetails();
+  getAlbumDetails(true);
 }
 
 function userIsLoggedOut() {
