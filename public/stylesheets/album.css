@@ -30,7 +30,7 @@
 #connections-info-card-body,
 #lists-info-card-body {
   overflow: auto;
-  max-height: 65vh;
+  max-height: 75vh;
 }
 
 /* this sets the info tab to the default */
@@ -41,21 +41,33 @@
 }
 
 #track-titles {
-  padding-left: 5px;
-  list-style-position: inside;
+  counter-reset: foo;
+  display: table;
+  margin-left: -38px;
+  line-height: 1.4em;
+  margin-bottom: 6px;
 }
 
-#track-titles li {
-  position: relative;
+#track-titles > li {
+  counter-increment: foo;
+  display: table-row;
 }
-#track-titles li span {
-  position: absolute;
-  left: 25px;
+
+#track-titles > li::before {
+  content: counter(foo) ".";
+  display: table-cell; 
+  text-align: center;
+  padding-right: 5px;
 }
 
 #release-date,
 #record-company {
   margin-bottom: 0px;
+}
+
+#more-by-this-artist:hover,
+#apple-music-link:hover {
+  text-decoration: none;
 }
 
 .album-tag {
@@ -72,6 +84,9 @@
     opacity: 0.9;
   }
 
+#tag-success {
+  line-height: 1em;
+}
 
 .connection {
   margin: 5px 10px 5px 5px;
@@ -142,6 +157,12 @@
     margin-left: 1px;
     margin-top: 0px;
   }
+
+/* moving add to new list button to accomidate private list */
+/* checkbox, currently disabled */
+/* #add-to-new-list-button {
+  margin-top: -25px;
+} */
 
 #add-to-favorites,
 #remove-from-favorites {

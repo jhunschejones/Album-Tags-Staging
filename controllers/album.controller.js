@@ -144,6 +144,15 @@ exports.find_by_tags = function (req, res) {
 }
 
 exports.add_tag = function (req, res, next) {
+  if (!req.body.tag || req.body.tag.length > 30) {
+    res.send({
+      "message": "Maximum character length for tag text exceeded",
+      "limit" : "tags: 30 characters",
+      "tag length recieved" : `${req.body.tag ? req.body.tag.length : 0}`
+    })
+    return;
+  }
+
   // album is already in the database
   if (req.params.id != "new"){
     // full tag update
@@ -438,7 +447,7 @@ exports.get_favorites = function (req, res) {
 
 exports.add_favorite = function (req, res, next) {
   const userID = req.body.user
-  if (req.params.id != "new") {
+  if (req.params.id && req.params.id != "new") {
     // $push just adds it, $addToSet adds if there are no duplicates
     Album.findByIdAndUpdate(req.params.id, { $addToSet: { favoritedBy: userID }}, {new:true}, function (err, album) {
       if (err) return next(err)
@@ -446,9 +455,10 @@ exports.add_favorite = function (req, res, next) {
       return
     })
   } else {
+    // ADD NEW ALBUM TO THE DATABASE
     const titleKeyWords = _this.utility_getKeyWords(req.body.albumData.title) || []
     const artistKeyWords = _this.utility_getKeyWords(req.body.albumData.artist) || []
-  
+
     let album = new Album(
       {
         appleAlbumID: req.body.albumData.appleAlbumID,

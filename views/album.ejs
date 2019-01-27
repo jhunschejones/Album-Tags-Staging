@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <% include partials/templates/head_tags.ejs %>
-    <link rel="stylesheet" href="/stylesheets/album.css">
+    <link rel="stylesheet" href="/stylesheets/album.min.css">
   </head>
   <body>
 
@@ -42,11 +42,12 @@
             <div id="info-info-card-body" class="card-body info-card-body">
               <h5 class="card-title">Album information:</h5>
               <strong class="card-text mb-0 mt-2">Tracks:</strong>
-              <ol id="track-titles" class="card-text text-secondary"></ol>
-              <p id="release-date" class="card-text mt-2"><strong>Released: </strong><span class="text-secondary"></span></p>
+              <ol id="track-titles" class="text-secondary"></ol>
+              <p id="release-date" class="card-text"><strong>Released: </strong><span class="text-secondary"></span></p>
               <p id="record-company" class="card-text"><strong>Record Label: </strong><span class="text-secondary"><span></p>
-              <p id="apple-album-id" class="card-text mb-0"><strong>Apple album ID: </strong><span class="text-secondary"></span></p>
-              <a id="more-by-this-artist"" href="">More by this artist</a>
+              <p id="apple-album-id" class="card-text mb-1"><strong>Apple album ID: </strong><span class="text-secondary" data-toggle="tooltip" data-placement="top" title="Use this to connect albums" data-trigger="hover"></span></p>
+              <a id="more-by-this-artist" href="">Search albums by this artist</a><br/>
+              <a id="apple-music-link" href="">Listen on Apple Music</a>
             </div>
             <div id="tags-info-card-body" class="card-body info-card-body">
               <h5 class="card-title">Tags by <span id="tag-title-modifier">all users:</span><span id="tags-toggle" class="float-right"></span></h5>
@@ -54,7 +55,7 @@
               <!-- Note: bootstrap float-right class causes these to reverse order -->
               <button type="button" class="btn btn-sm btn-outline-primary ml-1 float-right info-card-login-button">Log in to Update</button>
               <button id="tag-update-button" type="button" class="btn btn-sm btn-outline-primary ml-1 float-right" data-toggle="modal" data-target="#updateTagModal">Add Tags</button>
-              <a id="clear-tag-button" href="" class="btn btn-sm btn-outline-primary ml-1 float-right">Clear<span class="large-button-text"> Selection</span></a>
+              <a id="clear-tag-button" href="" class="btn btn-sm btn-outline-primary ml-1 float-right">Clear</a>
               <a id="tag-search-button" href="" class="btn btn-sm btn-outline-primary ml-1 float-right">Search</a>
             </div>
             <div id="connections-info-card-body" class="card-body info-card-body">
@@ -83,12 +84,13 @@
                     </button>
                   </div>
                   <div class="modal-body">
-                    <div class="input-group mb-3">
+                    <div class="input-group">
                       <input id="add-tag-input" type="text" class="form-control" placeholder="Add a new tag...">
                       <div class="input-group-append">
                         <button id="add-tag-button" class="btn btn-primary" type="button">Add</button>
                       </div>
                     </div>
+                    <small id="tag-success" class="text-primary">&nbsp;</small>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Done</button>
@@ -159,19 +161,12 @@
                     <div class="input-group mb-1">
                       <input id="new-display-name" type="text" class="form-control" placeholder="User display name...">
                     </div>
-                    <button id="add-to-new-list-button" type="button" class="btn btn btn-primary float-right">Add to new list</button>
-                    <!--
-                    <p class="text-secondary mb-1 mt-5"><small>Remove from a current list:</small></p>
-                    <div id="list-input-group2 mb-3" class="input-group">
-                      <select class="custom-select" id="list-options2">
-
-                        <option selected>Select a list...</option>
-                      </select>
-                      <div class="input-group-append">
-                        <button id="remove-from-list-button" class="btn btn-primary" type="button">Remove</button>
-                      </div>
+                    <!-- private checkbox, currently disabled
+                    <div class="input-group mt-2 mb-1">
+                      <input id="private-checkbox" type="checkbox" class="mr-1"><small class="text-secondary">Make this list private</small>
                     </div>
                     -->
+                    <button id="add-to-new-list-button" type="button" class="btn btn btn-primary float-right">Add to new list</button>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Done</button>
@@ -184,8 +179,6 @@
 
           </div>
         </div>
-        <!-- empty right column on xl screen size -->
-        <!-- <div class="col-xl-1"></div> -->
       </div>
       <!-- bottom row -->
       <div class="row">

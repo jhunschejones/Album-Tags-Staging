@@ -32,19 +32,39 @@ exports.find_lists_with_album = function (req, res, next) {
 // there is no call to populate virtual `album` document
 // before returning the new list
 exports.new_list = function (req, res, next) {
-  let list = new List(
-    {
-      user: req.body.user,
-      displayName: req.body.displayName || "",
-      title: req.body.title,
-      notes: req.body.notes || "",
-      albums: req.body.albums || []
-    }
-  )
-  list.save(function(err, list) {
-    if (err) { console.error(err) }
-    else { res.send(list) }
-  })
+  if (req.user) {
+    res.send({ 
+      "message" : "User ID must be specified for the list creator",
+      "userID recieved" : req.body.user
+    });
+    return;
+  }
+  if ((!req.body.displayName || req.body.displayName.length < 31) && 
+    (req.body.title.length < 61) && 
+    (!req.body.notes || req.body.notes.length < 181)) {
+    let list = new List(
+      {
+        user: req.body.user,
+        displayName: req.body.displayName || "",
+        title: req.body.title,
+        notes: req.body.notes || "",
+        isPrivate: req.body.isPrivate || false,
+        albums: req.body.albums || []
+      }
+    )
+    list.save(function(err, list) {
+      if (err) { console.error(err) }
+      else { res.send(list) }
+    })
+  } else {
+    res.send({ 
+      "message" : "Maximum character length exceeded for one or more fields",
+      "requirements" : "title: 60, display name: 30, notes: 180",
+      "title recieved" : `${req.body.title ? req.body.title.length : 0} characters`,
+      "displayName recieved" : `${req.body.displayName ? req.body.displayName.length : 0} characters`,
+      "notes recieved" : `${req.body.notes ? req.body.notes.length : 0} characters`
+    })
+  }
 }
 
 exports.get_list = function (req, res, next) {

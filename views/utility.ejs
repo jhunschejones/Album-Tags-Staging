@@ -20,28 +20,28 @@
     <div class="container-fluid">
       <div id="page-content">
         <div class="row">
-          <input id="find-blank-books" class="btn btn-secondary" type="button" value="Find Blank Albums">
+          <input id="find-blank-albums" class="btn btn-secondary" type="button" value="Find Blank Albums">
         </div>
         <div class="row">
-          <p id="blank-books-count">&nbsp;</p>
+          <p id="blank-albums-count">&nbsp;</p>
         </div>
         <div class="row">
-          <input id="delete-blank-books" class="btn btn-secondary" type="button" value="Delete Blank Albums">
+          <input id="delete-blank-albums" class="btn btn-secondary" type="button" value="Delete Blank Albums">
         </div>
         <div class="row">
-          <p id="blank-books-deleted">&nbsp;</p>
+          <p id="blank-albums-deleted">&nbsp;</p>
         </div>
         <div class="row">
-          <input id="find-books-missing-tags" class="btn btn-secondary" type="button" value="Find Albums Missing Tags">
+          <input id="find-albums-missing-tags" class="btn btn-secondary" type="button" value="Find Albums Missing Tags">
         </div>
         <div class="row">
-          <p id="missing-books-count">&nbsp;</p>
+          <p id="missing-albums-count">&nbsp;</p>
         </div>
         <div class="row">
-          <input id="update-books-missing-tags" class="btn btn-secondary" type="button" value="Update Albums Missing Tags">
+          <input id="update-albums-missing-tags" class="btn btn-secondary" type="button" value="Update Albums Missing Tags">
         </div>
         <div class="row">
-          <p id="missing-books-modified">&nbsp;</p>
+          <p id="missing-albums-modified">&nbsp;</p>
         </div>
       </div>
     </div>
@@ -51,33 +51,33 @@
     <% include partials/templates/footer.ejs %>
 
     <script>
-      var blankBooks
-      var missingTagBooks
+      var blankAlbums
+      var missingTagAlbums
 
-      function findBlankBooks() {
+      function findBlankAlbums() {
         $.ajax({
           method: "GET",
           url: "/api/v1/album/utility/blankalbums",
           success: function(data) {
-            blankBooks = data
+            blankAlbums = data
           }
         }).then(function() {
-          $('#blank-books-count').text(`Blank albums: ${blankBooks.length || 0}`)
+          $('#blank-albums-count').text(`Blank albums: ${blankAlbums.length || 0}`)
         })
       }
 
       function deleteBooks() {
-        if (blankBooks.length > 0) {
-          blankBooks.forEach(book => {
+        if (blankAlbums.length > 0) {
+          blankAlbums.forEach(album => {
             $.ajax({
               method: "DELETE",
-              url: "/api/v1/album/" + book._id,
+              url: "/api/v1/album/" + album._id,
             })          
           })
-          $('#blank-books-deleted').text('Blank albums deleted.')
-          findBlankBooks()
+          $('#blank-albums-deleted').text('Blank albums deleted.')
+          findBlankAlbums()
         } else {
-          $('#blank-books-deleted').text('No blank albums to delete!')
+          $('#blank-albums-deleted').text('No blank albums to delete!')
         }
       }
 
@@ -86,18 +86,18 @@
           method: "GET",
           url: "/api/v1/album/utility/missingtags",
           success: function(data) {
-            missingTagBooks = data
+            missingTagAlbums = data
           }
         }).then(function() {
-          $('#missing-books-count').text(`Albums missing tags: ${missingTagBooks.length || 0}`)
+          $('#missing-albums-count').text(`Albums missing tags: ${missingTagAlbums.length || 0}`)
         })
       }
 
       function updateMissingTagBooks() {
-        if (missingTagBooks.length > 0) {
-          missingTagBooks.forEach(book => {
+        if (missingTagAlbums.length > 0) {
+          missingTagAlbums.forEach(album => {
             let newTags = []
-            book.tagObjects.forEach(tagObject => {
+            album.tagObjects.forEach(tagObject => {
               newTags.push(tagObject.tag)
             })
             newTags.forEach(tag => {
@@ -107,23 +107,23 @@
               }
               $.ajax({
                 method: "POST",
-                url: '/api/v1/album/tags/' + book._id,
+                url: '/api/v1/album/tags/' + album._id,
                 data: JSON.stringify(updateObject),
                 contentType: "application/json"
               })
             })
           })
-          $('#missing-books-modified').text('Albums missing tags have been updated.')
+          $('#missing-albums-modified').text('Albums missing tags have been updated.')
         } else {
-          $('#missing-books-modified').text('There are no albums missing tags!')
+          $('#missing-albums-modified').text('There are no albums missing tags!')
         }
       }
 
       // ====== ADD EVENT LISTENERS ======
-      document.getElementById('find-blank-books').addEventListener('click', findBlankBooks)
-      document.getElementById('delete-blank-books').addEventListener('click', deleteBooks)
-      document.getElementById('find-books-missing-tags').addEventListener('click', findMissingTagBooks)
-      document.getElementById('update-books-missing-tags').addEventListener('click', updateMissingTagBooks)    
+      document.getElementById('find-blank-albums').addEventListener('click', findBlankAlbums)
+      document.getElementById('delete-blank-albums').addEventListener('click', deleteBooks)
+      document.getElementById('find-albums-missing-tags').addEventListener('click', findMissingTagBooks)
+      document.getElementById('update-albums-missing-tags').addEventListener('click', updateMissingTagBooks)    
     </script>
   </body>
 </html>

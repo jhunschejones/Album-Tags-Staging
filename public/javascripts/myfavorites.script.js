@@ -206,6 +206,7 @@ const defaultApp = firebase.initializeApp(config)
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
     userID = firebase.auth().currentUser.uid
+    $('#all-favorites-filters').show()
     getFavoriteAlbums()
 
     $('#full_menu_login_logout_container').show()
@@ -216,13 +217,15 @@ firebase.auth().onAuthStateChanged(function(user) {
     $('#log_in_message').hide()
   } else {   
     // no user logged in
-    $('#all_cards').html('')
     $('#full_menu_login_logout_container').show()
     $('#login_button').show()
     $('#full_menu_login_button').show()
     $('#logout_button').hide()
     $('#full_menu_logout_button').hide()
     $('#loader').hide()
+
+    $('#all-favorites-filters').hide()
+    $('#all_cards').html('')
     $('#log_in_message').show()   
   }
 })
@@ -236,6 +239,7 @@ function logIn() {
     return firebase.auth().signInWithPopup(provider)
   })
   .then(function(result) {
+    $('#all-favorites-filters').show()
     userID = user.uid
     getFavoriteAlbums()
 
@@ -253,11 +257,13 @@ function logIn() {
 function logOut() {
   firebase.auth().signOut().then(function() {
     // log out functionality
-    $('#full_menu_login_logout_container').show()
-    $('#login_button').show()
-    $('#full_menu_login_button').show()
-    $('#logout_button').hide()
-    $('#full_menu_logout_button').hide()
+    // $('#full_menu_login_logout_container').show()
+    // $('#login_button').show()
+    // $('#full_menu_login_button').show()
+    // $('#logout_button').hide()
+    // $('#full_menu_logout_button').hide()
+    // $('#all-favorites-filters').hide();
+    location.reload();
 
   }).catch(function(error) {
   // An error happened.
@@ -665,11 +671,12 @@ function startFavoritesPage() {
   // display instructions if no favorites exist for this user
   if (myFavoriteAlbums.message) {
     showDOMelement("log_in_message")
-    $('#log_in_message').html("<div style='text-align:center;margin: 20px 0px 50px 0px;'><p>Looks like you don't have any favorites yet!</p><p><a href='/search'>Search</a> for albums then click the <img src='../images/heart-unliked.png' height='30' width='auto'> icon on the Update</p><p>page to add them to your favorites.</p></div>")
+    $('#log_in_message').html("<div style='text-align:center;'><p style='margin: 20px 5px 50px 5px;'>Looks like you don't have any favorites yet! <a href='/search'>Search</a> for an album then click the <img src='../images/heart-unliked.png' height='30' width='auto'> icon on the Lists tab to add it to your favorites.</p></div>")
     hideDOMelement("filter_by_genre_dropdown_button")
     hideDOMelement("filter_by_year_dropdown_button")
     hideDOMelement("filter_by_artist_dropdown_button")
     hideDOMelement("clear_filters_button")
+    hideDOMelement("share-favorites-button")
     hideDOMelement("to_top_button")
     return
   } else {

@@ -8,16 +8,8 @@ function makeNiceDate(uglyDate) {
   return(`${niceMonth} ${day}, ${year}`);
 }
 
-// function safeParse(content) {
-//   // replace characters with html equivalents
-//   //prevents some basic cross site scripting attacks
-//   content = content.replace(/\</g, "&lt;").replace(/\>/g, "&gt;").replace(/\//g, "&#47;").replace(/\\/g, "&#92;").replace(/\(/g, "&#40;").replace(/\)/, "&#41;").replace(/\./g, "&#46;").replace(/\[/g, "&#91;").replace(/\]/g, "&#93;").replace(/\{/g, "&#123;").replace(/\}/g, "&#125;").replace(/\=/g, "&#61;");
-//   return content;
-// }
-
 function escapeHtml(text) {
   var map = {
-    // '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
     '"': '&quot;',
@@ -28,10 +20,6 @@ function escapeHtml(text) {
     '}': '&#125;'
   };
   return text.replace(/[<>"'/\\{}]/g, function(m) { return map[m]; });
-}
-
-function replaceBackSlashWithHtml(str) {
-  return str.replace(/\//g, '&sol;');
 }
 
 // removes accidental double spaces
@@ -152,13 +140,18 @@ function populateAlbumPage(userLoggedIn) {
   $('#record-company span').text(albumResult.recordCompany);
   $('#track-titles').html('');
   albumResult.songNames.forEach(songName => {
-    $('#track-titles').append(`<li><span>${songName}</span></li>`);
+    $('#track-titles').append(`<li>${songName}</li>`);
   });
   $('#apple-album-id span').text(albumResult.appleAlbumID);
   $('#more-by-this-artist').click(function(event) {
     event.preventDefault();
     sessionStorage.setItem('artist', albumResult.artist);
     window.location.href = '/search';
+  });
+  $('#apple-music-link').click(function(event){
+    event.preventDefault();
+    const redirectWindow = window.open(albumResult.appleURL, '_blank');
+    redirectWindow.location;
   });
   // ------ fill cards ------
   populateTags();
@@ -167,8 +160,8 @@ function populateAlbumPage(userLoggedIn) {
   getUserLists();
   checkFavorites();
   if (userLoggedIn) { 
-    updateTagDisplay(); 
-    updateConnectionDisplay();
+    updateTagDisplay(userLoggedIn); 
+    updateConnectionDisplay(userLoggedIn);
   } else {
     if ($('.album-tag').length === 0) { $('#current-tags').html('<div class="text-primary text-center"><small>There are currently no tags for this album. Log in to start adding your own tags!</small></div>'); }
     if ($('.connection').length === 0) { $('#connected-albums').html('<div class="text-primary text-center"><small>There are currently no connections for this album. Log in to start adding your own connections!</small><br/><br/></div>'); }
@@ -233,7 +226,6 @@ function getUserLists() {
   $.ajax({
     method: "GET",
     url: "/api/v1/list/user/" + userID,
-    // url: "/api/v1/list/user/Ol5d5mjWi9eQ7HoANLhM4OFBnso2",
     success: function(data) {
       if (data.message) { userLists = []; } 
       else { userLists = data; }
@@ -255,8 +247,6 @@ function getListsWithAlbum(userLoggedIn) {
 }
 
 function populateListsWithAlbum(userLoggedIn) {
-  $('#list-options2').html('');
-  $("<option selected>Remove from a list...</option>").appendTo("#list-options2");
   $('#all-lists').html('');
   $('.list-message').remove();
   listsWithAlbum.forEach(list => {
@@ -265,10 +255,8 @@ function populateListsWithAlbum(userLoggedIn) {
       if (listCreator.trim === "") { listCreator = "Unknown"; }
 
       if (list.user === userID) {
-        $(`<option value="${list._id}">${list.title}</option>`).appendTo("#list-options2");
         $('#all-lists').append(`<li class="list my-list" data-creator="${list.user}"><a href="/list/${list._id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span><span class="remove-from-list-button" data-list-id="${list._id}">&#10005;</span></li>`);
       } else {
-        $(`<option value="${list._id}">${list.title}</option>`).appendTo("#list-options2");
         $('#all-lists').append(`<li class="list other-list" data-creator="${list.user}"><a href="/list/${list._id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span></li>`);
       }
     }
@@ -296,6 +284,14 @@ function populateUserLists() {
 
 function addToList(chosenList) {
   if (chosenList) {
+    let alreadyInList = listsWithAlbum.find(x => x._id === chosenList);
+
+    if (alreadyInList) {
+      $('#list-options').get(0).selectedIndex = 0;
+      alert(`This album is already in your "${alreadyInList.title}" list.`);
+      return;
+    }
+
     let addAlbumToListBody = {
       method: "add album",
       appleAlbumID: albumResult.appleAlbumID,
@@ -312,18 +308,25 @@ function addToList(chosenList) {
       success: function(data) {
         listsWithAlbum.push(data);
         populateListsWithAlbum();
-        alert(`Successfully added this album to your list: "${data.title}"`);
+        // alert(`Successfully added this album to your list: "${data.title}"`);
+        $('#updateListModal').modal('hide');
+        $('#list-options').get(0).selectedIndex = 0;
       }
     });
   }
 }
 
 function addToNewList(listTitle, displayName) {
+  let private = false;
+  if ($('#private-checkbox').is(":checked")) {
+    private = true;
+  }
   if (listTitle && displayName) {
     let newList = {
       user: userID,
       displayName: displayName,
       title: listTitle,
+      isPrivate: private,
       albums: [albumResult]
     };
     $.ajax({
@@ -333,11 +336,18 @@ function addToNewList(listTitle, displayName) {
       data: JSON.stringify(newList),
       success: function(data) {
         // update the UI without making any additional API calls
-        userLists.push(data);
-        listsWithAlbum.push(data);
-        populateUserLists();
-        populateListsWithAlbum();
-        alert(`Successfully added list: "${data.title}"`);
+        if(!data.message) {
+          userLists.push(data);
+          listsWithAlbum.push(data);
+          populateUserLists();
+          populateListsWithAlbum();
+          // alert(`Successfully added list: "${data.title}"`);
+          $('#updateListModal').modal('hide');
+          $('#new-list-title').val('');
+          $('#new-display-name').val('');
+        } else {
+          alert(data.message);
+        }
       }
     });
   }
@@ -415,7 +425,7 @@ function displayMyLists() {
 }
 
 function populateConnections() {
-  if (albumResult.connectionObjects && albumResult.connectionObjects.length > 0) {
+  if (albumResult.connectionObjects) {
     $('#connected-albums').html('');
 
     for (let index = 0; index < albumResult.connectionObjects.length; index++) {
@@ -516,6 +526,7 @@ function deleteConnection(connectedAlbum) {
       success: function(album) {
         albumResult = album;
         populateConnections();
+        updateConnectionDisplay();
       }
     });
   }
@@ -632,13 +643,15 @@ function deleteTag(tagID) {
       method: 'DELETE',
       contentType: 'application/json',
       data: JSON.stringify({ 
-        // tags are stored escaped and displayed raw
-        "tag": escapeHtml(tag),
+        // tags are stored escaped and displayed raw, converting to string
+        // in case the raw tag is just a number (like a year)
+        "tag": escapeHtml(tag.toString()),
         "creator": creator
       }),
       success: function(album) {
         albumResult = album;
         populateTags();
+        updateTagDisplay(); 
       }
     });
   }
@@ -648,8 +661,14 @@ function addTag() {
   let newTag = $('#add-tag-input').val().trim();
 
   if (newTag) {
-    if (newTag.includes("<") && newTag.includes(">") || newTag.includes(".") || newTag.includes("{") || newTag.includes("}")) {
+    if ((newTag.includes("<") && newTag.includes(">")) || newTag.includes(".") || newTag.includes("{") || newTag.includes("}")) {
       alert("Some characters are not allowed in tags, sorry!");
+      $('#add-tag-input').val("");
+      return;
+    }
+
+    if (newTag.length > 30) {
+      alert("Tags cannot be longer than 30 characters. Check out the \"All tags\" page for some examples!");
       $('#add-tag-input').val("");
       return;
     }
@@ -657,16 +676,19 @@ function addTag() {
     newTag = removeExtraSpace(toTitleCase(newTag)).trim();
     newTag = escapeHtml(newTag);
 
-    let duplicates = 0;
-    albumResult.tagObjects.forEach(tagObject => {
-      if (isEqual(tagObject, { "tag": newTag, "creator": userID })) { duplicates++; }
-    });
+    // only run this check if there are other tags
+    if (albumResult.tagObjects) {
+      let duplicates = 0;
+      albumResult.tagObjects.forEach(tagObject => {
+        if (isEqual(tagObject, { "tag": newTag, "creator": userID })) { duplicates++; }
+      });
 
-    if (duplicates > 0) {
-      alert(`You already added the "${newTag}" tag to this album!`);
-      $('#add-tag-input').val("");
-      return;
-    }     
+      if (duplicates > 0) {
+        alert(`You already added the "${newTag}" tag to this album!`);
+        $('#add-tag-input').val("");
+        return;
+      }   
+    }  
 
     // ADD NEW TAG OR NEW ALBUM TO THE DATABASE
     $.ajax(`/api/v1/album/tags/${albumResult._id || "new"}`, {
@@ -678,8 +700,15 @@ function addTag() {
         "tag": newTag
       }),
       success: function (album) {
-        albumResult = album;
-        populateTags();
+        if (!album.message) {
+          albumResult = album;
+          populateTags();
+          $('#tag-success').text("You successfully added a tag!");
+          setTimeout(function(){ $('#tag-success').html('&nbsp;'); }, 3000);
+        } else {
+          alert(album.message);
+          return;
+        }
       }
     });
   } else {
@@ -709,27 +738,29 @@ function clearTagArray(event) {
   }
 }
 
-function updateTagDisplay() {
+function updateTagDisplay(userIsLoggedIn) {
   const whatTagsToShow = sessionStorage.getItem('tags');
-  if (whatTagsToShow === 'My Tags') {
+  if (whatTagsToShow === 'My Tags' && !userIsLoggedIn) {
     displayMyTags();
   } else {
-    displayAllTags();
+    displayAllTags(userIsLoggedIn);
   }
 }
 
-function displayAllTags() {
-  $("#tags-toggle").html('<img src="/images/toggle_on.png" id="show-all-tags" style="height:22px;margin-left:10px;">');
+function displayAllTags(userIsLoggedIn) {
+  if (userIsLoggedIn) { $("#tags-toggle").html('<img src="/images/toggle_on.png" id="show-all-tags" style="height:22px;margin-left:10px;">'); }
   $('.my-tag').show();
   $('.other-tag').show();
   $('#tag-title-modifier').text('all users:');
   if ($('.album-tag').length === 0) { $('#current-tags').html('<div class="text-primary text-center"><small>There are currently no tags for this album. Click "Add tags" below to get started!</small></div>'); }
 
-  $('#show-all-tags').click(function(event) {
-    event.preventDefault();
-    sessionStorage.setItem('tags', 'My Tags');
-    updateTagDisplay();
-  });
+  if (userIsLoggedIn) {
+    $('#show-all-tags').click(function(event) {
+      event.preventDefault();
+      sessionStorage.setItem('tags', 'My Tags');
+      updateTagDisplay(userIsLoggedIn);
+    });
+  }
 }
 
 function displayMyTags() {
@@ -827,12 +858,35 @@ $('#add-to-new-list-button').click(function(event) {
   let listTitle = document.getElementById("new-list-title").value.trim();
   let displayName = document.getElementById("new-display-name").value.trim() || "Unknown";
   
-  if (listTitle) {
-    addToNewList(listTitle, displayName);
+  // at least a list title should be present
+  if (!listTitle) {
+    alert("All lists require a title!");
+    return;
+  }
+
+  // check for characters that will cause trouble but aren't that useful
+  if ((listTitle.includes("<") && listTitle.includes(">")) || listTitle.includes(".") || listTitle.includes("{") || listTitle.includes("}")) {
+    alert("Some characters are not allowed in tags, sorry!");
+    $('#new-list-title').val("");
+    return;
+  } else if ((displayName.includes("<") && displayName.includes(">")) || displayName.includes(".") || displayName.includes("{") || displayName.includes("}")) {
+    alert("Some characters are not allowed in tags, sorry!");
+    $('#new-display-name').val("");
+    return;
+  }
+
+  // enforce character length limits
+  if (listTitle.length > 60) {
+    alert("List titles must be shorter than 60 characters in length.");
+    return;
+  } else if (displayName.length > 30) {
+    alert("Display names must be shorter than 30 characters in length.");
+    return;
+  } else {
+    // storing title and display name as escaped html, displaying raw
+    addToNewList(escapeHtml(listTitle), escapeHtml(displayName));
     document.getElementById("new-display-name").value = "";
     document.getElementById("new-list-title").value = "";
-  } else {
-    alert("All lists require a title!");
   }
 });
 // ----- START FIREBASE AUTH SECTION ------
@@ -849,6 +903,7 @@ function userIsLoggedIn() {
   $('#tag-update-button').show();
   $('#connection-update-button').show();
   $('#list-update-button').show();
+  $('#favorite-title').show();
 
   getAlbumDetails(true);
 }
@@ -866,8 +921,9 @@ function userIsLoggedOut() {
   $('#tag-update-button').hide();
   $('#connection-update-button').hide();
   $('#list-update-button').hide();
+  $('#favorite-title').hide();
 
-  getAlbumDetails();
+  getAlbumDetails(false);
 }
 
 // == New Config, November 2018 == 
@@ -886,6 +942,7 @@ firebase.auth().onAuthStateChanged(function(user) {
   } 
   if (!user) {   
     // no user logged in 
+    userID = false;
     userIsLoggedOut();
   }
 });
@@ -910,7 +967,9 @@ function logIn() {
 function logOut() {
   firebase.auth().signOut().then(function() {
     // log out functionality
-    userIsLoggedOut();
+    // userID = false;
+    // userIsLoggedOut();
+    location.reload();
 
   }).catch(function(error) {
   // An error happened.

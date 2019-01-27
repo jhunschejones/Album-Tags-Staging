@@ -78,6 +78,7 @@ firebase.auth().onAuthStateChanged(function(user) {
 
     $('#page-title').show()
     $('#login-message').hide()
+    $('#all-lists').show()
   } else {   
     // no user logged in
     $('#full_menu_login_logout_container').show()
@@ -89,6 +90,7 @@ firebase.auth().onAuthStateChanged(function(user) {
     $('#loader').hide()  
     $('#login-message').show()
     $('#page-title').hide()
+    $('#all-lists').hide()
   }
 })
 
@@ -106,6 +108,7 @@ function logIn() {
 
     $('#login-message').hide()
     $('#page-title').show()
+    $('#all-lists').show()
 
     $('#full_menu_login_logout_container').show()
     $('#login_button').hide()
@@ -129,6 +132,7 @@ function logOut() {
 
     $('#login-message').show()
     $('#page-title').hide()
+    $('#all-lists').hide()
 
   }).catch(function(error) {
   // An error happened.

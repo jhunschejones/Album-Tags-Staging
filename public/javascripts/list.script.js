@@ -81,7 +81,7 @@ function populateCard(album, cardNumber) {
 function populateList() {
   $("#no-albums-message").hide()
   $('#albums').html('')
-  // console.log(listData)
+
   let listCreator = listData.displayName
   if (!listCreator || listCreator.trim === "") { listCreator = "Unknown" }
   $('#list-title').text(`${listData.title}`)
@@ -135,6 +135,10 @@ function removeAlbum(albumID) {
 
 function editDisplayName() {
   let newDisplayName = $("#list-display-name-input").val().trim()
+  if (newDisplayName.length > 30) {
+    alert("Display names must be shorter than 30 characters in length.")
+    return;
+  } 
   let updateObject = {
     method: "change display name",
     displayName: newDisplayName
@@ -153,6 +157,10 @@ function editDisplayName() {
 
 function editListTitle() {
   let newListTitle = $("#list-title-input").val().trim()
+  if (newListTitle.length > 60) {
+    alert("List titles must be shorter than 60 characters in length.")
+    return;
+  } 
   if (newListTitle && newListTitle.length > 0) {
     let updateObject = {
       method: "change title",

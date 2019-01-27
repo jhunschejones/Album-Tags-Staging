@@ -11,7 +11,9 @@
         <% include partials/templates/navbar_basic.ejs %>
 
         <!-- FILTERS SECTION -->
-        <% include partials/content/favorites_filters.ejs %>
+        <div id="all-favorites-filters" style="display:none;">
+            <% include partials/content/favorites_filters.ejs %>
+        </div>
 
         <!-- BEGIN ALBUM CARDS -->
         <div id="all_cards" class="row container-fluid hide_when_logged_out">
