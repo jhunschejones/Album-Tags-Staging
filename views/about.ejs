@@ -1,14 +1,14 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <% include partials/templates/head_tags.ejs %>
+	<head>
+		<% include partials/templates/head_tags.ejs %>
 		<link rel="stylesheet" href="/stylesheets/about.min.css">
-    </head>
-    <body>
+	</head>
 
-        <!-- BASIC NAVBAR TEMPLATE -->
+	<body>
+		<!-- BASIC NAVBAR TEMPLATE -->
 		<% include partials/templates/navbar_basic.ejs %>
-		
+	
 		<div id="background_image_container">
 		<!--CSS INSERTS BACKGROUND HERE-->
 		</div>
@@ -23,10 +23,10 @@
 				<p>In fact, just like you, we can go into endless detail describing what we enjoy about our favorite records. As streaming has become a larger part of the music industry, we started to notice it was becoming harder and harder to keep track of all the great music in our libraries. We also noticed we were missing out on opportunities to share records we liked with our friends.</p>
 
 				<h4 class="text-secondary mb-0 mt-4 about_subheader">Our solution?</h4>
-				<p>We built Album Tags<small>&trade;</small>, an app where you can <a href="/search/">search</a> for music and write custom tags describing exactly what you love about it. You can then use these tags to find and keep track of even more awesome music! Words can't do your feelings justice? No problem! Just manually connect one album to another so you can remember how they are related later.</p>
+				<p>We built Album Tags<small>&trade;</small>, an app where you can <a href="/search/">search</a> for music and write custom tags describing exactly what you love about it. You can then use these tags to find and keep track of even more awesome music! Words can't do your feelings justice? No problem! Just manually connect one album to another so you can remember how they are related later. You can even create and share lists of albums with your friends, whether they use the site or not!</p>
 				
 				<h4 class="text-secondary mb-0 mt-4 about_subheader">How Do I Start?</h4>
-				<p>Getting started is easy! Watch a couple of the <a href="#features">feature walkthroughs</a> below to see Album Tags<small>&trade;</small> in action, or try <a href="/search/">searching</a> for some music and check out our <a href="/favorites">favorite albums</a> of <%= thisYear %> to see how we use the app. Finally, sign in with your google account so you can start saving your own tags and connections!</p>
+				<p>Getting started is easy! Watch a couple of the <a href="#features">feature walkthroughs</a> below to see Album Tags<small>&trade;</small> in action, or try <a href="/search/">searching</a> for some music and check out our <a href="/favorites">favorite albums</a> of <%= thisYear %> to see how we use the app. Finally, sign in with your google account so you can start saving your own tags, connections, and lists!</p>
 			</div>
 		
 			<div class='container-fluid'>
@@ -34,23 +34,7 @@
 			</div>
 
 			<div class='container-fluid' id="accordion">
-				<!-- CARD ONE 
-				<div class="card bg-light">
-					<div class="card-header header_clickable" id="headingFour" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-						<button class="btn btn-link collapsed text-dark accordion_button">
-							<h6 class="mb-0">Login, Search for Music, and Add an Album to Your Favorites</h6>
-						</button>
-					</div>
-					<div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordion">
-						<div class="card-body video_card">
-							<iframe allowFullScreen frameborder="0" height="564" mozallowfullscreen src="https://player.vimeo.com/video/278707134?autoplay=1&loop=1&autopause=0" webkitAllowFullScreen width="640"></iframe>
-						</div>
-					</div>
-				</div>
-				-->
-				
 				<!-- ===== Modal 1 ==== -->
-
 				<button type="button" class="btn btn-primary feature_button" data-toggle="modal" data-target="#modalOne">
 					<img src="/images/play_button_empty_white.png" id="modal_one_button" class="feature_button_icon" data-toggle="tooltip" data-placement="bottom" title="Login, Search for Music, and Add an Album to Your Favorites" data-trigger="hover"><br/>Start Here
 				</button>
@@ -74,25 +58,8 @@
 						</div>
 					</div>
 				</div>
-				
-
-				<!-- CARD TWO 
-				<div class="card bg-light">
-					<div class="card-header header_clickable" id="headingTwo" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-						<button class="btn btn-link collapsed text-dark accordion_button">
-							<h6 class="mb-0">Add and Search by Custom Tags</h6>
-						</button>
-					</div>
-					<div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
-						<div class="card-body video_card">
-							<iframe allowFullScreen frameborder="0" height="564" mozallowfullscreen src="https://player.vimeo.com/video/278707126?autoplay=1&loop=1&autopause=0" webkitAllowFullScreen width="640"></iframe>
-						</div>
-					</div>
-				</div>
-				-->
 
 				<!-- ===== Modal 2 ==== -->
-
 				<button type="button" class="btn btn-primary feature_button" data-toggle="modal" data-target="#modalTwo">
 					<img src="/images/play_button_empty_white.png" id="modal_two_button" class="feature_button_icon" data-toggle="tooltip" data-placement="bottom" title="Add and Search by Custom Tags" data-trigger="hover"><br/>Custom Tags
 				</button>
@@ -117,23 +84,7 @@
 					</div>
 				</div>
 
-				<!-- CARD THREE
-				<div class="card bg-light">
-					<div class="card-header header_clickable" id="headingThree" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">					
-						<button class="btn btn-link collapsed text-dark accordion_button">
-							<h6 class="mb-0">Search Albums and Add a Connection</h6>
-						</button>
-					</div>
-					<div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
-						<div class="card-body video_card">
-							<iframe allowFullScreen frameborder="0" height="564" mozallowfullscreen src="https://player.vimeo.com/video/279113954?autoplay=1&loop=1&autopause=0" webkitAllowFullScreen width="640"></iframe>
-						</div>
-					</div>
-				</div>
-				 -->
-
-				 <!-- ===== Modal 3 ==== -->
-
+					<!-- ===== Modal 3 ==== -->
 				<button type="button" class="btn btn-primary feature_button" data-toggle="modal" data-target="#modalThree">
 					<img src="/images/play_button_empty_white.png" id="modal_three_button" class="feature_button_icon" data-toggle="tooltip" data-placement="bottom" title="Search Albums and Add a Connection" data-trigger="hover"><br/>Connections
 				</button>
@@ -158,23 +109,7 @@
 					</div>
 				</div>
 
-				<!-- CARD FOUR
-				<div class="card bg-light">
-					<div class="card-header header_clickable" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-						<button class="btn btn-link collapsed text-dark accordion_button">
-							<h6 class="mb-0">Search From All Tags</h6>
-						</button>
-					</div>
-					<div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
-						<div class="card-body video_card">
-							<iframe allowFullScreen frameborder="0" height="564" mozallowfullscreen src="https://player.vimeo.com/video/261418274?autoplay=1&loop=1&autopause=0" webkitAllowFullScreen width="640"></iframe>						
-						</div>
-					</div>
-				</div>	
-				 -->
-				
 				<!-- ===== Modal 4 ==== -->
-
 				<button type="button" class="btn btn-primary feature_button" data-toggle="modal" data-target="#modalFour">
 					<img src="/images/play_button_empty_white.png" id="modal_four_button" class="feature_button_icon" data-toggle="tooltip" data-placement="bottom" title="Search From All Tags" data-trigger="hover"><br/>All Tags
 				</button>
@@ -198,25 +133,28 @@
 						</div>
 					</div>
 				</div>
+				<!-- ==== End Modal 4 ---- -->
 
-			</div>
-		</div>	         
+			</div> <!-- end modals container -->
+		</div> <!-- end absolute content container -->	         
 
-        <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
+		<!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
 		<% include partials/templates/footer.ejs %>
+
+		<!-- custom script to enable tool tabs on non-touch screens -->
 		<script>
-			var isTouchDevice = false
+			let isTouchDevice = false;
 			$(function () {
 				setTimeout(function(){ 
 					if ("ontouchstart" in document.documentElement) {
-						isTouchDevice = true
+						isTouchDevice = true;
 					}
 					
 					if(isTouchDevice == false) {
-						$('[data-toggle="tooltip"]').tooltip()
+						$('[data-toggle="tooltip"]').tooltip();
 					}
 				}, 1000);
-			})
+			});
 		</script>
-    </body>
+	</body>
 </html>

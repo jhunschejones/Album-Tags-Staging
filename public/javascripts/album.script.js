@@ -118,13 +118,19 @@ function getAlbumDetails(userLoggedIn) {
   $.ajax('/api/v1/album/albumid/' + albumID, {
     method: 'GET',
     success: function(album) {
+      // message returned here means no album in the database yet
       if (!album.message) {
         albumResult = album;
         populateAlbumPage(userLoggedIn);
       } else {
-        $.getJSON ( '/api/v1/apple/details/' + albumID, function(album) { 
-          albumResult = album;
-          populateAlbumPage(userLoggedIn);
+        $.getJSON ( '/api/v1/apple/details/' + albumID, function(appleAlbum) { 
+          if (!appleAlbum.message) {
+            albumResult = appleAlbum;
+            populateAlbumPage(userLoggedIn);
+          } else {
+            // message returned here means no album in the database or apple music API
+            alert(appleAlbum.message);
+          }
         });
       }
     }
@@ -206,7 +212,11 @@ function addToFavorites() {
       "albumData" : albumResult
     }),
     success: function(album) {
-      albumResult = album;
+      if (!album.message) {
+        albumResult = album;
+      } else {
+        alert(album.message);
+      }
     }
   });
 }
@@ -217,7 +227,11 @@ function removeFromFavorites() {
     contentType: 'application/json',
     data: JSON.stringify({ "user" : userID }),
     success: function(album) {
-      albumResult = album;
+      if (!album.message) {
+        albumResult = album;
+      } else {
+        alert(album.message);
+      }
     }
   });
 }
@@ -227,6 +241,7 @@ function getUserLists() {
     method: "GET",
     url: "/api/v1/list/user/" + userID,
     success: function(data) {
+      // message returned here means no lists for this user
       if (data.message) { userLists = []; } 
       else { userLists = data; }
       populateUserLists();
@@ -239,6 +254,7 @@ function getListsWithAlbum(userLoggedIn) {
     method: "GET",
     url: "/api/v1/list/album/" + albumResult.appleAlbumID,
     success: function(data) {
+      // message returned here means no lists with this album
       if (data.message) { listsWithAlbum = []; } 
       else { listsWithAlbum = data; }
       populateListsWithAlbum(userLoggedIn);
@@ -306,51 +322,63 @@ function addToList(chosenList) {
       contentType: 'application/json',
       data: JSON.stringify(addAlbumToListBody),
       success: function(data) {
-        listsWithAlbum.push(data);
-        populateListsWithAlbum();
-        // alert(`Successfully added this album to your list: "${data.title}"`);
-        $('#updateListModal').modal('hide');
-        $('#list-options').get(0).selectedIndex = 0;
-      }
-    });
-  }
-}
-
-function addToNewList(listTitle, displayName) {
-  let private = false;
-  if ($('#private-checkbox').is(":checked")) {
-    private = true;
-  }
-  if (listTitle && displayName) {
-    let newList = {
-      user: userID,
-      displayName: displayName,
-      title: listTitle,
-      isPrivate: private,
-      albums: [albumResult]
-    };
-    $.ajax({
-      method: "POST",
-      url: "/api/v1/list/",
-      contentType: 'application/json',
-      data: JSON.stringify(newList),
-      success: function(data) {
-        // update the UI without making any additional API calls
-        if(!data.message) {
-          userLists.push(data);
+        if (!data.message) {
           listsWithAlbum.push(data);
-          populateUserLists();
           populateListsWithAlbum();
-          // alert(`Successfully added list: "${data.title}"`);
+          // alert(`Successfully added this album to your list: "${data.title}"`);
           $('#updateListModal').modal('hide');
-          $('#new-list-title').val('');
-          $('#new-display-name').val('');
+          $('#list-options').get(0).selectedIndex = 0;
         } else {
           alert(data.message);
         }
       }
     });
   }
+}
+
+function addToNewList(listTitle, displayName) {
+
+  // check to see if this user has a list with the same name
+  let confirmed = true;
+  let listExists = userLists.find(x => x.title.toUpperCase() === listTitle.toUpperCase());
+  if (listExists) { confirmed = confirm(`You already have a list called "${listExists.title}". Choose "ok" to create a new list, "cancel" to go back and add this album to an existing list.`); }
+
+  // user either said okay to create a duplicate list, or there
+  // is no other list with this name by this user
+  if (confirmed) {
+    let private = false;
+    if ($('#private-checkbox').is(":checked")) { private = true; }
+    if (listTitle && displayName) {
+      let newList = {
+        user: userID,
+        displayName: displayName,
+        title: listTitle,
+        isPrivate: private,
+        albums: [albumResult]
+      };
+      $.ajax({
+        method: "POST",
+        url: "/api/v1/list/",
+        contentType: 'application/json',
+        data: JSON.stringify(newList),
+        success: function(data) {
+          // update the UI without making any additional API calls
+          if(!data.message) {
+            userLists.push(data);
+            listsWithAlbum.push(data);
+            populateUserLists();
+            populateListsWithAlbum();
+            // alert(`Successfully added list: "${data.title}"`);
+            $('#updateListModal').modal('hide');
+            $('#new-list-title').val('');
+            $('#new-display-name').val('');
+          } else {
+            alert(data.message);
+          }
+        }
+      });
+    }
+  } 
 }
 
 function removeFromList(listID) {
@@ -373,9 +401,15 @@ function removeFromList(listID) {
       contentType: 'application/json',
       data: JSON.stringify(deleteObject),
       success: function(data) {
-        let index = listsWithAlbum.indexOf(thisList);
-        listsWithAlbum.splice(index, 1);
-        populateListsWithAlbum();
+        // `data` object returns the list that the album was 
+        // removed from when successful
+        if (!data.message) {
+          let index = listsWithAlbum.indexOf(thisList);
+          listsWithAlbum.splice(index, 1);
+          populateListsWithAlbum();
+        } else {
+          alert(data.message);
+        }
       }
     });
   }
@@ -477,10 +511,14 @@ function addConnection(newAlbumID) {
               "creator": userID
             }),
             success: function(album) {
-              // returns just this album with updates
-              albumResult = album;
-              populateConnections();
-              $('#updateConnectionModal').modal('hide');
+              if (!album.message) {
+                // returns just this album with updates
+                albumResult = album;
+                populateConnections();
+                $('#updateConnectionModal').modal('hide');
+              } else {
+                alert(album.message);
+              }
             }
           });
         } else {
@@ -494,10 +532,14 @@ function addConnection(newAlbumID) {
               "creator": userID
             }),
             success: function(album) {
-              // returns just this album with updates
-              albumResult = album;
-              populateConnections();
-              $('#updateConnectionModal').modal('hide');
+              if (!album.message) {
+                // returns just this album with updates
+                albumResult = album;
+                populateConnections();
+                $('#updateConnectionModal').modal('hide');
+              } else {
+                alert(album.message);
+              }
             }
           });
         }
@@ -524,9 +566,13 @@ function deleteConnection(connectedAlbum) {
         "creator": userID
       }),
       success: function(album) {
-        albumResult = album;
-        populateConnections();
-        updateConnectionDisplay();
+        if (!album.message) {
+          albumResult = album;
+          populateConnections();
+          updateConnectionDisplay();
+        } else {
+          alert(album.message);
+        }
       }
     });
   }
@@ -649,9 +695,13 @@ function deleteTag(tagID) {
         "creator": creator
       }),
       success: function(album) {
-        albumResult = album;
-        populateTags();
-        updateTagDisplay(); 
+        if (!album.message) {
+          albumResult = album;
+          populateTags();
+          updateTagDisplay(); 
+        } else {
+          alert(album.message);
+        }
       }
     });
   }

@@ -1,7 +1,7 @@
 const List = require('../models/list.model')
 const request = require('request')
 const Cryptr = require('cryptr')
-const cryptr = new Cryptr('AlbumTagsSecretKey')
+const cryptr = new Cryptr(process.env.ENCRYPT_KEY)
 
 exports.find_all_user_lists = function (req, res, next) {
   const userID = req.params.id

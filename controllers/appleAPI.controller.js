@@ -31,7 +31,7 @@ exports.utility_getRealGenresArray = function (allGenres) {
 
 
 exports.return_album_details = function (req, res, next) {
-  const jwtToken = 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik05OVpGUEMyR1UifQ.eyJpYXQiOjE1NDY3NDEzOTMsImV4cCI6MTU2MjI5MzM5MywiaXNzIjoiUzJaUDI1NlBQSyJ9.uc5Wazj-mxf0t8NlmCm4rrwGxTJsoj4Ep-El0h5ZrWolXtvn1gp46Y00OGJEESjGLNF3A4fxnxXB8fx-rtF4Pw'
+  const jwtToken = process.env.APPLE_JWT
   const thisAlbum = req.params.appleAlbumID
   let result
 
@@ -66,7 +66,7 @@ exports.return_album_details = function (req, res, next) {
 }
 
 exports.search_by_album_or_artist = function (req, res, next) {
-  const jwtToken = 'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik05OVpGUEMyR1UifQ.eyJpYXQiOjE1NDY3NDEzOTMsImV4cCI6MTU2MjI5MzM5MywiaXNzIjoiUzJaUDI1NlBQSyJ9.uc5Wazj-mxf0t8NlmCm4rrwGxTJsoj4Ep-El0h5ZrWolXtvn1gp46Y00OGJEESjGLNF3A4fxnxXB8fx-rtF4Pw'
+  const jwtToken = process.env.APPLE_JWT
   // const thisSearch = req.params.search.replace(/\'/g, '%27').replace(/\s/g, '%20').replace(/\&/g, '%26').replace(/\,/g, '%2C')
   const thisSearch = req.params.search
 

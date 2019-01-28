@@ -65,7 +65,7 @@
               <button type="button" id="connection-update-button" class="btn btn-sm  btn-outline-primary float-right" data-toggle="modal" data-target="#updateConnectionModal">Add Connections</button>
             </div>
             <div id="lists-info-card-body" class="card-body info-card-body">
-              <h5 id="favorite-title" class="card-title text-secondary text-center"><span id="favorited-icon"></span> + <span id="favorites-link">your favorites</span></h5>
+              <h5 id="favorite-title" class="card-title text-secondary text-center"><span id="favorited-icon"></span> + <span id="favorites-link">your favorites</span><hr/></h5>
               <h5 class="card-title"><span id="list-title-modifier">All <span class="large-button-text">user </span></span>lists with this album:<span id="lists-toggle" class="float-right"></span></h5>
               <ul id="all-lists" class="card-text"></ul>
               <button type="button" class="btn btn-sm btn-outline-primary ml-1 float-right info-card-login-button">Log in to Update</button>
@@ -85,7 +85,7 @@
                   </div>
                   <div class="modal-body">
                     <div class="input-group">
-                      <input id="add-tag-input" type="text" class="form-control" placeholder="Add a new tag...">
+                      <input id="add-tag-input" type="search" class="form-control" placeholder="Add a new tag...">
                       <div class="input-group-append">
                         <button id="add-tag-button" class="btn btn-primary" type="button">Add</button>
                       </div>
@@ -113,7 +113,7 @@
                   </div>
                   <div class="modal-body">
                     <div class="input-group mb-3">
-                      <input id="add-connection-input" type="text" class="form-control" placeholder="Add a new connection...">
+                      <input id="add-connection-input" type="search" class="form-control" placeholder="Add a new connection...">
                       <div class="input-group-append">
                         <button id="add-connection-button" class="btn btn-primary" type="button">Add</button>
                       </div>
@@ -156,10 +156,10 @@
                     </div>
                     <p class="text-secondary mb-1 mt-4"><small>Add to a new list:</small></p>
                     <div class="input-group mb-2">
-                      <input id="new-list-title" type="text" class="form-control" placeholder="New list name...">
+                      <input id="new-list-title" type="search" class="form-control" placeholder="New list name...">
                     </div>
                     <div class="input-group mb-1">
-                      <input id="new-display-name" type="text" class="form-control" placeholder="User display name...">
+                      <input id="new-display-name" type="search" class="form-control" placeholder="User display name...">
                     </div>
                     <!-- private checkbox, currently disabled
                     <div class="input-group mt-2 mb-1">
@@ -187,6 +187,6 @@
     <!-- END PAGE CONTENT -->    
 
     <% include partials/templates/footer.ejs %>
-    <script src="/javascripts/album.script.js"></script>
+    <script src="/javascripts/album.script.min.js"></script>
   </body>
 </html>

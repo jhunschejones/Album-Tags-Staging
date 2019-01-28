@@ -148,7 +148,7 @@ function populateCard(album, cardNumber) {
       'src', album.cover.replace('{w}', 260).replace('{h}', 260))
   // add album-details-link to album cover
   $(`#card${cardNumber} .album_details_link`).attr(
-      'href', `/albumdetails/${album.appleAlbumID}`)
+      'href', `/album/${album.appleAlbumID}`)
 
   // add to list of years to filter by 
   yearsList.push(`${album.releaseDate.slice(0,4)}`)

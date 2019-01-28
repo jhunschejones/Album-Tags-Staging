@@ -66,7 +66,7 @@ function populateCard(album, cardNumber) {
   // album cover
   $(`#card${cardNumber} img`).attr('src', album.cover.replace('{w}', 260).replace('{h}', 260))
   // add album-details-link to album cover
-  $(`#card${cardNumber} .album_details_link`).attr('href', `/albumdetails/${album.appleAlbumID}`)
+  $(`#card${cardNumber} .album_details_link`).attr('href', `/album/${album.appleAlbumID}`)
   
   $(`#card${cardNumber}`).append(`<span class="album-delete-button" data-album-id="${album.appleAlbumID}" data-toggle="tooltip" data-placement="right" title="Remove from list" data-trigger="hover">&#10005;</span></li>`)
 
@@ -135,10 +135,18 @@ function removeAlbum(albumID) {
 
 function editDisplayName() {
   let newDisplayName = $("#list-display-name-input").val().trim()
+
+  // pass basic data validation
+  if (newDisplayName === listData.displayName) {
+    alert(`The display name for this list is already set as "${listData.displayName}"`);
+    return;
+  }
   if (newDisplayName.length > 30) {
     alert("Display names must be shorter than 30 characters in length.")
     return;
   } 
+
+  // start updating list
   let updateObject = {
     method: "change display name",
     displayName: newDisplayName
@@ -149,18 +157,32 @@ function editDisplayName() {
     contentType: 'application/json',
     data: JSON.stringify(updateObject),
     success: function(data) {
-      listData = data
-      populateList()
+      if (!data.message) {
+        listData = data
+        populateList()
+        $('#list-update-success').text("List info updated!");
+        setTimeout(function(){ $('#list-update-success').html('&nbsp;'); }, 3000);
+      } else {
+        alert(data.message);
+      }
     }
   })
 }
 
 function editListTitle() {
   let newListTitle = $("#list-title-input").val().trim()
+
+  // pass basic data validation
+  if (newListTitle === listData.title) {
+    alert(`The title for this list is already "${listData.title}"`);
+    return;
+  }
   if (newListTitle.length > 60) {
     alert("List titles must be shorter than 60 characters in length.")
     return;
   } 
+
+  // start updating list
   if (newListTitle && newListTitle.length > 0) {
     let updateObject = {
       method: "change title",
@@ -172,8 +194,14 @@ function editListTitle() {
       contentType: 'application/json',
       data: JSON.stringify(updateObject),
       success: function(data) {
-        listData = data
-        populateList()
+        if (!data.message) {
+          listData = data
+          populateList()
+          $('#list-update-success').text("List info updated!");
+          setTimeout(function(){ $('#list-update-success').html('&nbsp;'); }, 3000);
+        } else {
+          alert(data.message);
+        }
       }
     })
   } else {
@@ -187,6 +215,16 @@ document.getElementById("edit-button").addEventListener("click", function() {
   $('#list-title-input').val(listData.title)
   $('#list-display-name-input').val(listData.displayName || "Unknown")
 })
+$("#list-title-input").keyup(function(event) {
+  if (event.keyCode === 13) {
+    $("#update-list-title").click();
+  }
+});
+$("#list-display-name-input").keyup(function(event) {
+  if (event.keyCode === 13) {
+    $("#update-list-display-name").click();
+  }
+});
 
 document.getElementById("update-list-display-name").addEventListener("click", editDisplayName)
 document.getElementById("update-list-title").addEventListener("click", editListTitle)

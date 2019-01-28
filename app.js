@@ -1,4 +1,6 @@
-// const newrelic = require('newrelic')
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').load();
+}
 const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
@@ -25,7 +27,7 @@ app.use(cors())
 // ====== Set up database connection ======
 const mongoose = require('mongoose')
 mongoose.set('useFindAndModify', false)
-mongoose.connect('mongodb://joshua:roofuzz@album-tags-shard-00-00-qntxy.mongodb.net:27017,album-tags-shard-00-01-qntxy.mongodb.net:27017,album-tags-shard-00-02-qntxy.mongodb.net:27017/Album-Tags?ssl=true&replicaSet=Album-Tags-shard-0&authSource=admin&retryWrites=true', { useNewUrlParser: true })
+mongoose.connect(process.env.MONGO_STRING, { useNewUrlParser: true })
 let db = mongoose.connection
 db.on('error', console.error.bind(console, 'MongoDB connection error:'))
 

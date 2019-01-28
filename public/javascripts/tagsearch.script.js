@@ -30,7 +30,7 @@ function getTagedAlbums() {
     if (!allMatchingAlbums.message) {
       allMatchingAlbums.forEach(matchingAlbum => {
         $.getJSON ( '/api/v1/album/albumid/' + matchingAlbum.appleAlbumID, function(album) {
-          $('.album_results').append(`${album.title} <span class="text-secondary font-italic">${album.artist}, ${album.releaseDate.slice(0, 4)}</span> : <a href="/albumdetails/${album.appleAlbumID}">Album Details</a> <br>`)
+          $('.album_results').append(`${album.title} <span class="text-secondary font-italic">${album.artist}, ${album.releaseDate.slice(0, 4)}</span> : <a href="/album/${album.appleAlbumID}">Album Details</a> <br>`)
         })
       })
     }

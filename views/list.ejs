@@ -38,24 +38,27 @@
             </button>
           </div>
           <div class="modal-body">
-            <label for="list-title-input" class="text-secondary">List title:</label>
+            <label for="list-title-input" class="text-secondary mb-0"><small>Edit the list title:</small></label>
             <div class="input-group mb-3">
-              <input id="list-title-input" type="text" class="form-control">
+              <input id="list-title-input" type="search" class="form-control">
               <div class="input-group-append">
                 <button id="update-list-title" class="btn btn-outline-primary" type="button">Update</button>
               </div>
-            </div>
-            <label for="list-display-name-input" class="text-secondary">List display name:</label>
+            </div>          
+            <label for="list-display-name-input" class="text-secondary mb-0"><small>Edit your display name:</small></label>
             <div class="input-group mb-3">
-              <input id="list-display-name-input" type="text" class="form-control">
+              <input id="list-display-name-input" type="search" class="form-control">
               <div class="input-group-append">
                 <button id="update-list-display-name" class="btn btn-outline-primary" type="button">Update</button>
               </div>
             </div>
+            <p class="text-secondary mt-3 mb-3" style="line-height:1em;"><small>To <strong>add</strong> an album to a list, <a href="/search">search</a> for the album, then add it from the <span class="font-italic">lists</span> tab of the album page.</small></p>
+            <p class="text-secondary mb-0" style="line-height:1em;"><small>To <strong>delete</strong> an album from this list, click the 'X' in the upper-right corner of the album cover.</small></p>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button>
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <div id="update-list-modal-footer" class="modal-footer justify-content-between">
+            <small id="list-update-success" class="text-primary">&nbsp;</small><br/>
+            <!-- <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button> -->
+            <button type="button" class="btn btn-secondary justify-content-end" data-dismiss="modal">Exit</button>
           </div>
         </div>
       </div>

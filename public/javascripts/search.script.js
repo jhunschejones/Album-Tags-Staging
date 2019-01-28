@@ -142,7 +142,7 @@ function populateAlbumResults() {
     // iterate over album results array
     
     for (let index = 0; index < 5; index++) {
-      $('.album_results').append(`<p class="result"><a href="/albumdetails/${albums[index].appleAlbumID}">${albums[index].title}</a> : <span class="text-secondary">${albums[index].artist} (${albums[index].releaseDate.slice(0, 4)})</span></p>`);  
+      $('.album_results').append(`<p class="result"><a href="/album/${albums[index].appleAlbumID}">${albums[index].title}</a> : <span class="text-secondary">${albums[index].artist} (${albums[index].releaseDate.slice(0, 4)})</span></p>`);  
     };
     $('.album_results').append(`<button class="btn btn-outline-primary btn-sm btn_xsm" onClick="expandAlbumResults(event)">More Albums</button> <br>`);    
   } catch(err) {
@@ -172,7 +172,7 @@ function expandAlbumResults(event) {
            
   // iterate over album results array
   albums.forEach(element => {
-    $('.album_results').append(`<p class="result"><a href="/albumdetails/${element.appleAlbumID}">${element.title}</a> : <span class="text-secondary">${element.artist} (${element.releaseDate.slice(0, 4)})</span></p>`);
+    $('.album_results').append(`<p class="result"><a href="/album/${element.appleAlbumID}">${element.title}</a> : <span class="text-secondary">${element.artist} (${element.releaseDate.slice(0, 4)})</span></p>`);
   });   
   $('.album_results').append(`<button class="btn btn-outline-primary btn-sm btn_xsm" onClick="populateAlbumResults()">Less Albums</button> <br>`);         
 };
@@ -197,7 +197,7 @@ function showArtistAlbums(event) {
             
         // iterate over album results array
         for (let index = 0; index < 5; index++) {                  
-          $(`#i${thisArtistId}`).append(`<li><a href="/albumdetails/${thisArtistAlbums[index].appleAlbumID}">${thisArtistAlbums[index].title}</a> <span class="text-secondary">(${thisArtistAlbums[index].releaseDate.slice(0, 4)})</span></li>`);  
+          $(`#i${thisArtistId}`).append(`<li><a href="/album/${thisArtistAlbums[index].appleAlbumID}">${thisArtistAlbums[index].title}</a> <span class="text-secondary">(${thisArtistAlbums[index].releaseDate.slice(0, 4)})</span></li>`);  
         }
         hideDOMelement("loader");
       } catch(err) {
