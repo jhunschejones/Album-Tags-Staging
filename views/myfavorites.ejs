@@ -1,63 +1,100 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <% include partials/templates/head_tags.ejs %>
-        <link rel="stylesheet" href="/stylesheets/cards.min.css">
-        <link rel="stylesheet" href="/stylesheets/spinner.min.css">
-        <link rel="stylesheet" href="/stylesheets/favoritesfiltering.min.css">
-    </head>
-    <body>
-        <!-- BASIC NAVBAR TEMPLATE -->
-        <% include partials/templates/navbar_basic.ejs %>
+  <head>
+    <% include partials/templates/head_tags.ejs %>
+    <link rel="stylesheet" href="/stylesheets/cards.min.css">
+    <link rel="stylesheet" href="/stylesheets/spinner.min.css">
+    <link rel="stylesheet" href="/stylesheets/favoritesfiltering.min.css">
+  </head>
+  <body>
+    <!-- BASIC NAVBAR TEMPLATE -->
+    <% include partials/templates/navbar_basic.ejs %>
 
-        <!-- FILTERS SECTION -->
-        <div id="all-favorites-filters" style="display:none;">
-            <% include partials/content/favorites_filters.ejs %>
-        </div>
+    <!-- FILTERS SECTION -->
+    <div id="all-favorites-filters" style="display:none;">
+      <% include partials/content/favorites_filters.ejs %>
+    </div>
 
-        <!-- BEGIN ALBUM CARDS -->
-        <div id="all_cards" class="row container-fluid hide_when_logged_out">
-            <div id="loader"></div>
-        </div>
-        
-        <span id="log_in_message" style="display:none;"><div class="text-center"><br/><br/><br/><br/><h4 class="text-secondary">Please <span class="login_button text-primary" style="cursor:pointer;">log in</span> to access your favorites!</h4><br/><br/><br/><br/><br/></div></span>
+    <!-- BEGIN ALBUM CARDS -->
+    <div id="all_cards" class="row container-fluid hide_when_logged_out">
+      <div id="loader"></div>
+    </div>
+    
+    <span id="log_in_message" style="display:none;"><div class="text-center"><br/><br/><br/><br/><h4 class="text-secondary">Please <span class="login_button text-primary" style="cursor:pointer;">log in</span> to access your favorites!</h4><br/><br/><br/><br/><br/></div></span>
 
-        <div class="container-fluid album_list_instruction">
-            <ul class="album_list" style="list-style-type: none;">
+    <div class="container-fluid album_list_instruction">
+      <ul class="album_list" style="list-style-type: none;">
 
-            </ul>
-        </div>
-        <!-- END ALBUM CARDS -->   
-        
-        <!-- Modal -->
-        <div class="modal fade" id="shareFavoritesModal" tabindex="-1" role="dialog" aria-labelledby="shareFavoritesModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="shareFavoritesModalLabel">Share your favorites list</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="input-group mb-3">
-                            <input id="display-name-input" type="text" class="form-control" placeholder="User display name...">
-                        </div>
-                        <div class="input-group mb-3">
-                            <textarea id="shareable-url" class="form-control" placeholder="Share this url..." rows="5"></textarea>
-                        </div>
-                    </div>
-                    <small id="copied-message" class="text-secondary">Copied!</small>
-                    <div class="modal-footer">
-                        <button id="get-shareable-link" type="button" class="btn btn-outline-primary" data-clipboard-target="#shareable-url">Get shareable link</button>
-                        <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Done</button>
-                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
-                    </div>
-                </div>
+      </ul>
+    </div>
+    <!-- END ALBUM CARDS -->   
+    
+    <!-- Start Share Favorites Modal -->
+    <div class="modal fade" id="shareFavoritesModal" tabindex="-1" role="dialog" aria-labelledby="shareFavoritesModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="shareFavoritesModalLabel">Share your favorites list</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="input-group mb-3">
+              <input id="display-name-input" type="text" class="form-control" placeholder="User display name...">
             </div>
+            <div class="input-group mb-3">
+              <textarea id="shareable-url" class="form-control" placeholder="Share this url..." rows="5"></textarea>
+            </div>
+          </div>
+          <small id="copied-message" class="text-secondary">Copied!</small>
+          <div class="modal-footer">
+            <button id="get-shareable-link" type="button" class="btn btn-outline-primary" data-clipboard-target="#shareable-url">Get shareable link</button>
+            <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Done</button>
+            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+          </div>
         </div>
+      </div>
+    </div>
 
-        <% include partials/templates/footer.ejs %>
-        <script src="/javascripts/myfavorites.script.min.js"></script>
-    </body>
+    <!-- ====== start page info modal ====== -->
+    <div class="modal fade" id="pageInfoModal" tabindex="-1" role="dialog" aria-labelledby="pageInfoModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="pageInfoModalLabel">How to use this page</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div id="page-info-modal-body" class="modal-body text-secondary pt-2">
+
+            <small style="line-height:1em;"><strong>To add an album to your favorites:</strong></small><br/>
+            <ol class="mb-2 pl-4"><small>
+              <li><a href="/search">Search</a> for an album and click to navigate to the album page</li>
+              <li>Click the <span class="font-italic">Lists</span> tab on the album page</li>
+              <li>Click the heart icon at the top/center of the <span class="font-italic">Lists</span> card</li>
+              <li>The heart will turn red for favorited, grey for un-favorited</li>
+            </small></ol>
+
+            <small style="line-height:1em;"><strong>To remove an album from your favorites:</strong></small><br/>
+            <ol class="mb-2 pl-4"><small>
+              <li>Click on an album on this page to navigate to the <span class="font-italic">album</span> page</li>
+              <li>Click the <span class="font-italic">Lists</span> tab on the album page</li>
+              <li>Click the heart icon at the top/center of the <span class="font-italic">Lists</span> card</li>
+              <li>The heart will turn red for favorited, grey for un-favorited</li>
+            </small></ol>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-dismiss="modal">Done</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ====== end page info modal ====== -->    
+    
+
+    <% include partials/templates/footer.ejs %>
+    <script src="/javascripts/myfavorites.script.min.js"></script>
+  </body>
 </html>

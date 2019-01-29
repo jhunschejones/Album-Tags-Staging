@@ -1,3 +1,9 @@
+.page-info-button{
+  cursor: pointer;
+  opacity: 0.4;
+  padding-top: 3px;
+}
+
 #album-title {
   margin-bottom: 0px;
   margin-top: 10px;
@@ -183,7 +189,6 @@ input[type=search]::-webkit-search-cancel-button {
 
 #favorite-title {
   font-weight: 300;
-  font-style: italic;
   margin-top: 8px;
   margin-bottom: 20px;
 }

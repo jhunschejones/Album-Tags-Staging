@@ -85,6 +85,7 @@ function populateList() {
   let listCreator = listData.displayName
   if (!listCreator || listCreator.trim === "") { listCreator = "Unknown" }
   $('#list-title').text(`${listData.title}`)
+  $('#list-title').append('<small class="text-secondary pl-2 page-info-button" data-toggle="modal" data-target="#pageInfoModal">&#9432;</small>')
   $('#list-creator').text("by: " + listCreator)
 
   if (listData.albums && listData.albums.length > 0) {

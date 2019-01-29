@@ -702,3 +702,12 @@ function startFavoritesPage() {
   albumCardsList = $(".albumCard")
   startTags()
 }
+
+function addInfoButtons() {
+  const infoButtonSmall = '<small class="text-secondary ml-2 float-right page-info-button" style="cursor:pointer;" data-toggle="modal" data-target="#pageInfoModal">&#9432;</small>'
+  $('#compact_menu p').append(infoButtonSmall)
+  const infoButtonLage = '<button class="btn btn-sm btn-outline-secondary sticky-top float-left button_text" style="cursor:pointer;margin-top:2px;" data-toggle="modal" data-target="#pageInfoModal">&#9432;</button>'
+  $('#all-favorites-filters').append(infoButtonLage)
+}
+
+addInfoButtons()

@@ -64,6 +64,50 @@
       </div>
     </div>
 
+    <!-- ====== start page info modal ====== -->
+    <div class="modal fade" id="pageInfoModal" tabindex="-1" role="dialog" aria-labelledby="pageInfoModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="pageInfoModalLabel">How to use this page</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div id="page-info-modal-body" class="modal-body text-secondary pt-2">
+
+            <small style="line-height:1em;"><strong>To add an album to this list:</strong></small><br/>
+            <ol class="mb-2 pl-4"><small>
+              <li><a href="/search">Search</a> for an album & click on it to navigate to the <span class="font-italic">album</span> page</li>
+              <li>Click the <span class="font-italic">Lists</span> tab on the album page</li>
+              <li>Click the <span class="font-italic">Add to a List</span> button in the bottom right corner of the card</li>
+              <li>Select from an existing list or create a new list</li>
+              <li>You can choose the title of a new list and how you would like your name displayed as the creator of the list</li>
+            </small></ol>
+
+            <small style="line-height:1em;"><strong>To remove an album from this list:</strong></small><br/>
+            <ol class="mb-2 pl-4"><small>
+              <li>Exit this information modal</li>
+              <li>Click the 'X' in the upper-right corner of the album cover for the album you want to remove</li>
+              <li>Click <span class="font-italic">Ok</span> on the confirmation alert to finish removing the album</li>
+            </small></ol>
+
+            <small style="line-height:1em;"><strong>To edit the list title or display name for this list:</strong></small><br/>
+            <ol class="mb-1 pl-4"><small>
+              <li>Exit this information modal</li>
+              <li>Click the <span class="font-italic">Edit List</span> button at the bottom of this page</li>
+              <li>Change the text in the <span class="font-italic">List title</span> or <span class="font-italic">Display name</span> fields and click the corresponding <span class="font-italic">Update</span> button to the right of the field</li>
+              <li>Exit the <span class="font-italic">Edit List</span> modal</li>
+            </small></ol>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-dismiss="modal">Done</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ====== end page info modal ====== -->  
+
     <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
     <% include partials/templates/footer.ejs %>
     <script src="/javascripts/list.script.min.js"></script>
