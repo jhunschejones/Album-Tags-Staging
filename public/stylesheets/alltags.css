@@ -51,7 +51,7 @@
 }
 
 .all_tags {
-  overflow: auto;
+  overflow-y: auto;
   max-height: 60vh;
 }
 
@@ -124,5 +124,37 @@ hr {
     /* background-image: url("../images/read_earbuds_lg.jpg"); */
     /* background-image: url("../images/white_headphones_lg.jpg"); */
     /* background-image: url("../images/pink_headphones_lg.jpg"); */
+  }
+}
+
+/* iphone x */
+@media screen and (width: 375px) and (height: 812px) {
+  #absolute_content {
+      top: 99px;
+      left: 0%;
+      right: 0%;
+      max-height: 82vh;
+  }
+  #background_image_container {
+      height: 82vh;
+  }
+  .all_tags {
+    max-height: 67vh;
+  }
+}
+
+/* iphone 5s */
+@media screen and (max-width: 320px) {
+  #absolute_content {
+      top: 98px;
+      left: 0%;
+      right: 0%;
+      /* max-height: 80vh; */
+  }
+  #background_image_container {
+      height: 75vh;
+  }
+  .all_tags {
+    max-height: 57vh;
   }
 }
