@@ -48,6 +48,9 @@ exports.config = {
       'response.headers.proxyAuthorization',
       'response.headers.setCookie*',
       'response.headers.x*'
-    ]
+    ],
+    distributed_tracing: {
+      enabled: true
+    }
   }
 }
