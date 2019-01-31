@@ -24,6 +24,17 @@ app.use(helmet())
 if (process.env.NODE_ENV === 'production') { app.use(redirectToHTTPS([/localhost:(\d{4})/])) }
 app.use(cors())
 
+// limit requests to 100 per 15mins in production
+const rateLimit = require("express-rate-limit");
+app.enable("trust proxy"); 
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: "Too many requests from this IP, please try again in 15 minutes",
+  statusCode: 429
+});
+if (process.env.NODE_ENV === 'production') { app.use("/api/", apiLimiter); }
+
 // ====== Set up database connection ======
 const mongoose = require('mongoose')
 mongoose.set('useFindAndModify', false)
