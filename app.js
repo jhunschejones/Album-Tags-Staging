@@ -29,7 +29,7 @@ const rateLimit = require("express-rate-limit");
 app.enable("trust proxy"); 
 const apiLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
-  max: 50,
+  max: 120,
   message: "Too many requests from this IP, please try again in 15 minutes",
   statusCode: 429
 });
