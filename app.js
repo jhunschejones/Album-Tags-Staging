@@ -28,8 +28,8 @@ app.use(cors())
 const rateLimit = require("express-rate-limit");
 app.enable("trust proxy"); 
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
+  windowMs: 10 * 60 * 1000,
+  max: 50,
   message: "Too many requests from this IP, please try again in 15 minutes",
   statusCode: 429
 });
