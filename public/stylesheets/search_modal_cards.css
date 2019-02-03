@@ -1,0 +1,65 @@
+/* ====== custom styling for cards ======= */
+#search-modal-results {
+  display: inline-flex;
+  max-width: 100%;
+  overflow-x: scroll;
+  padding-right: 5px;
+}
+
+.search-modal-card {
+  width: 16rem;
+  word-wrap: break-word;
+}
+
+.search-modal-card-image {
+  border-radius: .25rem;
+  width: 16rem;
+  box-shadow: 2px 2px 5px grey;
+}
+
+@media screen and (max-width: 800px) {
+  .search-modal-card,
+  .search-modal-card-image {
+    width: 10.8rem;
+  }
+  .search-modal-card-large-artist,
+  .search-modal-card-large-album {
+    display: none;
+  }
+  .search-modal-card-small-artist,
+  .search-modal-card-small-album {
+    display: block;
+  }
+}
+
+@media screen and (min-width: 800px) {
+  .search-modal-card-small-artist,
+  .search-modal-card-small-album {
+    display: none;
+  }
+  .search-modal-card-large-artist,
+  .search-modal-card-large-album {
+    display: block;
+  }
+}
+  
+.search-modal-card {
+  margin: 5px !important;
+}
+
+.search-modal-card-title {
+  margin-bottom: 3px;
+  font-size: 1.1rem;
+  line-height: 1.1;
+}
+
+.search-modal-card-body {
+  padding: 5px 9px 6px 4px;
+  line-height: 1.1;
+}
+
+.search-modal-card-album {
+  font-size: .9rem;
+  color: #6c757d;
+  font-weight: 100;
+}

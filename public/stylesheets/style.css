@@ -50,6 +50,10 @@
   padding: 6px 0px 12px 0px !important;
 }
 
+.full_menu_link:hover{
+  cursor: pointer;
+}
+
 .full_menu_divider {
   padding: 6px 10px 12px 10px
 }
