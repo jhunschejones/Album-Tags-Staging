@@ -3,6 +3,7 @@
     <head>
         <% include partials/templates/head_tags.ejs %>
         <link rel="stylesheet" href="/stylesheets/alltags.min.css">
+        <link rel="stylesheet" href="/stylesheets/search_modal_cards.css">
     </head>
     <body>
 
@@ -21,10 +22,15 @@
             <a href="" onclick="tagSearch(event)" class="btn btn-sm btn-outline-light all_tags_button">Search<span class="extra_text"> by Selected Tags</span></a>
             <a href="" onclick="clearTagArray(event)" class="btn btn-sm btn-outline-light all_tags_button">Clear Selected<span class="extra_text"> Tags</span></a>
             <p class="warning_label text-danger"></p>
-        </div>           
+        </div>  
+        
+        <!-- ====== START SEARCH MODAL ====== -->
+        <% include partials/content/search_modal.ejs %>
+        <!-- ====== END SEARCH MODAL ====== -->    
 
         <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
         <% include partials/templates/footer.ejs %>
         <script src="/javascripts/alltags.script.min.js"></script>
+        <script src="/javascripts/search_modal.script.js"></script>
     </body>
 </html>

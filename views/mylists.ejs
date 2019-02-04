@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="/stylesheets/cards.min.css">
     <link rel="stylesheet" href="/stylesheets/spinner.min.css">
     <link rel="stylesheet" href="/stylesheets/mylists.min.css">
+    <link rel="stylesheet" href="/stylesheets/search_modal_cards.css">
   </head>
   <body>
     <!-- BASIC NAVBAR TEMPLATE -->
@@ -19,7 +20,7 @@
     </br>
       <h3 id="page-title" class="text-secondary">My Album Lists:</h3>
       <div id="loader"></div>
-      <p id="no-lists-message" class="text-secondary">You do not have any custom album lists. <a href="/search">Search</a> for an album and add it to a new list on the <i>Lists</i> tab.</p>
+      <p id="no-lists-message" class="text-secondary">You do not have any custom album lists. <a href="" data-toggle="modal" data-target="#searchModal">Search</a> for an album and add it to a new list on the <i>Lists</i> tab.</p>
       <ul id="all-lists">
         <!-- lists go here -->
       </ul>
@@ -34,8 +35,13 @@
     </br>
     <button id="back-button" class="btn btn-sm btn-light" onclick="window.history.back()"><img id="back_arrow" src="/images/back_arrow.png"><span class="button_text">Back</span></button>     
 
+    <!-- ====== START SEARCH MODAL ====== -->
+    <% include partials/content/search_modal.ejs %>
+    <!-- ====== END SEARCH MODAL ====== -->    
+
     <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
     <% include partials/templates/footer.ejs %>
     <script src="/javascripts/mylists.script.min.js"></script>
+    <script src="/javascripts/search_modal.script.js"></script>
   </body>
 </html>

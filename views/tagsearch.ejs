@@ -3,6 +3,7 @@
     <head>
         <% include partials/templates/head_tags.ejs %>
         <link rel="stylesheet" href="/stylesheets/tagsearch.min.css">
+        <link rel="stylesheet" href="/stylesheets/search_modal_cards.css">
     </head>
     <body>
 
@@ -25,6 +26,10 @@
             <button class="btn btn-sm btn-outline-light back_button" onclick="window.history.back()">Go Back</button>
         </div>           
 
+        <!-- ====== START SEARCH MODAL ====== -->
+        <% include partials/content/search_modal.ejs %>
+        <!-- ====== END SEARCH MODAL ====== -->            
+
         <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
         <% include partials/templates/footer.ejs %>
 
@@ -32,5 +37,6 @@
         <p class="heres_the_selected_tags" style="display:none;"> <%= selectedTags %> </p>   
 
         <script src="/javascripts/tagsearch.script.min.js"></script>
+        <script src="/javascripts/search_modal.script.js"></script>
     </body>
 </html>

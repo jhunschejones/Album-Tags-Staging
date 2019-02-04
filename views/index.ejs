@@ -2,7 +2,8 @@
 <html lang="en">
     <head>
         <% include partials/templates/head_tags.ejs %>
-		<link rel="stylesheet" href="/stylesheets/home.min.css">
+        <link rel="stylesheet" href="/stylesheets/home.min.css">
+        <link rel="stylesheet" href="/stylesheets/search_modal_cards.css">
     </head>
     <body>
 
@@ -17,11 +18,16 @@
 
         <div id="centered_content" class='container-fluid'>
             <h1 class="text-dark">Just like you, we're here for the music.</h1>
-            <a href="/search" class="btn btn-outline-dark">Search Music</a>
+            <a href="" class="btn btn-outline-dark" data-toggle="modal" data-target="#searchModal">Search Music</a>
             <a href="/myfavorites" class="btn btn-outline-dark">Your Favorites</a>    
         </div>
 
+        <!-- ====== START SEARCH MODAL ====== -->
+        <% include partials/content/search_modal.ejs %>
+        <!-- ====== END SEARCH MODAL ====== -->    
+
         <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
         <% include partials/templates/footer.ejs %>
+        <script src="/javascripts/search_modal.script.js"></script>
     </body>
 </html>

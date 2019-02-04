@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="/stylesheets/cards.min.css">
     <link rel="stylesheet" href="/stylesheets/spinner.min.css">
     <link rel="stylesheet" href="/stylesheets/favoritesfiltering.min.css">
+    <link rel="stylesheet" href="/stylesheets/search_modal_cards.css">
   </head>
   <body>
     <!-- BASIC NAVBAR TEMPLATE -->
@@ -71,7 +72,7 @@
 
             <small style="line-height:1em;"><strong>To add an album to your favorites:</strong></small><br/>
             <ol class="mb-2 pl-4"><small>
-              <li><a href="/search">Search</a> for an album and click to navigate to the album page</li>
+              <li><a href="" data-toggle="modal" data-target="#searchModal">Search</a> for an album and click to navigate to the album page</li>
               <li>Click the <span class="font-italic">Lists</span> tab on the album page</li>
               <li>Click the heart icon at the top/center of the <span class="font-italic">Lists</span> card</li>
               <li>The heart will turn red for favorited, grey for un-favorited</li>
@@ -93,8 +94,12 @@
     </div>
     <!-- ====== end page info modal ====== -->    
     
+    <!-- ====== START SEARCH MODAL ====== -->
+    <% include partials/content/search_modal.ejs %>
+    <!-- ====== END SEARCH MODAL ====== -->        
 
     <% include partials/templates/footer.ejs %>
     <script src="/javascripts/myfavorites.script.min.js"></script>
+    <script src="/javascripts/search_modal.script.js"></script>
   </body>
 </html>

@@ -104,26 +104,22 @@
 
             <!-- ====== start update connection modal ====== -->
             <div class="modal fade" id="updateConnectionModal" tabindex="-1" role="dialog" aria-labelledby="updateConnectionModalLabel" aria-hidden="true">
-              <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="updateConnectionModalLabel">Update Tags</h5>
+                    <h5 class="modal-title" id="updateConnectionModalLabel">Add a new connection</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                     </button>
                   </div>
                   <div class="modal-body">
                     <div class="input-group mb-3">
-                      <input id="add-connection-input" type="search" class="form-control" placeholder="Add a new connection...">
+                      <input id="add-connection-input" type="search" class="form-control" placeholder="Search an album to connect to...">
                       <div class="input-group-append">
-                        <button id="add-connection-button" class="btn btn-primary" type="button">Add</button>
+                        <button id="add-connection-button" class="btn btn-primary" type="button">Search</button>
                       </div>
                     </div>
-                    <small class="text-secondary font-italic">To add a connection:</small><br/>
-                    <small>1. <span class="text-primary" id="search-for-second-album">Search</span> for the album you want to connect to</small><br/>
-                    <small>2. Copy the apple album ID from the info tab of another album</small><br/>
-                    <small>3. Paste the album ID into the input field above</small><br/>
-                    <small>4. Click 'add'!</small><br/>
+                    <div id="connection-search-results" class="mt-3 mb-0"></div>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Done</button>
@@ -188,7 +184,7 @@
 
     <!-- ====== start page info modal ====== -->
     <div class="modal fade" id="pageInfoModal" tabindex="-1" role="dialog" aria-labelledby="pageInfoModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="pageInfoModalLabel">How to use this page</h5>
@@ -205,16 +201,14 @@
               <li>Type in the new tag text</li>
               <li>Click <span class="font-italic">Add</span></li>
             </small></ol>
-            <p class="mb-2 pl-2" style="line-height:1em;"><small><span class="font-italic">Bonus:</span> visit the <a href="/alltags">all tags</a> page to see tags other users have used. Re-using tags is a great idea to connect albums together!</small></p>
+            <p class="mb-2 pl-2" style="line-height:1em;"><small><span class="font-italic">Bonus:</span> visit the <a href="/alltags">all tags</a> page to see tags other users have used. Re-using tags is a great idea to connect the albums together!</small></p>
 
             <small style="line-height:1em;"><strong>To add a connection to this album:</strong></small><br/>
             <ol class="mb-2 pl-4"><small>
-              <li>Copy the Apple album ID from the <span class="font-italic">Info</span> tab on this page</li>
-              <li><a href="/search">Search</a> for the album you want to connect to</li>
-              <li>Click the <span class="font-italic">Connections</span> tab on the <span class="font-italic">Album</span> page for the second album</li>
+              <li>Click the <span class="font-italic">Connections</span> tab on the <span class="font-italic">Album</span> page</li>
               <li>Click the <span class="font-italic">Add Connections</span> button at the bottom right of the card there</li>
-              <li>Paste the first album's Apple album ID in the input field</li>
-              <li>Click <span class="font-italic">Add</span></li>
+              <li>Search for an album to connect to</li>
+              <li>Click on the album cover in your connection search results to connect the albums!</li>
             </small></ol>
 
             <small style="line-height:1em;"><strong>To add this album to your favorites:</strong></small><br/>
@@ -243,30 +237,7 @@
     <!-- ====== end page info modal ====== -->    
 
     <!-- ====== START SEARCH MODAL ====== -->
-    <div class="modal fade" id="searchModal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="searchModalLabel">Search for an album or artist</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="input-group">
-              <input id="search-modal-input" type="search" class="form-control" placeholder="Search by album or artist...">
-              <div class="input-group-append">
-                <button id="search-modal-button" class="btn btn-primary" type="button">Search</button>
-              </div>
-            </div>
-            <div id="search-modal-results" class="mt-3 mb-0"></div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <% include partials/content/search_modal.ejs %>
     <!-- ====== END SEARCH MODAL ====== -->    
 
     <!-- END PAGE CONTENT -->    

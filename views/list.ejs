@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="/stylesheets/cards.min.css">
     <link rel="stylesheet" href="/stylesheets/spinner.min.css">
     <link rel="stylesheet" href="/stylesheets/list.min.css">
+    <link rel="stylesheet" href="/stylesheets/search_modal_cards.css">
   </head>
   <body>
     <!-- BASIC NAVBAR TEMPLATE -->
@@ -18,7 +19,7 @@
     <h3 id="list-title"></h3>
     <p id="list-creator" class="text-secondary"></p>
     <div id="loader"></div>
-    <p id="no-albums-message" class="text-secondary">There are currently no albums in this list. <a href="/search">Search</a> for an album and add it to a list on the <i>Lists</i> tab.</p>
+    <p id="no-albums-message" class="text-secondary">There are currently no albums in this list. <a href="" data-toggle="modal" data-target="#searchModal">Search</a> for an album and add it to a list on the <i>Lists</i> tab.</p>
     <div id="albums" class="row container-fluid">
       <!-- lists go here -->
     </div>
@@ -52,7 +53,7 @@
                 <button id="update-list-display-name" class="btn btn-outline-primary" type="button">Update</button>
               </div>
             </div>
-            <p class="text-secondary mt-3 mb-3" style="line-height:1em;"><small>To <strong>add</strong> an album to a list, <a href="/search">search</a> for the album, then add it from the <span class="font-italic">lists</span> tab of the album page.</small></p>
+            <p class="text-secondary mt-3 mb-3" style="line-height:1em;"><small>To <strong>add</strong> an album to a list, <a href="" data-toggle="modal" data-target="#searchModal">search</a> for the album, then add it from the <span class="font-italic">lists</span> tab of the album page.</small></p>
             <p class="text-secondary mb-0" style="line-height:1em;"><small>To <strong>delete</strong> an album from this list, click the 'X' in the upper-right corner of the album cover.</small></p>
           </div>
           <div id="update-list-modal-footer" class="modal-footer justify-content-between">
@@ -78,7 +79,7 @@
 
             <small style="line-height:1em;"><strong>To add an album to this list:</strong></small><br/>
             <ol class="mb-2 pl-4"><small>
-              <li><a href="/search">Search</a> for an album & click on it to navigate to the <span class="font-italic">album</span> page</li>
+              <li><a href="" data-toggle="modal" data-target="#searchModal">Search</a> for an album & click on it to navigate to the <span class="font-italic">album</span> page</li>
               <li>Click the <span class="font-italic">Lists</span> tab on the album page</li>
               <li>Click the <span class="font-italic">Add to a List</span> button in the bottom right corner of the card</li>
               <li>Select from an existing list or create a new list</li>
@@ -108,8 +109,13 @@
     </div>
     <!-- ====== end page info modal ====== -->  
 
+    <!-- ====== START SEARCH MODAL ====== -->
+    <% include partials/content/search_modal.ejs %>
+    <!-- ====== END SEARCH MODAL ====== -->    
+
     <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
     <% include partials/templates/footer.ejs %>
     <script src="/javascripts/list.script.min.js"></script>
+    <script src="/javascripts/search_modal.script.js"></script>
   </body>
 </html>
