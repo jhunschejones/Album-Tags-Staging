@@ -151,8 +151,15 @@ function populateAlbumPage(userLoggedIn) {
   $('#apple-album-id span').text(albumResult.appleAlbumID);
   $('#more-by-this-artist').click(function(event) {
     event.preventDefault();
-    sessionStorage.setItem('artist', albumResult.artist);
-    window.location.href = '/search';
+
+    // OLD SEARCH-PAGE ARTIST SEARCH
+    // sessionStorage.setItem('artist', albumResult.artist);
+    // window.location.href = '/search';
+
+    // NEW SEARCH-MODAL ARTIST SEARCH
+    $('#searchModal').modal('show');
+    $('#search-modal-input').val(albumResult.artist);
+    executeSearch(albumResult.artist);
   });
   $('#apple-music-link').click(function(event){
     event.preventDefault();
@@ -551,6 +558,52 @@ function addConnection(newAlbumID) {
   });
 }
 
+function populateConnectionModalResults(data) {
+  $('#connection-search-results').html('');
+  if (data.albums) {
+    for (let index = 0; index < data.albums.length; index++) {
+      const album = data.albums[index];
+      const cardNumber = index + 1;
+      createConnectionModalCard(album, cardNumber);
+      populateConnectionModalCard(album, cardNumber);
+    }
+    // this adds an empty space at the end so the user can scroll 
+    // all the way to the right to see the last album
+    createConnectionModalCard(data.albums.length + 1);
+  }
+}
+
+function createConnectionModalCard(album, cardNumber) {
+  $('#connection-search-results').append(`<div id="connectionModalCard${cardNumber}" class="search-modal-card" data-apple-album-id="${album.appleAlbumID}"><a class="search-modal-card-album-link" href=""><img class="search-modal-card-image" src="" alt=""><a/><div class="search-modal-card-body"><h4 class="search-modal-card-title"></h4><span class="search-modal-card-album"></span></div></div>`)
+}
+
+function populateConnectionModalCard(album, cardNumber) {
+  // set up album and artist trunction
+  let smallArtist = album.artist;
+  let largeArtist = album.artist;
+  let smallAlbum = album.title;
+  let largeAlbum = album.title;
+  if (smallArtist.length > 32) { smallArtist = truncate(smallArtist, 32); } 
+  if (smallAlbum.length > 44) { smallAlbum = truncate(smallAlbum, 44); } 
+
+  if (largeArtist.length > 49) { largeArtist = truncate(largeArtist, 49); } 
+  if (largeAlbum.length > 66) { largeAlbum = truncate(largeAlbum, 66); }
+  
+  // artist name
+  $(`#connectionModalCard${cardNumber} .search-modal-card-title`).html(`<span class="search-modal-card-large-artist">${largeArtist}</span><span class="search-modal-card-small-artist">${smallArtist}</span>`);
+  // album name
+  $(`#connectionModalCard${cardNumber} .search-modal-card-album`).html(`<span class="search-modal-card-large-album">${largeAlbum}</span><span class="search-modal-card-small-album">${smallAlbum}</span>`);
+  // album cover
+  $(`#connectionModalCard${cardNumber} .search-modal-card-image`).attr('src', album.cover.replace('{w}', 260).replace('{h}', 260));
+
+  $(`#connectionModalCard${cardNumber}`).click(function(event) {
+    event.preventDefault();
+    // connect to this album
+    const selectedAlbum = $(this).data("apple-album-id");
+    addConnection(selectedAlbum);
+  })
+}
+
 function deleteConnection(connectedAlbum) {
   const confirmation = confirm('Are you sure you want to delete a connection? You cannot undo this operation.');
   if (confirmation === true) {
@@ -881,12 +934,8 @@ $("#add-tag-input").keyup(function(event) {
 });
 $("#add-connection-button").click(function(event) {
   event.preventDefault();
-  const newAlbum = $('#add-connection-input').val().trim();
-  if (newAlbum.length > 0) {
-    addConnection(newAlbum);
-  } else {
-    alert("Add an apple album ID to connect two albums.");
-  }
+  const search = $('#add-connection-input').val().trim();
+  executeSearch(search, "connection")
 });
 $("#add-connection-input").keyup(function(event) {
   if (event.keyCode === 13) {

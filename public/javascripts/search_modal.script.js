@@ -12,7 +12,7 @@ function truncate(str, len){
 }
 // ------- END UTILITIES SECTION ----------
 
-function executeSearch(searchString) {
+function executeSearch(searchString, searchType) {
   $.ajax({
     method: "GET",
     url: "/api/v1/apple/search/" + searchString,
@@ -21,7 +21,12 @@ function executeSearch(searchString) {
         alert(data.messsage);
         return;
       } else {
-        populateSearchModalResults(data);
+        if (searchType === "connection") {
+          // this function is defined in album.script.js
+          populateConnectionModalResults(data);
+        } else {
+          populateSearchModalResults(data);
+        }
       }
     }
   });
@@ -29,11 +34,16 @@ function executeSearch(searchString) {
 
 function populateSearchModalResults(data) {
   $('#search-modal-results').html('');
-  for (let index = 0; index < data.albums.length; index++) {
-    const album = data.albums[index];
-    const cardNumber = index + 1;
-    createModalCard(cardNumber);
-    populateModalCard(album, cardNumber);
+  if (data.albums) {
+    for (let index = 0; index < data.albums.length; index++) {
+      const album = data.albums[index];
+      const cardNumber = index + 1;
+      createModalCard(cardNumber);
+      populateModalCard(album, cardNumber);
+    }
+    // this adds an empty space at the end so the user can scroll 
+    // all the way to the right to see the last album
+    createModalCard(data.albums.length + 1)
   }
 }
 
@@ -59,7 +69,7 @@ function populateModalCard(album, cardNumber) {
   $(`#searchModalCard${cardNumber} .search-modal-card-album`).html(`<span class="search-modal-card-large-album">${largeAlbum}</span><span class="search-modal-card-small-album">${smallAlbum}</span>`) 
   // album cover
   $(`#searchModalCard${cardNumber} .search-modal-card-image`).attr('src', album.cover.replace('{w}', 260).replace('{h}', 260))
-  // add album-details-link to album cover
+  // add album-page-link to album cover
   $(`#searchModalCard${cardNumber} .search-modal-card-album-link`).attr('href', `/album/${album.appleAlbumID}`)
 }
 
@@ -69,7 +79,7 @@ $('#search-modal-button').click(function(event) {
   executeSearch(search);
 });
 
-// execute search on enter key
+// execute search when enter key is pressed
 $("#search-modal-input").keyup(function(event) {
   if (event.keyCode === 13) {
     $("#search-modal-button").click();
