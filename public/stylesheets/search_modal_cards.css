@@ -1,3 +1,6 @@
+@import "new-spinner.min.css";
+/* ^ adding spinner to use in modal */
+
 /* ====== custom styling for cards ======= */
 #search-modal-results {
   display: inline-flex;
@@ -13,14 +16,18 @@
 
 .search-modal-card-image {
   border-radius: .25rem;
-  width: 16rem;
+  width: 16rem!important;
+  height: 16rem!important;
   box-shadow: 2px 2px 5px grey;
 }
 
 @media screen and (max-width: 800px) {
-  .search-modal-card,
   .search-modal-card-image {
-    width: 10.8rem;
+    width: 10.8rem!important;
+    height: 10.8rem!important;
+  }
+  .search-modal-card {
+    width: 10.8rem!important;
   }
   .search-modal-card-large-artist,
   .search-modal-card-large-album {
