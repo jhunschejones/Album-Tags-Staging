@@ -24,6 +24,9 @@ function executeSearch(searchString, searchType) {
         if (searchType === "connection") {
           // this function is defined in album.script.js
           populateConnectionModalResults(data);
+        } else if (searchType === "add to list") {
+          // this function is defined in list.script.js
+          populateAddToListModalResults(data);
         } else {
           populateSearchModalResults(data);
         }
@@ -34,6 +37,7 @@ function executeSearch(searchString, searchType) {
 
 function populateSearchModalResults(data) {
   $('#search-modal-results').html('');
+  $('#searchModal .new-loader').hide();
   if (data.albums) {
     for (let index = 0; index < data.albums.length; index++) {
       const album = data.albums[index];
@@ -76,6 +80,8 @@ function populateModalCard(album, cardNumber) {
 $('#search-modal-button').click(function(event) {
   event.preventDefault();
   const search = $('#search-modal-input').val().trim().replace(/[^\w\s]/gi, '');
+  $('#search-modal-results').html('');
+  $('#searchModal .new-loader').show();
   executeSearch(search);
 });
 

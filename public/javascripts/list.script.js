@@ -211,6 +211,116 @@ function editListTitle() {
   }
 }
 
+let addAlbumResults = [];
+function populateAddToListModalResults(data) {
+  $('#add-album-search-results').html('');
+  $('#add-album-card-body .new-loader').hide();
+  if (data.albums) {
+    for (let index = 0; index < data.albums.length; index++) {
+      const album = data.albums[index];
+      const cardNumber = index;
+      createAddAlbumModalCard(album, cardNumber);
+      populateAddAlbumModalCard(album, cardNumber);
+    }
+    // this adds an empty space at the end so the user can scroll 
+    // all the way to the right to see the last album
+    createAddAlbumModalCard(data.albums.length + 1);
+
+    // store search results
+    addAlbumResults = data.albums;
+  }
+}
+
+function createAddAlbumModalCard(album, cardNumber) {
+  $('#add-album-search-results').append(`<div id="addAlbumModalCard${cardNumber}" class="search-modal-card" data-result-index="${cardNumber}"><img class="search-modal-card-image" src="" alt=""><div class="search-modal-card-body"><h4 class="search-modal-card-title"></h4><span class="search-modal-card-album"></span></div></div>`)
+}
+
+function populateAddAlbumModalCard(album, cardNumber) {
+  // set up album and artist trunction
+  let smallArtist = album.artist;
+  let largeArtist = album.artist;
+  let smallAlbum = album.title;
+  let largeAlbum = album.title;
+  if (smallArtist.length > 32) { smallArtist = truncate(smallArtist, 32); } 
+  if (smallAlbum.length > 44) { smallAlbum = truncate(smallAlbum, 44); } 
+
+  if (largeArtist.length > 49) { largeArtist = truncate(largeArtist, 49); } 
+  if (largeAlbum.length > 66) { largeAlbum = truncate(largeAlbum, 66); }
+  
+  // artist name
+  $(`#addAlbumModalCard${cardNumber} .search-modal-card-title`).html(`<span class="search-modal-card-large-artist">${largeArtist}</span><span class="search-modal-card-small-artist">${smallArtist}</span>`);
+  // album name
+  $(`#addAlbumModalCard${cardNumber} .search-modal-card-album`).html(`<span class="search-modal-card-large-album">${largeAlbum}</span><span class="search-modal-card-small-album">${smallAlbum}</span>`);
+  // album cover
+  $(`#addAlbumModalCard${cardNumber} .search-modal-card-image`).attr('src', album.cover.replace('{w}', 260).replace('{h}', 260));
+
+  $(`#addAlbumModalCard${cardNumber}`).click(function(event) {
+    event.preventDefault();
+    // connect to this album
+    const selectedAlbumIndex = $(this).data("result-index");
+    const selectedAlbum = addAlbumResults[selectedAlbumIndex];
+    addToList(selectedAlbum);
+  })
+}
+
+function addToList(selectedAlbum) {
+  if (selectedAlbum) {
+    let alreadyInList = listData.albums.find(x => x.appleAlbumID === selectedAlbum.appleAlbumID);
+
+    if (alreadyInList) {
+      alert(`"${selectedAlbum.title}" is already in this list.`);
+      return;
+    }
+
+    let addAlbumToListBody = {
+      method: "add album",
+      appleAlbumID: selectedAlbum.appleAlbumID,
+      title: selectedAlbum.title,
+      artist: selectedAlbum.artist,
+      releaseDate: selectedAlbum.releaseDate,
+      cover: selectedAlbum.cover
+    };
+    $.ajax({
+      method: "PUT",
+      url: "/api/v1/list/" + listData._id,
+      contentType: 'application/json',
+      data: JSON.stringify(addAlbumToListBody),
+      success: function(data) {
+        if (!data.message) {
+          listData = data;
+          populateList();
+          $('#editListModal').modal('hide');
+        } else {
+          alert(data.message);
+        }
+      }
+    });
+  }
+}
+
+function toggleActiveInfoTab(element) {
+  $('#editListModal .active').removeClass("active").addClass("inactive-list-edit-tab");
+  $(element).removeClass("inactive-list-edit-tab").addClass("active");
+  $('.edit-list-card-body').hide();
+  const selectedCard = element.data('card');
+  $(`#${selectedCard}-card-body`).show();
+}
+
+$('#add-album-modal-button').click(function(event) {
+  event.preventDefault();
+  const search = $('#add-album-modal-input').val().trim().replace(/[^\w\s]/gi, '');
+  $('#add-album-search-results').html('');
+  $('#add-album-card-body .new-loader').show();
+  executeSearch(search, "add to list");
+})
+
+// execute search when enter key is pressed
+$("#add-album-modal-input").keyup(function(event) {
+  if (event.keyCode === 13) {
+    $("#add-album-modal-button").click();
+  }
+});
+
 document.getElementById("edit-button").addEventListener("click", function() {
   $('#editListModal').modal('show')
   $('#list-title-input').val(listData.title)
@@ -229,6 +339,11 @@ $("#list-display-name-input").keyup(function(event) {
 
 document.getElementById("update-list-display-name").addEventListener("click", editDisplayName)
 document.getElementById("update-list-title").addEventListener("click", editListTitle)
+
+$('#editListModal .nav-link').click(function(event) {
+  event.preventDefault();
+  toggleActiveInfoTab($(this));
+});
 
 // ----- START FIREBASE AUTH SECTION ------
 const config = {

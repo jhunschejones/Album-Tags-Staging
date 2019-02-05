@@ -57,6 +57,20 @@
   padding: 5px 10px;
   display: none;
 }
+.inactive-list-edit-tab {
+  color: #6c757d;
+}
+
+  .inactive-list-edit-tab:hover {
+    color: #007bff;
+  }
+
+#add-album-search-results {
+  display: inline-flex;
+  max-width: 100%;
+  overflow-x: scroll;
+  padding-right: 5px;
+}
 
 /* This overrides bootstrap's style for the text input
  box so that it will display the 'x' in chrome */
