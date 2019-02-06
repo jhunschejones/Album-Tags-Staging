@@ -81,3 +81,36 @@
     margin-top: 100px;
     margin-bottom: 100px;
 }
+
+#favorites-search-results {
+    display: inline-flex;
+    max-width: 100%;
+    overflow-x: scroll;
+    padding-right: 5px;
+}
+
+.remove-favorite-button {
+    cursor: pointer;
+    margin-left: 235px;
+    margin-top: -8px;
+    background-color: rgba(245, 245, 245, 0.7);
+    display: block;
+    border-radius: 12px;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 0px;
+    padding-bottom: 1px;
+    font-size: 1em;
+    position: absolute;
+    color: darkslategrey;
+}
+    .remove-favorite-button:hover {
+        background-color: rgba(245, 245, 245, 0.9);
+        box-shadow: 2px 2px 5px lightgray;
+    }
+
+@media screen and (max-width: 800px) {
+    .remove-favorite-button {
+        margin-left: 153px;
+    }
+}

@@ -59,7 +59,7 @@ router.get('/myfavorites', function(req, res, next) {
   res.setHeader("Cache-Control", "private, max-age=600")
   res.render('myfavorites', { 
     pageTitle: ': My Favorites',
-    subTitle: 'Your Favorited Albums'
+    subTitle: 'Your Favorite Albums'
   })
 })
 

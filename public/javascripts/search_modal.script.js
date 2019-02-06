@@ -27,6 +27,9 @@ function executeSearch(searchString, searchType) {
         } else if (searchType === "add to list") {
           // this function is defined in list.script.js
           populateAddToListModalResults(data);
+        } else if (searchType === "add to favorites") {
+          // this function is defined in myfavorites.script.js
+          populateAddToFavoritesModalResults(data);
         } else {
           populateSearchModalResults(data);
         }
