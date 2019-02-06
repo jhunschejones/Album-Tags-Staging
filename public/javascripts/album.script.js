@@ -1,4 +1,9 @@
 // ====== START UTILITY SECTION ======
+// ======
+// To compile with google closure compiler
+// instructions: https://developers.google.com/closure/compiler/docs/gettingstarted_app
+// terminal command: `java -jar compiler.jar --js album.script.js --js_output_file album.script.min.js`
+// ======
 function makeNiceDate(uglyDate) {
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   let year = uglyDate.slice(0, 4);
@@ -353,14 +358,14 @@ function addToNewList(listTitle, displayName) {
   // user either said okay to create a duplicate list, or there
   // is no other list with this name by this user
   if (confirmed) {
-    let private = false;
-    if ($('#private-checkbox').is(":checked")) { private = true; }
+    let privateList = false;
+    if ($('#private-checkbox').is(":checked")) { privateList = true; }
     if (listTitle && displayName) {
       let newList = {
         user: userID,
         displayName: displayName,
         title: listTitle,
-        isPrivate: private,
+        isPrivate: privateList,
         albums: [albumResult]
       };
       $.ajax({
@@ -528,7 +533,7 @@ function addConnection(newAlbumID) {
               }
             }
           });
-        } else {
+        } else if (databaseAlbum.message === "No matching album in the database.") {
           // ALBUM DOES NOT EXIST IN THE DATABASE POST A NEW ALBUM WITH THE CONNECTION IN IT
           $.ajax(`/api/v1/album/connections/${albumResult._id || "new"}`, {
             method: 'POST',
@@ -549,6 +554,8 @@ function addConnection(newAlbumID) {
               }
             }
           });
+        } else {
+          alert(databaseAlbum.message);
         }
       });
     } else {
