@@ -11,12 +11,6 @@
             <a class="btn btn-sm btn-primary hide_when_logged_in" id="full_menu_login_button">Log In</a>
             <a class="btn btn-sm btn-danger hide_when_logged_out" id="full_menu_logout_button">Log Out</a>
         </div>          
-        
-        <!-- menu search -->
-        <!-- NOTE: search functionality does not currently work in a manner that it can be easily called from any page -->
-        <!-- <form class="form-inline my-2 my-lg-0 float-right">
-            <input id="full_menu_search_input" class="form-control mr-sm-2" type="search" placeholder="Search for Music" aria-label="Search" onsearch="myFunction()">
-        </form> -->
     </h1>
  
     <!-- compact navigation -->
@@ -29,15 +23,13 @@
                 <div class="dropdown-divider" id="login_divider" style="display:none;"></div>
                 <a class="dropdown-item" href="/">Home</a>
                 <a class="dropdown-item" href="/about">About</a>
-                <a class="dropdown-item" data-toggle="modal" data-target="#searchModal">Search</a>
+                <a class="dropdown-item" href="" data-toggle="modal" data-target="#searchModal">Search</a>
                 <a class="dropdown-item" href="/alltags">All Tags</a>
-                <!-- <a class="dropdown-item" href="/favorites">Favorites</a> OLD OUR FAVORITES PAGE-->
+                <!-- ====== OLD OUR FAVORITES PAGE ====== -->
+                <!-- <a class="dropdown-item" href="/favorites">Favorites</a> -->
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="/mylists">My Lists</a>
                 <a class="dropdown-item" href="/myfavorites">My Favorites</a>
-                
-                <!-- <div class="dropdown-divider"></div> -->
-                <!-- <a class="dropdown-item" href="mailto:joshua@hunschejones.com?subject=This Week App">Contact</a> -->
             </div>
         </li>
         <p class="subtitle lead text-muted"><%= subTitle %> </p>
@@ -56,19 +48,20 @@
                 </li>  
                 <li class="text-secondary full_menu_divider">|</li>            
                 <li class="nav-item">                
-                    <a class="nav-link full_menu_link" data-toggle="modal" data-target="#searchModal">Search</a>
+                    <a href="" class="nav-link full_menu_link" data-toggle="modal" data-target="#searchModal">Search</a>
                 </li>
                 <li class="text-secondary full_menu_divider">|</li>               
                 <li class="nav-item">
                     <a class="nav-link full_menu_link" href="/alltags">All Tags</a>
                 </li>
                 <li class="text-secondary full_menu_divider">|</li>  
-                <!--            
+                <!--       
+                ====== OLD OUR FAVORITES PAGE ======     
                 <li class="nav-item">
                     <a class="nav-link full_menu_link" href="/favorites">Favorites</a>
                 </li>     
                 <li class="text-secondary full_menu_divider">|</li> 
-                OLD OUR FAVORITES PAGE --> 
+                --> 
                 <li class="nav-item">
                     <a class="nav-link full_menu_link" href="/mylists">My Lists</a>
                 </li>  
