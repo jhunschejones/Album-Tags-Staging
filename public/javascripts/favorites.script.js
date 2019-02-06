@@ -1,4 +1,9 @@
 // ------- START UTILITIES SECTION ----------
+// ======
+// To compile with google closure compiler
+// instructions: https://developers.google.com/closure/compiler/docs/gettingstarted_app
+// terminal command: `java -jar compiler.jar --js favorites.script.js --js_output_file favorites.script.min.js`
+// ======
 function truncate(str, len){
   // set up the substring
   var subString = str.substr(0, len-1)

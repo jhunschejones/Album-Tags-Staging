@@ -1,4 +1,9 @@
 // ====== START UTILITY FUNCTIONS ======
+// ======
+// To compile with google closure compiler
+// instructions: https://developers.google.com/closure/compiler/docs/gettingstarted_app
+// terminal command: `java -jar compiler.jar --js mylists.script.js --js_output_file mylists.script.min.js`
+// ======
 function removeByID(arr, ID) {
   return arr.filter(function(ele){
     return ele._id != ID

@@ -1,4 +1,9 @@
 // ---------- BEGIN UTILITIES ------------
+// ======
+// To compile with google closure compiler
+// instructions: https://developers.google.com/closure/compiler/docs/gettingstarted_app
+// terminal command: `java -jar compiler.jar --js tagsearch.script.js --js_output_file tagsearch.script.min.js`
+// ======
 function safeParse(content) {
   // replace characters with html equivalents
   //prevents some basic cross site scripting attacks

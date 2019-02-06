@@ -61,3 +61,5 @@ typings/
 .next
 
 *.DS_Store
+public/javascripts/closure-compiler-v20190121.jar
+public/javascripts/compiler.jar
