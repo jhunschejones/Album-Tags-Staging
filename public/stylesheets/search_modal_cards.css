@@ -70,3 +70,9 @@
   color: #6c757d;
   font-weight: 100;
 }
+
+/* This overrides bootstrap's style for the text input
+box so that it will display the 'x' in chrome */
+input[type=search]::-webkit-search-cancel-button {
+  -webkit-appearance: searchfield-cancel-button;
+}
