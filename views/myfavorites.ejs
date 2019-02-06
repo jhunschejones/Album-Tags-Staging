@@ -51,8 +51,8 @@
           <small id="copied-message" class="text-secondary">Copied!</small>
           <div class="modal-footer">
             <button id="get-shareable-link" type="button" class="btn btn-outline-primary" data-clipboard-target="#shareable-url">Get shareable link</button>
-            <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Done</button>
-            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+            <!-- <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Done</button>
+            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button> -->
           </div>
         </div>
       </div>
@@ -60,7 +60,7 @@
 
     <!-- ====== start page info modal ====== -->
     <div class="modal fade" id="pageInfoModal" tabindex="-1" role="dialog" aria-labelledby="pageInfoModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="pageInfoModalLabel">How to use this page</h5>
@@ -72,23 +72,21 @@
 
             <small style="line-height:1em;"><strong>To add an album to your favorites:</strong></small><br/>
             <ol class="mb-2 pl-4"><small>
-              <li><a href="" data-toggle="modal" data-target="#searchModal">Search</a> for an album and click to navigate to the album page</li>
-              <li>Click the <span class="font-italic">Lists</span> tab on the album page</li>
-              <li>Click the heart icon at the top/center of the <span class="font-italic">Lists</span> card</li>
-              <li>The heart will turn red for favorited, grey for un-favorited</li>
+              <li>Click the <span class="text-primary add-album-instruction-link">Add Album</span> button on the top toolbar of the my favorites page</li>
+              <li>Search for an album by album title or artist name
+              <li>Scroll through the results and click an album card to add it to your favorites</li>
             </small></ol>
 
             <small style="line-height:1em;"><strong>To remove an album from your favorites:</strong></small><br/>
             <ol class="mb-2 pl-4"><small>
-              <li>Click on an album on this page to navigate to the <span class="font-italic">album</span> page</li>
-              <li>Click the <span class="font-italic">Lists</span> tab on the album page</li>
-              <li>Click the heart icon at the top/center of the <span class="font-italic">Lists</span> card</li>
-              <li>The heart will turn red for favorited, grey for un-favorited</li>
+              <li>Exit the instruction modal you are currently in</li>
+              <li>On the my favorites page, click the 'X' in the upper-right corner of the album you would like to remove</li>
+              <li>Confirm you would like to remove the album from your favorites in the prompt</li>
             </small></ol>
           </div>
-          <div class="modal-footer">
+          <!-- <div class="modal-footer">
             <button type="button" class="btn btn-sm btn-outline-secondary" data-dismiss="modal">Done</button>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -96,7 +94,36 @@
     
     <!-- ====== START SEARCH MODAL ====== -->
     <% include partials/content/search_modal.ejs %>
-    <!-- ====== END SEARCH MODAL ====== -->        
+    <!-- ====== END SEARCH MODAL ====== -->      
+    
+    <!-- ====== start add album modal ====== -->
+    <div class="modal fade" id="addFavoritesAlbumModal" tabindex="-1" role="dialog" aria-labelledby="addFavoritesAlbumModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addFavoritesAlbumModalLabel">Add an album to your favorites</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="input-group mb-3">
+              <input id="add-favorites-album-input" type="search" class="form-control" placeholder="Search for an album...">
+              <div class="input-group-append">
+                <button id="add-favorites-album-button" class="btn btn-primary" type="button">Search</button>
+              </div>
+            </div>
+            <div class="new-loader text-center" style="display:none;"><span class="text-secondary">Loading...</span></div>
+            <div id="favorites-search-results" class="mt-3 mb-0"></div>
+          </div>
+          <!-- <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Done</button>
+            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+          </div> -->
+        </div>
+      </div>
+    </div>
+    <!-- ====== end add album modal ====== -->     
 
     <% include partials/templates/footer.ejs %>
     <script src="/javascripts/myfavorites.script.min.js"></script>
