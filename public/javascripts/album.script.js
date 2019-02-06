@@ -848,10 +848,13 @@ function clearTagArray(event) {
   }
 }
 
-function updateTagDisplay(userIsLoggedIn) {
+function updateTagDisplay(data) {
+  let userIsLoggedIn = false;
+  if (data || userID) { userIsLoggedIn = true; }
+
   const whatTagsToShow = sessionStorage.getItem('tags');
-  if (whatTagsToShow === 'My Tags' && !userIsLoggedIn) {
-    displayMyTags();
+  if (whatTagsToShow === 'My Tags' && userIsLoggedIn) {
+    displayMyTags(userIsLoggedIn);
   } else {
     displayAllTags(userIsLoggedIn);
   }
@@ -873,7 +876,7 @@ function displayAllTags(userIsLoggedIn) {
   }
 }
 
-function displayMyTags() {
+function displayMyTags(userIsLoggedIn) {
   $("#tags-toggle").html('<img src="/images/toggle_off.png" id="show-my-tags" style="height:22px;margin-left:10px;">');
   $('.my-tag').show();
   $('.other-tag').hide();
@@ -883,7 +886,7 @@ function displayMyTags() {
   $('#show-my-tags').click(function(event) {
     event.preventDefault();
     sessionStorage.setItem('tags', 'All Tags');
-    updateTagDisplay();
+    updateTagDisplay(userIsLoggedIn);
   });
 }
 
