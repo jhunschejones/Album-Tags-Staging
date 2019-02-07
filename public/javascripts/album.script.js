@@ -157,10 +157,6 @@ function populateAlbumPage(userLoggedIn) {
   $('#more-by-this-artist').click(function(event) {
     event.preventDefault();
 
-    // OLD SEARCH-PAGE ARTIST SEARCH
-    // sessionStorage.setItem('artist', albumResult.artist);
-    // window.location.href = '/search';
-
     // NEW SEARCH-MODAL ARTIST SEARCH
     $('#searchModal').modal('show');
     $('#search-modal-input').val(albumResult.artist);
@@ -998,6 +994,7 @@ $('#add-to-new-list-button').click(function(event) {
     document.getElementById("new-list-title").value = "";
   }
 });
+
 // ----- START FIREBASE AUTH SECTION ------
 function userIsLoggedIn() {
   $('.hide_when_logged_in').addClass('hide_me');
