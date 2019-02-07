@@ -69,10 +69,12 @@ exports.search_by_album_or_artist = function (req, res, next) {
   const jwtToken = process.env.APPLE_JWT
   // const thisSearch = req.params.search.replace(/\'/g, '%27').replace(/\s/g, '%20').replace(/\&/g, '%26').replace(/\,/g, '%2C')
   const thisSearch = req.params.search
+  const offset = req.query.offset || 0;
 
   request.get(  
   {  
-    url: `https://api.music.apple.com/v1/catalog/us/search?term=${thisSearch}&limit=25&types=artists,albums`, 
+    // add &offset=25 to get page 2, &offset=50 for page 3
+    url: `https://api.music.apple.com/v1/catalog/us/search?term=${thisSearch}&offset=${offset}&limit=25&types=artists,albums`, 
     auth: {  
       bearer: jwtToken  
     },  

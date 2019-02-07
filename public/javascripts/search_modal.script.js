@@ -1,4 +1,9 @@
 // ------- START UTILITIES SECTION ----------
+// ======
+// To compile with google closure compiler
+// instructions: https://developers.google.com/closure/compiler/docs/gettingstarted_app
+// terminal command: `java -jar compiler.jar --js search_modal_script.script.js --js_output_file search_modal_script.script.min.js`
+// ======
 function truncate(str, len){
   // set up the substring
   var subString = str.substr(0, len-1)
@@ -12,10 +17,14 @@ function truncate(str, len){
 }
 // ------- END UTILITIES SECTION ----------
 
-function executeSearch(searchString, searchType) {
+function executeSearch(searchString, searchType, pageNumber) {
+  let searchOffset = 0;
+  if (pageNumber && pageNumber > 1) { searchOffset = (pageNumber - 1) * 25; }
+
   $.ajax({
     method: "GET",
     url: "/api/v1/apple/search/" + searchString,
+    data: { offset: searchOffset },
     success: function(data) {
       if (data.message) {
         alert(data.messsage);
@@ -31,27 +40,50 @@ function executeSearch(searchString, searchType) {
           // this function is defined in myfavorites.script.js
           populateAddToFavoritesModalResults(data);
         } else {
-          populateSearchModalResults(data);
+          populateSearchModalResults(data, pageNumber || 1);
         }
       }
     }
   });
 }
 
-function populateSearchModalResults(data) {
-  $('#search-modal-results').html('');
-  $('#searchModal .new-loader').hide();
+function populateSearchModalResults(data, pageNumber) {
+  let offset = 0;
+  if (!pageNumber || pageNumber < 2) {
+    $('#search-modal-results').html('');
+    $('#searchModal .new-loader').hide();
+  } else {
+    offset = (pageNumber - 1) * 25;
+    $('#search-modal-placeholder').remove();
+  }
+
   if (data.albums) {
     for (let index = 0; index < data.albums.length; index++) {
       const album = data.albums[index];
-      const cardNumber = index + 1;
+      const cardNumber = index + offset;
       createModalCard(cardNumber);
       populateModalCard(album, cardNumber);
     }
     // this adds an empty space at the end so the user can scroll 
     // all the way to the right to see the last album
-    createModalCard(data.albums.length + 1)
+    $('#search-modal-results').append('<div id="search-modal-placeholder">&nbsp;</div>');
+    
+    if (data.albums.length === 25) {
+      const search = $('#search-modal-input').val().trim().replace(/[^\w\s]/gi, '');
+      pageNumber++;
+      addNextPageButton(search, pageNumber);
+    }
   }
+}
+
+function addNextPageButton(search, pageNumber) {
+  $('#search-modal-results').append('<div class="align-self-center" id="next-page-button"><img src="/images/back_arrow.png" style="height:25px;cursor:pointer;transform:scaleX(-1);"></div>');
+
+  $('#next-page-button').click(function(event) {
+    event.preventDefault();
+    $('#next-page-button').remove();
+    executeSearch(search, "next page", pageNumber);
+  })
 }
 
 function createModalCard(cardNumber) {
