@@ -97,8 +97,7 @@ function truncatePlain(str, len){
   )
 }
 
-function bubbleSort(arr, prop)
-{
+function bubbleSort(arr, prop) {
   var swapped
   do {
     swapped = false
@@ -113,6 +112,35 @@ function bubbleSort(arr, prop)
   } while (swapped)
 }
 // ------- END UTILITIES SECTION ----------
+
+// === UI MODIFICATION FOR MOBILE MENU BAR ===
+function addInfoButtons() {
+  const infoButtonSmall = '<span class="text-secondary ml-2 float-right page-info-button" style="cursor:pointer;margin-top:8px;" data-toggle="modal" data-target="#pageInfoModal">&#9432;</span>';
+  const addAlbumButtonSmall = '<span class="text-secondary ml-2 mr-1" style="cursor:pointer;font-size:1.4em;" data-toggle="modal" data-target="#addFavoritesAlbumModal">&plus;</span>';
+  // allows the mobile info button to show on the far right of the screen
+  $('#compact_menu p').width("80%");
+  // correcting for larger font size on add-to-favorites button
+  $('#compact_menu p').css("margin-top", "-9px");
+  $('.my_dropdown').css("margin-top", "-2px");
+
+  $('#compact_menu p').append(addAlbumButtonSmall);
+  $('#compact_menu p').append(infoButtonSmall);
+  
+  // btn-outline-secondary
+  const infoButtonLage = '<button class="btn btn-sm btn-light sticky-top float-left button_text ml-1" style="cursor:pointer;margin-top:2px;" data-toggle="modal" data-target="#pageInfoModal">&#9432;</button>';
+  const addAlbumButtonLarge = '<button class="btn btn-sm btn-light sticky-top float-left button_text ml-1" style="cursor:pointer;margin-top:2px;" data-toggle="modal" data-target="#addFavoritesAlbumModal">Add Album</button>';
+  $('#all-favorites-filters').append(addAlbumButtonLarge);
+  $('#all-favorites-filters').append(infoButtonLage);
+}
+
+addInfoButtons();
+
+$('.add-album-instruction-link').click(function(event) {
+  event.preventDefault();
+  $('#pageInfoModal').modal('hide');
+  $('#addFavoritesAlbumModal').modal('show');
+});
+// === END UI MODIFICATION FOR MOBILE MENU BAR ===
 
 function createCard(album, cardNumber) {
   $('#all_cards').append(`<div id="card${cardNumber}" class="card albumCard"><a class="album_details_link" href=""><img class="card-img-top" src="" alt=""><a/><span class="remove-favorite-button" data-album-id="${album._id}">&#10005;</span><div class="card-body"><h4 class="card-title"></h4><span class="album"><span class="text-primary">Loading Album Details...</span></span></div></div>`)
@@ -319,7 +347,7 @@ function masterFilter(classToFilter) {
 
 function restoreCards() {
   for (let index = 0; index < albumCardsList.length; index++) {
-    albumCardsList[index].style.display = "inline"
+    albumCardsList[index].style.display = "inline-flex"
   }
 }
 
@@ -845,33 +873,6 @@ function removeFromFavorites(selectedAlbum) {
     });
   }
 }
-
-function addInfoButtons() {
-  const infoButtonSmall = '<span class="text-secondary ml-2 float-right page-info-button" style="cursor:pointer;margin-top:3px;" data-toggle="modal" data-target="#pageInfoModal">&#9432;</span>';
-  const addAlbumButtonSmall = '<span class="text-secondary ml-2 mr-1" style="cursor:pointer;font-size:1.2em;" data-toggle="modal" data-target="#addFavoritesAlbumModal">&plus;</span>';
-  // allows the mobile info button to show on the far right of the screen
-  $('#compact_menu p').width("80%");
-  // correcting for larger font size on add-to-favorites button
-  $('#compact_menu p').css("margin-top", "-5px");
-  $('.my_dropdown').css("margin-top", "-2px");
-
-  $('#compact_menu p').append(addAlbumButtonSmall);
-  $('#compact_menu p').append(infoButtonSmall);
-  
-  // btn-outline-secondary
-  const infoButtonLage = '<button class="btn btn-sm btn-light sticky-top float-left button_text ml-1" style="cursor:pointer;margin-top:2px;" data-toggle="modal" data-target="#pageInfoModal">&#9432;</button>';
-  const addAlbumButtonLarge = '<button class="btn btn-sm btn-light sticky-top float-left button_text ml-1" style="cursor:pointer;margin-top:2px;" data-toggle="modal" data-target="#addFavoritesAlbumModal">Add Album</button>';
-  $('#all-favorites-filters').append(addAlbumButtonLarge);
-  $('#all-favorites-filters').append(infoButtonLage);
-}
-
-addInfoButtons();
-
-$('.add-album-instruction-link').click(function(event) {
-  event.preventDefault();
-  $('#pageInfoModal').modal('hide');
-  $('#addFavoritesAlbumModal').modal('show');
-});
 
 // make hover scrollbar always visible on touchscreens
 $(document).ready(function() {
