@@ -4,6 +4,7 @@
         <% include partials/templates/head_tags.ejs %>
         <link rel="stylesheet" href="/stylesheets/search.min.css">
         <link rel="stylesheet" href="/stylesheets/spinner.min.css">
+        <link rel="stylesheet" href="/stylesheets/search_modal_cards.min.css">
         
         <!-- spinner styles just for search page -->
         <style>
@@ -42,10 +43,14 @@
                 <span id="album_results" class="album_results"></span>
             </div>
         </div>  
-        
 
+        <!-- ====== START SEARCH MODAL ====== -->
+		<% include partials/content/search_modal.ejs %>
+		<!-- ====== END SEARCH MODAL ====== -->   
+        
         <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
         <% include partials/templates/footer.ejs %>
         <script src="/javascripts/search.script.min.js"></script>
+        <script src="/javascripts/search_modal.script.min.js"></script>
     </body>
 </html>

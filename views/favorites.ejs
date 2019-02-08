@@ -5,6 +5,7 @@
         <link rel="stylesheet" href="/stylesheets/cards.min.css">
         <link rel="stylesheet" href="/stylesheets/spinner.min.css">
         <!-- <link rel="stylesheet" href="/stylesheets/favorites.min.css"> -->
+        <link rel="stylesheet" href="/stylesheets/search_modal_cards.min.css">
     </head>
     <body>
 
@@ -26,10 +27,15 @@
 
             </ul>
         </div>
-        <!-- END ALBUM CARDS -->       
+        <!-- END ALBUM CARDS -->     
+        
+        <!-- ====== START SEARCH MODAL ====== -->
+		<% include partials/content/search_modal.ejs %>
+		<!-- ====== END SEARCH MODAL ====== -->   
 
         <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
         <% include partials/templates/footer.ejs %>
         <script src="/javascripts/favorites.script.min.js"></script>
+        <script src="/javascripts/search_modal.script.min.js"></script>
     </body>
 </html>
