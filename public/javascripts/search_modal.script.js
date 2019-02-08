@@ -2,7 +2,7 @@
 // ======
 // To compile with google closure compiler
 // instructions: https://developers.google.com/closure/compiler/docs/gettingstarted_app
-// terminal command: `java -jar compiler.jar --js search_modal_script.script.js --js_output_file search_modal_script.script.min.js`
+// terminal command: `java -jar compiler.jar --js search_modal.script.js --js_output_file search_modal.script.min.js`
 // ======
 function truncate(str, len){
   // set up the substring
