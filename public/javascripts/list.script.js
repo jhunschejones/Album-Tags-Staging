@@ -109,7 +109,10 @@ function populateList() {
     $("#no-albums-message").show()
   }
 
-  if (isFavoritesList) { $('#edit-button').hide(); }
+  if (isFavoritesList) { 
+    $('#edit-button').hide(); 
+    $('#add-album-button').hide();
+  }
 }
 
 function removeAlbum(albumID) {
@@ -326,10 +329,17 @@ $("#add-album-modal-input").keyup(function(event) {
   }
 });
 
-document.getElementById("edit-button").addEventListener("click", function() {
+$('#edit-button').click(function(event) {
+  event.preventDefault();
+  toggleActiveInfoTab($('#edit-list-modal-nav-tab'));
+  $('#editListModal').modal('show');
+  $('#list-title-input').val(listData.title);
+  $('#list-display-name-input').val(listData.displayName || "Unknown");
+});
+$('#add-album-button').click(function(event) {
+  event.preventDefault();
+  toggleActiveInfoTab($('#add-album-modal-nav-tab'));
   $('#editListModal').modal('show')
-  $('#list-title-input').val(listData.title)
-  $('#list-display-name-input').val(listData.displayName || "Unknown")
 })
 $("#list-title-input").keyup(function(event) {
   if (event.keyCode === 13) {
@@ -350,6 +360,17 @@ $('#editListModal .nav-link').click(function(event) {
   toggleActiveInfoTab($(this));
 });
 
+// make hover scrollbar always visible on touchscreens
+$(document).ready(function() {
+  let isTouchDevice = false;
+  if ("ontouchstart" in document.documentElement) { isTouchDevice = true; }
+  if (isTouchDevice) {
+    const searchResultsBox = document.getElementById("add-album-search-results");
+    searchResultsBox.style.paddingBottom="0px";
+    searchResultsBox.style.overflowX="scroll";
+  }
+});
+
 // ----- START FIREBASE AUTH SECTION ------
 const config = {
   apiKey: "AIzaSyAoadL6l7wVMmMcjqqa09_ayEC8zwnTyrc",
@@ -361,34 +382,36 @@ let userID = false
 // checking if user is logged in or logs in during session
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
-    userID = firebase.auth().currentUser.uid
-    getList()
+    userID = firebase.auth().currentUser.uid;
+    getList();
 
-    $('#full_menu_login_logout_container').show()
-    $('#login_button').hide()
-    $('#full_menu_login_button').hide()
-    $('#logout_button').show()
-    $('#full_menu_logout_button').show()
+    $('#full_menu_login_logout_container').show();
+    $('#login_button').hide();
+    $('#full_menu_login_button').hide();
+    $('#logout_button').show();
+    $('#full_menu_logout_button').show();
 
-    $('#edit-button').show()
-    $('.album-delete-button').show()
+    $('#edit-button').show();
+    $('#add-album-button').show();
+    $('.album-delete-button').show();
   } else {   
     // no user logged in
-    userID = false
+    userID = false;
 
-    getList()
+    getList();
 
-    $('#full_menu_login_logout_container').show()
-    $('#login_button').show()
-    $('#full_menu_login_button').show()
-    $('#logout_button').hide()
-    $('#full_menu_logout_button').hide()
-    $('#loader').hide()
+    $('#full_menu_login_logout_container').show();
+    $('#login_button').show();
+    $('#full_menu_login_button').show();
+    $('#logout_button').hide();
+    $('#full_menu_logout_button').hide();
+    $('#loader').hide();
 
-    $('#edit-button').hide()
-    $('.album-delete-button').hide()
+    $('#edit-button').hide();
+    $('#add-album-button').hide();
+    $('.album-delete-button').hide();
   }
-})
+});
 
 function logIn() {
   firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
@@ -398,37 +421,39 @@ function logIn() {
     return firebase.auth().signInWithPopup(provider)
   })
   .then(function(result) {
-    userID = user.uid
-    getList()
+    userID = user.uid;
+    getList();
 
-    $('#full_menu_login_logout_container').show()
-    $('#login_button').hide()
-    $('#full_menu_login_button').hide()
-    $('#logout_button').show()
-    $('#full_menu_logout_button').show()
+    $('#full_menu_login_logout_container').show();
+    $('#login_button').hide();
+    $('#full_menu_login_button').hide();
+    $('#logout_button').show();
+    $('#full_menu_logout_button').show();
 
-    $('#edit-button').show()
-    $('.album-delete-button').show()
+    $('#edit-button').show();
+    $('#add-album-button').show();
+    $('.album-delete-button').show();
   }).catch(function(error) {
     // Handle Errors here.
-  })
+  });
 }
 
 function logOut() {
   firebase.auth().signOut().then(function() {
-    userID = false
+    userID = false;
     // log out functionality
-    $('#full_menu_login_logout_container').show()
-    $('#login_button').show()
-    $('#full_menu_login_button').show()
-    $('#logout_button').hide()
-    $('#full_menu_logout_button').hide()
+    $('#full_menu_login_logout_container').show();
+    $('#login_button').show();
+    $('#full_menu_login_button').show();
+    $('#logout_button').hide();
+    $('#full_menu_logout_button').hide();
 
-    $('#edit-button').hide()
-    $('.album-delete-button').hide()
+    $('#edit-button').hide();
+    $('#add-album-button').hide();
+    $('.album-delete-button').hide();
   }).catch(function(error) {
   // An error happened.
-  })
+  });
 }
 
 // add event listener to log in and out buttons

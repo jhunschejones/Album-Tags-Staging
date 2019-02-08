@@ -25,12 +25,13 @@
     </div>
     </br>
     <button id="back-button" class="btn btn-sm btn-light" onclick="window.history.back()"><img id="back_arrow" src="/images/back_arrow.png"><span class="button_text">Back</span></button>
+    <button id="add-album-button" class="btn btn-sm btn-light">Add Album</button>
     <button id="edit-button" class="btn btn-sm btn-light">Edit List</button>
     <!-- END LISTS -->   
     
    
 
-    <!-- Modal -->
+    <!-- ====== START EDIT LIST MODAL ====== -->
     <div class="modal fade" id="editListModal" tabindex="-1" role="dialog" aria-labelledby="editListModalTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
@@ -39,10 +40,10 @@
               <div class="card-header pt-3">
                 <ul class="nav nav-tabs card-header-tabs">
                   <li class="nav-item">
-                    <a class="nav-link active" href="" data-card="add-album">Add album</a>
+                    <a id="add-album-modal-nav-tab" class="nav-link active" href="" data-card="add-album">Add album</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link inactive-list-edit-tab" href="" data-card="edit-list-info">Edit list info</a>
+                    <a id="edit-list-modal-nav-tab" class="nav-link inactive-list-edit-tab" href="" data-card="edit-list-info">Edit list info</a>
                   </li>
                 </ul>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="margin-top:-30px;">
@@ -81,15 +82,12 @@
             </div> 
           </div>
           <small id="list-update-success" class="text-primary ml-3 mb-3">&nbsp;</small>
-          <!-- <div id="update-list-modal-footer" class="modal-footer justify-content-between">
-            <button type="button" class="btn btn-primary" data-dismiss="modal">Done</button> 
-            <button type="button" class="btn btn-secondary justify-content-end" data-dismiss="modal">Done</button>
-          </div>  -->
         </div>
       </div>
     </div>
+    <!-- ====== END EDIT LIST MODAL ====== -->
 
-    <!-- ====== start page info modal ====== -->
+    <!-- ====== START PAGE INFO MODAL ====== -->
     <div class="modal fade" id="pageInfoModal" tabindex="-1" role="dialog" aria-labelledby="pageInfoModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -125,13 +123,10 @@
               <li>Exit the <span class="font-italic">Edit List</span> modal</li>
             </small></ol>
           </div>
-          <!-- <div class="modal-footer">
-            <button type="button" class="btn btn-sm btn-outline-secondary" data-dismiss="modal">Done</button>
-          </div> -->
         </div>
       </div>
     </div>
-    <!-- ====== end page info modal ====== -->  
+    <!-- ====== END PAGE INFO MODAL ====== -->  
 
     <!-- ====== START SEARCH MODAL ====== -->
     <% include partials/content/search_modal.ejs %>
