@@ -15,6 +15,25 @@ function truncate(str, len){
     .replace(/(^[,\s]+)|([,\s]+$)/g, '') + '...'
   )
 }
+
+function removeDash(str) {
+  return str.replace(/-/g, '');
+}
+
+function bubbleSort(arr, prop) {
+  var swapped;
+  do {
+    swapped = false
+    for (var i = 0; i < arr.length - 1; i++) {
+      if (parseInt(removeDash(arr[i][prop])) > parseInt(removeDash(arr[i + 1][prop]))) {
+        var temp = arr[i];
+        arr[i] = arr[i + 1];
+        arr[i + 1] = temp;
+        swapped = true;
+      }
+    }
+  } while (swapped);
+}
 // ------- END UTILITIES SECTION ----------
 
 let listData
@@ -94,8 +113,12 @@ function populateList() {
   $('#list-creator').text("by: " + listCreator)
 
   if (listData.albums && listData.albums.length > 0) {
+    let albumArray = listData.albums
+    bubbleSort(albumArray, "releaseDate")
+    // reverse shows newer albums first (mostly)
+    albumArray = albumArray.reverse()
     let card = 0
-    listData.albums.forEach(albumObject => {
+    albumArray.forEach(albumObject => {
       card = card + 1
       createCard(card)
       populateCard(albumObject.album || albumObject, card)
@@ -339,7 +362,9 @@ $('#edit-button').click(function(event) {
 $('#add-album-button').click(function(event) {
   event.preventDefault();
   toggleActiveInfoTab($('#add-album-modal-nav-tab'));
-  $('#editListModal').modal('show')
+  $('#editListModal').modal('show');
+  $('#list-title-input').val(listData.title);
+  $('#list-display-name-input').val(listData.displayName || "Unknown");
 })
 $("#list-title-input").keyup(function(event) {
   if (event.keyCode === 13) {
