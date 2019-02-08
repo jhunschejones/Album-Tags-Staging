@@ -433,12 +433,18 @@ function updateListDisplay() {
 }
 
 function displayAllLists() {
-  $("#lists-toggle").html('<img src="/images/toggle_on.png" id="show-all-lists" style="height:22px;margin-left:10px;">');
+  if ($("#lists-toggle").html().length === 0) {
+    $("#lists-toggle").html('<img src="/images/toggle_on.png" id="show-all-lists" style="height:22px;margin-left:10px;"><img src="/images/toggle_off.png" id="show-my-lists" style="height:22px;margin-left:10px;display:none;">');
+  } else {
+    $('#show-my-lists').hide();
+    $('#show-all-lists').show();
+  }
   $('.my-list').show();
   $('.other-list').show();
   $('#list-title-modifier').html('All <span class="large-button-text">user </span>');
+
+  $('.list-message').remove();
   if ($('.list').length === 0) { 
-    $('.list-message').remove();
     $('#all-lists').after('<div class="text-primary text-center list-message"><small>This album is not in any public user lists. Click "Add to a list" below to get started!</small><br/><br/></div>'); 
   }
 
@@ -450,12 +456,18 @@ function displayAllLists() {
 }
 
 function displayMyLists() {
-  $("#lists-toggle").html('<img src="/images/toggle_off.png" id="show-my-lists" style="height:22px;margin-left:10px;">');
-  $('.my-lists').show();
-  $('.other-lists').hide();
+  if ($("#lists-toggle").html().length === 0) {
+    $("#lists-toggle").html('<img src="/images/toggle_off.png" id="show-my-lists" style="height:22px;margin-left:10px;"><img src="/images/toggle_on.png" id="show-all-lists" style="height:22px;margin-left:10px;display:none;">');
+  } else {
+    $('#show-all-lists').hide();
+    $('#show-my-lists').show();
+  }
+  $('.my-list').show();
+  $('.other-list').hide();
   $('#list-title-modifier').text('Your ');
+
+  $('.list-message').remove();
   if ($('.my-list').length === 0) { 
-    $('.list-message').remove();
     $('#all-lists').after('<div class="text-primary text-center list-message"><small>You have added this album to any lists. Click "Add to a list" below to get started!</small><br/><br/></div>'); 
   }
 
@@ -644,11 +656,19 @@ function updateConnectionDisplay() {
 }
 
 function displayAllConnections() {
-  $("#connections-toggle").html('<img src="/images/toggle_on.png" id="show-all-connections" style="height:22px;margin-left:10px;">');
+  if ($("#connections-toggle").html().length === 0) {
+    $("#connections-toggle").html('<img src="/images/toggle_on.png" id="show-all-connections" style="height:22px;margin-left:10px;"><img src="/images/toggle_off.png" id="show-my-connections" style="height:22px;margin-left:10px;display:none;">');
+  } else {
+    $('#show-my-connections').hide();
+    $('#show-all-connections').show();
+  }
   $('.my-connection').show();
   $('.other-connection').show();
-  $('#connection-title-modifier').text('all users:');
-  if ($('.connection').length === 0) { $('#connected-albums').html('<div class="text-primary text-center"><small>There are currently no connections for this album. Click "Add connections" below to get started!</small><br/><br/></div>'); }
+  $('#connection-title-modifier').text('all users');
+
+  $('#no-my-connections').remove();
+  $('#no-other-connections').remove();
+  if ($('.connection').length === 0) { $('#connected-albums').html('<div id="no-other-connections" class="text-primary text-center"><small>There are currently no connections for this album. Click "Add connections" below to get started!</small><br/><br/></div>'); }
 
   $('#show-all-connections').click(function(event) {
     event.preventDefault();
@@ -658,11 +678,19 @@ function displayAllConnections() {
 }
 
 function displayMyConnections() {
-  $("#connections-toggle").html('<img src="/images/toggle_off.png" id="show-my-connections" style="height:22px;margin-left:10px;">');
-  $('.my-connections').show();
-  $('.other-connections').hide();
-  $('#connection-title-modifier').text('you:');
-  if ($('.my-connection').length === 0) { $('#connected-albums').html('<div class="text-primary text-center"><small>You have not created any connections for this album. Click "Add connections" below to get started!</small><br/><br/></div>'); }
+  if ($("#connections-toggle").html().length === 0) {
+    $("#connections-toggle").html('<img src="/images/toggle_off.png" id="show-my-connections" style="height:22px;margin-left:10px;"><img src="/images/toggle_on.png" id="show-all-connections" style="height:22px;margin-left:10px;display:none;">');
+  } else {
+    $('#show-all-connections').hide();
+    $('#show-my-connections').show();
+  }
+  $('.my-connection').show();
+  $('.other-connection').hide();
+  $('#connection-title-modifier').text('you');
+
+  $('#no-my-connections').remove();
+  $('#no-other-connections').remove();
+  if ($('.my-connection').length === 0) { $('#connected-albums').append('<div id="no-my-connections" class="text-primary text-center"><small>You have not created any connections for this album. Click "Add connections" below to get started!</small><br/><br/></div>'); }
 
   $('#show-my-connections').click(function(event) {
     event.preventDefault();
@@ -857,11 +885,21 @@ function updateTagDisplay(data) {
 }
 
 function displayAllTags(userIsLoggedIn) {
-  if (userIsLoggedIn) { $("#tags-toggle").html('<img src="/images/toggle_on.png" id="show-all-tags" style="height:22px;margin-left:10px;">'); }
+  if (userIsLoggedIn) { 
+    if ($("#tags-toggle").html().length === 0) {
+      $("#tags-toggle").html('<img src="/images/toggle_on.png" id="show-all-tags" style="height:22px;margin-left:10px;"><img src="/images/toggle_off.png" id="show-my-tags" style="height:22px;margin-left:10px;display:none;">'); 
+    } else {
+      $('#show-my-tags').hide();
+      $('#show-all-tags').show();
+    }
+  }
   $('.my-tag').show();
   $('.other-tag').show();
-  $('#tag-title-modifier').text('all users:');
-  if ($('.album-tag').length === 0) { $('#current-tags').html('<div class="text-primary text-center"><small>There are currently no tags for this album. Click "Add tags" below to get started!</small></div>'); }
+  $('#tag-title-modifier').text('all users');
+
+  $('#no-all-tags').remove();
+  $('#no-my-tags').remove();
+  if ($('.album-tag').length === 0) { $('#current-tags').append('<div id="no-all-tags" class="text-primary text-center"><small>There are currently no tags for this album. Click "Add tags" below to get started!</small></div>'); }
 
   if (userIsLoggedIn) {
     $('#show-all-tags').click(function(event) {
@@ -873,11 +911,19 @@ function displayAllTags(userIsLoggedIn) {
 }
 
 function displayMyTags(userIsLoggedIn) {
-  $("#tags-toggle").html('<img src="/images/toggle_off.png" id="show-my-tags" style="height:22px;margin-left:10px;">');
+  if ($("#tags-toggle").html().length === 0) {
+    $("#tags-toggle").html('<img src="/images/toggle_off.png" id="show-my-tags" style="height:22px;margin-left:10px;"><img src="/images/toggle_on.png" id="show-all-tags" style="height:22px;margin-left:10px;display:none;">');
+  } else {
+    $('#show-all-tags').hide();
+    $('#show-my-tags').show();
+  }
   $('.my-tag').show();
   $('.other-tag').hide();
-  $('#tag-title-modifier').text('you:');
-  if ($('.my-tag').length === 0) { $('#current-tags').html('<div class="text-primary text-center"><small>You have not created any tags for this album. Click "Add tags" below to get started!</small></div>'); }
+  $('#tag-title-modifier').text('you');
+
+  $('#no-all-tags').remove();
+  $('#no-my-tags').remove();
+  if ($('.my-tag').length === 0) { $('#current-tags').append('<div id="no-my-tags" class="text-primary text-center"><small>You have not created any tags for this album. Click "Add tags" below to get started!</small></div>'); }
 
   $('#show-my-tags').click(function(event) {
     event.preventDefault();
@@ -992,6 +1038,17 @@ $('#add-to-new-list-button').click(function(event) {
     addToNewList(escapeHtml(listTitle), escapeHtml(displayName));
     document.getElementById("new-display-name").value = "";
     document.getElementById("new-list-title").value = "";
+  }
+});
+
+// make hover scrollbar always visible on touchscreens
+$(document).ready(function() {
+  let isTouchDevice = false;
+  if ("ontouchstart" in document.documentElement) { isTouchDevice = true; }
+  if (isTouchDevice) {
+    const searchResultsBox = document.getElementById("connection-search-results");
+    searchResultsBox.style.paddingBottom="0px";
+    searchResultsBox.style.overflowX="scroll";
   }
 });
 
