@@ -126,3 +126,14 @@ $("#search-modal-input").keyup(function(event) {
     $("#search-modal-button").click();
   }
 });
+
+// make hover scrollbar always visible on touchscreens
+$(document).ready(function() {
+  let isTouchDevice = false;
+  if ("ontouchstart" in document.documentElement) { isTouchDevice = true; }
+  if (isTouchDevice) {
+    const searchResultsBox = document.getElementById("search-modal-results");
+    searchResultsBox.style.paddingBottom="0px";
+    searchResultsBox.style.overflowX="scroll";
+  }
+});

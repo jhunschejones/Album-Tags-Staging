@@ -858,8 +858,9 @@ function addInfoButtons() {
   $('#compact_menu p').append(addAlbumButtonSmall);
   $('#compact_menu p').append(infoButtonSmall);
   
-  const infoButtonLage = '<button class="btn btn-sm btn-outline-secondary sticky-top float-left button_text" style="cursor:pointer;margin-top:2px;" data-toggle="modal" data-target="#pageInfoModal">&#9432;</button>';
-  const addAlbumButtonLarge = '<button class="btn btn-sm btn-outline-secondary sticky-top float-left button_text" style="cursor:pointer;margin-top:2px;" data-toggle="modal" data-target="#addFavoritesAlbumModal">Add Album</button>';
+  // btn-outline-secondary
+  const infoButtonLage = '<button class="btn btn-sm btn-light sticky-top float-left button_text ml-1" style="cursor:pointer;margin-top:2px;" data-toggle="modal" data-target="#pageInfoModal">&#9432;</button>';
+  const addAlbumButtonLarge = '<button class="btn btn-sm btn-light sticky-top float-left button_text ml-1" style="cursor:pointer;margin-top:2px;" data-toggle="modal" data-target="#addFavoritesAlbumModal">Add Album</button>';
   $('#all-favorites-filters').append(addAlbumButtonLarge);
   $('#all-favorites-filters').append(infoButtonLage);
 }
@@ -870,4 +871,15 @@ $('.add-album-instruction-link').click(function(event) {
   event.preventDefault();
   $('#pageInfoModal').modal('hide');
   $('#addFavoritesAlbumModal').modal('show');
+});
+
+// make hover scrollbar always visible on touchscreens
+$(document).ready(function() {
+  let isTouchDevice = false;
+  if ("ontouchstart" in document.documentElement) { isTouchDevice = true; }
+  if (isTouchDevice) {
+    const searchResultsBox = document.getElementById("favorites-search-results");
+    searchResultsBox.style.paddingBottom="0px";
+    searchResultsBox.style.overflowX="scroll";
+  }
 });

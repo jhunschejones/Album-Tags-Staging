@@ -5,8 +5,14 @@
 #search-modal-results {
   display: inline-flex;
   max-width: 100%;
-  overflow-x: scroll;
   padding-right: 5px;
+  overflow-x: hidden;
+  padding-bottom: 11px; /* accomidates size of scroll bar */
+}
+
+#search-modal-results:hover {
+  overflow-x: scroll;
+  padding-bottom: 0px; /* accomidates size of scroll bar */
 }
 
 .search-modal-card {
@@ -75,4 +81,48 @@
 box so that it will display the 'x' in chrome */
 input[type=search]::-webkit-search-cancel-button {
   -webkit-appearance: searchfield-cancel-button;
+}
+
+/* ====== show scrollbar ====== */
+#search-modal-results::-webkit-scrollbar {
+  -webkit-appearance: none;
+}
+
+#search-modal-results::-webkit-scrollbar:vertical {
+  width: 11px;
+}
+
+#search-modal-results::-webkit-scrollbar:horizontal {
+  height: 11px;
+}
+
+#search-modal-results::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  border: 2px solid white; /* should match background, can't be transparent */
+  background-color: rgba(0, 0, 0, .5);
+}
+
+#search-modal-results::-webkit-scrollbar-track { 
+  background-color: #fff; 
+  border-radius: 8px; 
+} 
+
+/* adds the arrow to the end of the scroll bar */
+#search-modal-results::-webkit-scrollbar-button:horizontal:end:increment {
+  display: block;
+  background:
+      linear-gradient(210deg, #fff 40%, rgba(0, 0, 0, 0) 41%),
+      linear-gradient(330deg, #fff 40%, rgba(0, 0, 0, 0) 41%),
+      linear-gradient(90deg, #fff 30%, rgba(0, 0, 0, 0) 31%);
+  background-color: #b6b6b6;
+}
+
+/* adds the arrow to the start of the scroll bar */
+#search-modal-results::-webkit-scrollbar-button:horizontal:start:decrement {
+  display: block;
+  background:
+      linear-gradient(30deg, #fff 40%, rgba(0, 0, 0, 0) 41%),
+      linear-gradient(150deg, #fff 40%, rgba(0, 0, 0, 0) 41%),
+      linear-gradient(270deg, #fff 30%, rgba(0, 0, 0, 0) 31%);
+  background-color: #b6b6b6;
 }
