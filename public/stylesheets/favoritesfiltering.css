@@ -115,8 +115,8 @@
 
 .remove-favorite-button {
   cursor: pointer;
-  margin-left: 235px;
-  margin-top: -8px;
+  margin-left: 233px;
+  margin-top: -4px;
   background-color: rgba(245, 245, 245, 0.7);
   display: block;
   border-radius: 12px;
@@ -135,7 +135,7 @@
 
 @media screen and (max-width: 800px) {
   .remove-favorite-button {
-      margin-left: 153px;
+      margin-left: 150px;
   }
 }
 
