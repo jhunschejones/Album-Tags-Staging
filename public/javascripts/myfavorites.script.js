@@ -366,18 +366,6 @@ $(document).on( 'scroll', function(){
   $('#artist_filter_menu').removeClass('show');
 });
 
-// $(function() {
-//   var toolbox = $('.dropdown-menu'),
-//     height = toolbox.height(),
-//     scrollHeight = toolbox.get(0).scrollHeight;
-
-//   toolbox.bind('mousewheel', function(e, d) {
-//     if((this.scrollTop === (scrollHeight - height) && d < 0) || (this.scrollTop === 0 && d > 0)) {
-//       e.preventDefault();
-//     }
-//   });
-// });
-
 // filters artists in filter to match what albums are on page
 function whatsOnThePage_artists() {
   let whatsLeft = $('.albumCard:visible')
