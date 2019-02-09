@@ -811,7 +811,7 @@ function startFavoritesPage() {
   // display instructions if no favorites exist for this user
   if (myFavoriteAlbums.message) {
     showDOMelement("log_in_message")
-    $('#log_in_message').html("<div style='text-align:center;'><p style='margin: 20px 5px 50px 5px;'>Looks like you don't have any favorites yet! <a href='/search'>Search</a> for an album then click the <img src='../images/heart-unliked.png' height='30' width='auto'> icon on the Lists tab to add it to your favorites.</p></div>")
+    $('#log_in_message').html("<div class='text-secondary' style='text-align:center;'><p style='margin: 20px 5px 50px 5px;'>Looks like you don't have any favorites yet! Click <span class='text-primary' style='cursor:pointer;' data-toggle='modal' data-target='#addFavoritesAlbumModal'>Add Album</span> to find an album and add it to your favorites.</p></div>")
     hideDOMelement("filter_by_genre_dropdown_button")
     hideDOMelement("filter_by_year_dropdown_button")
     hideDOMelement("filter_by_artist_dropdown_button")

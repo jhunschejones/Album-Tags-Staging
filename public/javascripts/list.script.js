@@ -366,6 +366,10 @@ $('#add-album-button').click(function(event) {
   $('#list-title-input').val(listData.title);
   $('#list-display-name-input').val(listData.displayName || "Unknown");
 })
+$('#add-album-refrence').click(function(event) {
+  event.preventDefault();
+  $("#add-album-button").click();
+})
 $("#list-title-input").keyup(function(event) {
   if (event.keyCode === 13) {
     $("#update-list-title").click();
