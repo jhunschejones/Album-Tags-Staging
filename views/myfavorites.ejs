@@ -12,7 +12,7 @@
     <% include partials/templates/navbar_basic.ejs %>
 
     <!-- FILTERS SECTION -->
-    <div id="all-favorites-filters" style="display:none;">
+    <div id="all-favorites-filters" class="sticky-top" style="display:none;">
       <% include partials/content/favorites_filters.ejs %>
     </div>
 
@@ -51,8 +51,6 @@
           <small id="copied-message" class="text-secondary">Copied!</small>
           <div class="modal-footer">
             <button id="get-shareable-link" type="button" class="btn btn-outline-primary" data-clipboard-target="#shareable-url">Get shareable link</button>
-            <!-- <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Done</button>
-            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button> -->
           </div>
         </div>
       </div>

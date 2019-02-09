@@ -1,13 +1,13 @@
 
-<button id="share-favorites-button" class="btn btn-sm btn-light sticky-top float-right hide_when_logged_out">
+<button id="share-favorites-button" class="btn btn-sm btn-light float-right hide_when_logged_out">
     <span class="button_text">Share Favorites</span><img src="/images/share.png" class="mobile-button-icon" style="height:20px;margin-top:-3px;opacity:0.7;">
 </button>
 
-<button id="clear_filters_button" class="btn btn-sm btn-light sticky-top float-right hide_when_logged_out" onclick="clearFilters()">
+<button id="clear_filters_button" class="btn btn-sm btn-light float-right hide_when_logged_out" onclick="clearFilters()">
     <span class="button_text">Clear Filters</span><img src="/images/clear-icon.png" class="mobile-button-icon" style="height:20px;margin-top:-3px;opacity:0.7;">
 </button>
 
-<div class="dropdown sticky-top float-right">
+<div class="dropdown float-right">
     <button id="filter_by_year_dropdown_button" class="btn btn-sm btn-light dropdown-toggle hide_when_logged_out" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="buildYearFilters()">
         <span class="button_text">Filter by Year</span><img src="/images/calendar-icon.png" class="mobile-button-icon" style="height:20px;margin-top:-3px;opacity:0.7;">
     </button>
@@ -16,7 +16,7 @@
     </div>
 </div>
 
-<div class="dropdown sticky-top float-right">
+<div class="dropdown float-right">
     <button id="filter_by_genre_dropdown_button" class="btn btn-sm btn-light dropdown-toggle hide_when_logged_out" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="buildGenreFilters()">
     <span class="button_text">Filter by Genre</span><img src="/images/genre.png" class="mobile-button-icon" style="height:20px;margin-top:-3px;opacity:0.9;">
     </button>
@@ -25,7 +25,7 @@
     </div>
 </div>
 
-<div class="dropdown sticky-top float-right">
+<div class="dropdown float-right">
     <button id="filter_by_artist_dropdown_button" class="btn btn-sm btn-light dropdown-toggle hide_when_logged_out" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="buildArtistFilters()">
     <span class="button_text">Filter by Artist</span><img src="/images/artist-icon.png" class="mobile-button-icon" style="height:20px;margin-top:-3px;opacity:0.6;">
     </button>
@@ -40,7 +40,7 @@
     </button>
 </div>
 
-<div class="to_top_button_container sticky-top float-left">
+<div class="to_top_button_container float-left">
     <button id="to_top_button" class="btn btn-sm btn-light hide_when_logged_out" onclick="scrollToTop()"><img id="up_arrow" src="/images/up_arrow.png"><span class="button_text">Top</span></button>
 </div>
 
