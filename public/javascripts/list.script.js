@@ -365,11 +365,17 @@ $('#add-album-button').click(function(event) {
   $('#editListModal').modal('show');
   $('#list-title-input').val(listData.title);
   $('#list-display-name-input').val(listData.displayName || "Unknown");
-})
-$('#add-album-refrence').click(function(event) {
+});
+$('.add-album-refrence').click(function(event) {
   event.preventDefault();
+  $('#pageInfoModal').modal('hide');
   $("#add-album-button").click();
-})
+});
+$('.edit-list-refrence').click(function(event) {
+  event.preventDefault();
+  $('#pageInfoModal').modal('hide');
+  $('#edit-button').click();
+});
 $("#list-title-input").keyup(function(event) {
   if (event.keyCode === 13) {
     $("#update-list-title").click();
