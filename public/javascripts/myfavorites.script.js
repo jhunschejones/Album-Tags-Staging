@@ -115,15 +115,9 @@ function bubbleSort(arr, prop) {
 
 // === UI MODIFICATION FOR MOBILE MENU BAR ===
 function addInfoButtons() {
-  const infoButtonSmall = '<span class="text-secondary ml-2 float-right page-info-button" style="cursor:pointer;margin-top:8px;" data-toggle="modal" data-target="#pageInfoModal">&#9432;</span>';
-  const addAlbumButtonSmall = '<span class="text-secondary ml-2 mr-1" style="cursor:pointer;font-size:1.4em;" data-toggle="modal" data-target="#addFavoritesAlbumModal">&plus;</span>';
-  // allows the mobile info button to show on the far right of the screen
+  const infoButtonSmall = '<span class="text-secondary ml-2 float-right page-info-button" style="cursor:pointer;" data-toggle="modal" data-target="#pageInfoModal">&#9432;</span>';
   $('#compact_menu p').width("80%");
-  // correcting for larger font size on add-to-favorites button
-  $('#compact_menu p').css("margin-top", "-9px");
   $('.my_dropdown').css("margin-top", "-2px");
-
-  $('#compact_menu p').append(addAlbumButtonSmall);
   $('#compact_menu p').append(infoButtonSmall);
   
   // btn-outline-secondary
@@ -824,6 +818,7 @@ function startFavoritesPage() {
     hideDOMelement("clear_filters_button")
     hideDOMelement("share-favorites-button")
     hideDOMelement("to_top_button")
+    // hideDOMelement("add-album-menu-button")
     return
   } else {
     $('#log_in_message').html("")
