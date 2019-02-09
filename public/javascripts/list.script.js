@@ -44,7 +44,6 @@ function getList() {
   if (listID.length < 25) {
     $.ajax({
       method: "GET",
-      // url: "/api/v1/list/user/" + userID,
       url: "/api/v1/list/" + listID,
       success: function(data) {
         listData = data
@@ -56,7 +55,6 @@ function getList() {
     isFavoritesList = true
     $.ajax({
       method: "GET",
-      // url: "/api/v1/list/user/" + userID,
       url: "/api/v1/list/favorites/" + listID,
       success: function(data) {
         listData = data
@@ -103,13 +101,14 @@ function populateCard(album, cardNumber) {
 }
 
 function populateList() {
-  $("#no-albums-message").hide()
-  $('#albums').html('')
+  $('.page-info-button').hide();
+  $("#no-albums-message").hide();
+  $('#albums').html('');
 
   let listCreator = listData.displayName
   if (!listCreator || listCreator.trim === "") { listCreator = "Unknown" }
   $('#list-title').text(`${listData.title}`)
-  $('#list-title').append('<small class="text-secondary pl-2 page-info-button" data-toggle="modal" data-target="#pageInfoModal">&#9432;</small>')
+  $('#list-title').append('<small class="text-secondary pl-2 page-info-button" data-toggle="modal" style="display:none;" data-target="#pageInfoModal">&#9432;</small>')
   $('#list-creator').text("by: " + listCreator)
 
   if (listData.albums && listData.albums.length > 0) {
@@ -132,9 +131,10 @@ function populateList() {
     $("#no-albums-message").show()
   }
 
-  if (isFavoritesList) { 
-    $('#edit-button').hide(); 
-    $('#add-album-button').hide();
+  if (!isFavoritesList && userID) { 
+    $('#edit-button').show(); 
+    $('#add-album-button').show();
+    $('.page-info-button').show();
   }
 }
 
@@ -426,9 +426,9 @@ firebase.auth().onAuthStateChanged(function(user) {
     $('#logout_button').show();
     $('#full_menu_logout_button').show();
 
-    $('#edit-button').show();
-    $('#add-album-button').show();
-    $('.album-delete-button').show();
+    // $('#edit-button').show();
+    // $('#add-album-button').show();
+    // $('.album-delete-button').show();
   } else {   
     // no user logged in
     userID = false;
