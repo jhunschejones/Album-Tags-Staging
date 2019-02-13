@@ -19,6 +19,7 @@
           <h2 id="album-title"></h2>
           <p id="band-name" class="text-secondary"></p>
           <img src="" id="album-cover" class="img-fluid">
+          <div id="album-cover-loader" class="new-loader text-center"><span class="text-secondary">Loading...</span></div>
         </div>
         <!-- right main column -->
         <div class="col-md-6 mr-md-2 mt-md-5 mt-3">
@@ -115,12 +116,9 @@
                         <button id="add-connection-button" class="btn btn-primary" type="button">Search</button>
                       </div>
                     </div>
+                    <div id="connection-loader" class="new-loader text-center" style="display:none;"><span class="text-secondary">Loading...</span></div>
                     <div id="connection-search-results" class="mt-3 mb-0"></div>
                   </div>
-                  <!--  <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Done</button>
-                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
-                  </div> -->
                 </div>
               </div>
             </div>
@@ -161,9 +159,6 @@
                     -->
                     <button id="add-to-new-list-button" type="button" class="btn btn btn-primary float-right">Add to new list</button>
                   </div>
-                  <!-- <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Exit</button>
-                  </div> -->
                 </div>
               </div>
             </div>
@@ -223,9 +218,6 @@
               <li>View lists this album is in by clicking the link on the <span class="font-italic">Lists</span>, or view all your lists on the <a href="/mylists">my lists</a> page</li>
             </small></ol>
           </div>
-          <!-- <div class="modal-footer">
-            <button type="button" class="btn btn-sm btn-outline-secondary" data-dismiss="modal">Done</button>
-          </div> -->
         </div>
       </div>
     </div>

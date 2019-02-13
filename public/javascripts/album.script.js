@@ -147,6 +147,12 @@ function populateAlbumPage(userLoggedIn) {
   $('#album-title').text(albumResult.title);
   $('#band-name').text(albumResult.artist);
   $('#album-cover').attr('src', albumResult.cover.replace('{w}', 450).replace('{h}', 450));
+
+  // hide cover loader when main album cover has loaded
+  $('#album-cover').on('load', function(){
+    $('#album-cover-loader').hide();
+  });
+
   $('#release-date span').text(makeNiceDate(albumResult.releaseDate));
   $('#record-company span').text(albumResult.recordCompany);
   $('#track-titles').html('');
@@ -575,6 +581,7 @@ function addConnection(newAlbumID) {
 
 function populateConnectionModalResults(data) {
   $('#connection-search-results').html('');
+  $('#connection-loader').hide();
   if (data.albums) {
     for (let index = 0; index < data.albums.length; index++) {
       const album = data.albums[index];
@@ -587,6 +594,8 @@ function populateConnectionModalResults(data) {
     createConnectionModalCard(data.albums.length + 1);
   }
 }
+
+
 
 function createConnectionModalCard(album, cardNumber) {
   $('#connection-search-results').append(`<div id="connectionModalCard${cardNumber}" class="search-modal-card" data-apple-album-id="${album.appleAlbumID}"><a class="search-modal-card-album-link" href=""><img class="search-modal-card-image" src="" alt=""><a/><div class="search-modal-card-body"><h4 class="search-modal-card-title"></h4><span class="search-modal-card-album"></span></div></div>`)
@@ -987,6 +996,8 @@ $("#add-tag-input").keyup(function(event) {
 $("#add-connection-button").click(function(event) {
   event.preventDefault();
   const search = $('#add-connection-input').val().trim();
+  $('#connection-search-results').html('');
+  $('#connection-loader').show();
   executeSearch(search, "connection")
 });
 $("#add-connection-input").keyup(function(event) {
