@@ -83,11 +83,12 @@ router.get('/search/tags/:selectedtags', function(req, res, next) {
 
 // GET album update page
 router.get('/update/:albumId', function(req, res) {
-  res.render('update', {
-    pageTitle: ': Update',
-    subTitle: 'Update Album Tags',
-    albumId: req.params.albumId
-  })
+  // res.render('update', {
+  //   pageTitle: ': Update',
+  //   subTitle: 'Update Album Tags',
+  //   albumId: req.params.albumId
+  // })
+  res.redirect('/album/' + req.params.albumId)
 })
 
 // GET my-lists page
