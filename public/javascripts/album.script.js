@@ -521,64 +521,61 @@ function populateConnections() {
   }
 }
 
-function addConnection(newAlbumID) {
-  $.getJSON ('/api/v1/apple/details/' + newAlbumID, function(appleAlbum) {
-    // check if this is a valid album id
-    if (!appleAlbum.message) {
-      $.getJSON ('/api/v1/album/albumid/' + newAlbumID, function(databaseAlbum) {
-        if (!databaseAlbum.message) {
-          // ALBUM EXISTS IN DATABASE, SEND PUT REQUEST WITH BOTH ALBUM OBJECTS
-          $.ajax(`/api/v1/album/connections/${albumResult._id || "new"}`, {
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ 
-              "albumOne": albumResult,
-              "albumTwo": databaseAlbum,
-              "creator": userID
-            }),
-            success: function(album) {
-              if (!album.message) {
-                // returns just this album with updates
-                albumResult = album;
-                populateConnections();
-                $('#updateConnectionModal').modal('hide');
-              } else {
-                alert(album.message);
-              }
-            }
-          });
-        } else if (databaseAlbum.message === "No matching album in the database.") {
-          // ALBUM DOES NOT EXIST IN THE DATABASE POST A NEW ALBUM WITH THE CONNECTION IN IT
-          $.ajax(`/api/v1/album/connections/${albumResult._id || "new"}`, {
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ 
-              "albumOne": albumResult,
-              "albumTwo": appleAlbum,
-              "creator": userID
-            }),
-            success: function(album) {
-              if (!album.message) {
-                // returns just this album with updates
-                albumResult = album;
-                populateConnections();
-                $('#updateConnectionModal').modal('hide');
-              } else {
-                alert(album.message);
-              }
-            }
-          });
-        } else {
-          alert(databaseAlbum.message);
+function addConnection(selectedAlbum) {
+  $.getJSON ('/api/v1/album/albumid/' + selectedAlbum.appleAlbumID, function(databaseAlbum) {
+    if (!databaseAlbum.message) {
+      // ALBUM EXISTS IN DATABASE, SEND PUT REQUEST WITH BOTH ALBUM OBJECTS
+      $.ajax(`/api/v1/album/connections/${albumResult._id || "new"}`, {
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ 
+          "albumOne": albumResult,
+          "albumTwo": databaseAlbum,
+          "creator": userID
+        }),
+        success: function(album) {
+          if (!album.message) {
+            // returns just this album with updates
+            albumResult = album;
+            populateConnections();
+            $('#updateConnectionModal').modal('hide');
+          } else {
+            alert(album.message);
+          }
+        }
+      });
+    } else if (databaseAlbum.message === "No matching album in the database.") {
+      // ALBUM DOES NOT EXIST IN THE DATABASE POST A NEW ALBUM WITH THE CONNECTION IN IT
+      $.ajax(`/api/v1/album/connections/${albumResult._id || "new"}`, {
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ 
+          "albumOne": albumResult,
+          "albumTwo": selectedAlbum,
+          "creator": userID
+        }),
+        success: function(album) {
+          if (!album.message) {
+            // returns just this album with updates
+            albumResult = album;
+            populateConnections();
+            $('#updateConnectionModal').modal('hide');
+          } else {
+            alert(album.message);
+          }
         }
       });
     } else {
-      alert("Sorry, Apple says that's not an album ID.");
+      alert(databaseAlbum.message);
     }
-    $('#add-connection-input').val('');
   });
-}
+  $('#add-connection-input').val('');
+} 
+    
 
+
+
+let connectionSearchResults = [];
 function populateConnectionModalResults(data) {
   $('#connection-search-results').html('');
   $('#connection-loader').hide();
@@ -586,12 +583,15 @@ function populateConnectionModalResults(data) {
     for (let index = 0; index < data.albums.length; index++) {
       const album = data.albums[index];
       const cardNumber = index + 1;
+
+      connectionSearchResults.push(album);
+
       createConnectionModalCard(album, cardNumber);
       populateConnectionModalCard(album, cardNumber);
     }
     // this adds an empty space at the end so the user can scroll 
     // all the way to the right to see the last album
-    createConnectionModalCard(data.albums.length + 1);
+    $('#connection-search-results').append('<div id="connection-search-modal-placeholder">&nbsp;</div>');
   }
 }
 
@@ -623,7 +623,8 @@ function populateConnectionModalCard(album, cardNumber) {
   $(`#connectionModalCard${cardNumber}`).click(function(event) {
     event.preventDefault();
     // connect to this album
-    const selectedAlbum = $(this).data("apple-album-id");
+    const selectedAlbumID = $(this).data("apple-album-id");
+    const selectedAlbum = connectionSearchResults.find(x => x.appleAlbumID === selectedAlbumID.toString());
     addConnection(selectedAlbum);
   })
 }
@@ -726,10 +727,10 @@ function populateTags() {
     
       if (creator === userID) {
         // tags are stored escaped and displayed raw
-        $('#current-tags').append(`<a href="" id="${tagName}" class="badge badge-light album-tag my-tag" data-creator="${creator}" data-rawtag="${escapeHtml(albumResult.tagObjects[index].tag)}"><span>${tag}</span><span class="delete-tag-button ml-1" data-tag-id="${tagName}">&#10005;</span></a>`);
+        $('#current-tags').append(`<a href="" id="${tagName}-${creator}" class="badge badge-light album-tag my-tag" data-creator="${creator}" data-rawtag="${escapeHtml(albumResult.tagObjects[index].tag)}"><span>${tag}</span><span class="delete-tag-button ml-1" data-tag-id="${tagName}-${creator}">&#10005;</span></a>`);
       } else {
         // tags are stored escaped and displayed raw
-        $('#current-tags').append(`<a href="" id="${tagName}" class="badge badge-light album-tag other-tag" data-creator="${creator}" data-rawtag="${escapeHtml(albumResult.tagObjects[index].tag)}"><span>${tag}</span></a>`);
+        $('#current-tags').append(`<a href="" id="${tagName}-${creator}" class="badge badge-light album-tag other-tag" data-creator="${creator}" data-rawtag="${escapeHtml(albumResult.tagObjects[index].tag)}"><span>${tag}</span></a>`);
       }
     }
     // ------ tag delete button event listener -----
@@ -771,6 +772,34 @@ function modifySelectedTags(tag) {
   }
 }
 
+function fixShortTagsArray() {
+  let newTags = []
+  albumResult.tagObjects.forEach(tagObject => {
+    newTags.push(tagObject.tag)
+  })
+  newTags.forEach(tag => {
+    let updateObject = 
+    {
+      "tag": tag
+    }
+    $.ajax({
+      method: "POST",
+      url: '/api/v1/album/tags/' + albumResult._id,
+      data: JSON.stringify(updateObject),
+      contentType: "application/json",
+      success: function(album) {
+        if (!album.message) {
+          albumResult = album;
+          populateTags();
+          updateTagDisplay(); 
+        } else {
+          alert(album.message);
+        }
+      }
+    })
+  })
+}
+
 function deleteTag(tagID) {
   const creator = $(`#${tagID}`).data('creator');
   const tag = $(`#${tagID}`).data('rawtag');
@@ -792,6 +821,7 @@ function deleteTag(tagID) {
           albumResult = album;
           populateTags();
           updateTagDisplay(); 
+          if (albumResult.tagObjects.length > albumResult.tags.length) { fixShortTagsArray(); }
         } else {
           alert(album.message);
         }
@@ -819,18 +849,26 @@ function addTag() {
     newTag = removeExtraSpace(toTitleCase(newTag)).trim();
     newTag = escapeHtml(newTag);
 
-    // only run this check if there are other tags
+    // only run these two checks if there are other tags
     if (albumResult.tagObjects) {
+
+      // check for duplicates by this user, hard fail
       let duplicates = 0;
       albumResult.tagObjects.forEach(tagObject => {
         if (isEqual(tagObject, { "tag": newTag, "creator": userID })) { duplicates++; }
       });
-
       if (duplicates > 0) {
         alert(`You already added the "${newTag}" tag to this album!`);
         $('#add-tag-input').val("");
         return;
       }   
+
+      // check for duplicates overall, option to proceed
+      if (albumResult.tags.indexOf(newTag) != -1) { 
+        let confirmed = confirm(`Someone else already added the "${newTag}" tag to this album. Choose "ok" to add your tag, or "cancel" to avoid duplicates.`); 
+        $('#add-tag-input').val("");
+        if (!confirmed) { return; }
+      }
     }  
 
     // ADD NEW TAG OR NEW ALBUM TO THE DATABASE
