@@ -66,7 +66,7 @@
         })
       }
 
-      function deleteBooks() {
+      function deleteAlbums() {
         if (blankAlbums.length > 0) {
           blankAlbums.forEach(album => {
             $.ajax({
@@ -81,7 +81,7 @@
         }
       }
 
-      function findMissingTagBooks() {
+      function findMissingTagAlbums() {
         $.ajax({
           method: "GET",
           url: "/api/v1/album/utility/missingtags",
@@ -93,7 +93,7 @@
         })
       }
 
-      function updateMissingTagBooks() {
+      function updateMissingTagAlbums() {
         if (missingTagAlbums.length > 0) {
           missingTagAlbums.forEach(album => {
             let newTags = []
@@ -114,6 +114,7 @@
             })
           })
           $('#missing-albums-modified').text('Albums missing tags have been updated.')
+          findMissingTagAlbums()
         } else {
           $('#missing-albums-modified').text('There are no albums missing tags!')
         }
@@ -121,9 +122,9 @@
 
       // ====== ADD EVENT LISTENERS ======
       document.getElementById('find-blank-albums').addEventListener('click', findBlankAlbums)
-      document.getElementById('delete-blank-albums').addEventListener('click', deleteBooks)
-      document.getElementById('find-albums-missing-tags').addEventListener('click', findMissingTagBooks)
-      document.getElementById('update-albums-missing-tags').addEventListener('click', updateMissingTagBooks)    
+      document.getElementById('delete-blank-albums').addEventListener('click', deleteAlbums)
+      document.getElementById('find-albums-missing-tags').addEventListener('click', findMissingTagAlbums)
+      document.getElementById('update-albums-missing-tags').addEventListener('click', updateMissingTagAlbums)    
     </script>
   </body>
 </html>
