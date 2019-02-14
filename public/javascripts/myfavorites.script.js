@@ -310,8 +310,15 @@ function getFavoriteAlbums() {
     method: "GET",
     url: "/api/v1/album/favorites/" + userID,
     success: function(data) {
-      myFavoriteAlbums = data
-      startFavoritesPage()
+      if (data.message && data.message === "This user does not have any favorited albums.") {
+        myFavoriteAlbums = [];
+        startFavoritesPage()
+      } else if (data.message) {
+        alert(data.message)
+      } else {
+        myFavoriteAlbums = data
+        startFavoritesPage()
+      }
     }
   })
 }
@@ -730,6 +737,7 @@ function populateFavoritesModalCard(album, cardNumber) {
     // add this album to favorites
     const selectedAlbumIndex = $(this).data("result-index");
     const selectedAlbum = addAlbumResults[selectedAlbumIndex];
+
     let alreadyInFavorites = myFavoriteAlbums.find(x => x.appleAlbumID === selectedAlbum.appleAlbumID);
     if (!alreadyInFavorites) {
       addToFavorites(selectedAlbum);
@@ -809,7 +817,7 @@ function startFavoritesPage() {
   $('#all_cards').html("")
 
   // display instructions if no favorites exist for this user
-  if (myFavoriteAlbums.message) {
+  if (myFavoriteAlbums.length < 1) {
     showDOMelement("log_in_message")
     $('#log_in_message').html("<div class='text-secondary' style='text-align:center;'><p style='margin: 20px 5px 50px 5px;'>Looks like you don't have any favorites yet! Click <span class='text-primary' style='cursor:pointer;' data-toggle='modal' data-target='#addFavoritesAlbumModal'>Add Album</span> to find an album and add it to your favorites.</p></div>")
     hideDOMelement("filter_by_genre_dropdown_button")
@@ -818,10 +826,17 @@ function startFavoritesPage() {
     hideDOMelement("clear_filters_button")
     hideDOMelement("share-favorites-button")
     hideDOMelement("to_top_button")
-    // hideDOMelement("add-album-menu-button")
+    // this removes top-10 filter
+    whatsOnThePage_Top10()
     return
   } else {
-    $('#log_in_message').html("")
+    $('#log_in_message').hide();
+    showDOMelement("filter_by_genre_dropdown_button");
+    showDOMelement("filter_by_year_dropdown_button");
+    showDOMelement("filter_by_artist_dropdown_button");
+    showDOMelement("clear_filters_button");
+    showDOMelement("share-favorites-button");
+    showDOMelement("to_top_button");
   }
   $('#artist_filter_menu').html("")
   $('#artist_filter_menu').append('<small id="loading_artist_filters" class="text-primary" style="margin-left:8px;">Loading Artist Filters...</small>')
