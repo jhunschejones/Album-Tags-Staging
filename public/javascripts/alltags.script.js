@@ -53,7 +53,7 @@ function populateTags() {
 
         // Here we add the tags as elements on the DOM, with an onclick function that uses a unique
         // tag to toggle a badge-success class name and change the color
-        $('.all_tags').append(`<a href="" onclick="changeClass(${tagName}, event)" id="${tagName}" class="badge badge-light tag">${safeParse(tag)}</a>  `);    
+        $('.all_tags').append(`<a href="" onclick="changeClass(${tagName}, event)" id="${tagName}" class="badge badge-light tag">${safeParse(tag)}</a>`);    
       });
     };
   });

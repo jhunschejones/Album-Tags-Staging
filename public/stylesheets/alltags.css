@@ -1,7 +1,7 @@
 .tag {
   font-size: .8em;
   padding: 5px;
-  margin: 3px;
+  margin: 3px 4px;
 }
 
 .all_tags_button, .back_button {
@@ -50,6 +50,12 @@
   border-radius: 5px;
 }
 
+@media screen and (max-width: 800px) {
+  #absolute_content {
+    top: 110px;
+  }
+}
+
 .all_tags {
   overflow-y: scroll;
   max-height: 60vh;
@@ -62,10 +68,6 @@
 
 .all_tags::-webkit-scrollbar:vertical {
   width: 11px;
-}
-
-.all_tags::-webkit-scrollbar:horizontal {
-  height: 11px;
 }
 
 .all_tags::-webkit-scrollbar-thumb {
