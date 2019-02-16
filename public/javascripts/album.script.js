@@ -522,54 +522,29 @@ function populateConnections() {
 }
 
 function addConnection(selectedAlbum) {
-  $.getJSON ('/api/v1/album/albumid/' + selectedAlbum.appleAlbumID, function(databaseAlbum) {
-    if (!databaseAlbum.message) {
-      // ALBUM EXISTS IN DATABASE, SEND PUT REQUEST WITH BOTH ALBUM OBJECTS
-      $.ajax(`/api/v1/album/connections/${albumResult._id || "new"}`, {
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({ 
-          "albumOne": albumResult,
-          "albumTwo": databaseAlbum,
-          "creator": userID
-        }),
-        success: function(album) {
-          if (!album.message) {
-            // returns just this album with updates
-            albumResult = album;
-            populateConnections();
-            $('#updateConnectionModal').modal('hide');
-          } else {
-            alert(album.message);
-          }
+  // make sure object passed in looks like an album object
+  if (selectedAlbum && selectedAlbum.title) {
+    $.ajax(`/api/v1/album/connections/${albumResult._id || "new"}`, {
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ 
+        "albumOne": albumResult,
+        "albumTwo": selectedAlbum,
+        "creator": userID
+      }),
+      success: function(album) {
+        if (!album.message) {
+          // returns just this album with updates
+          albumResult = album;
+          populateConnections();
+          $('#updateConnectionModal').modal('hide');
+        } else {
+          alert(album.message);
         }
-      });
-    } else if (databaseAlbum.message === "No matching album in the database.") {
-      // ALBUM DOES NOT EXIST IN THE DATABASE POST A NEW ALBUM WITH THE CONNECTION IN IT
-      $.ajax(`/api/v1/album/connections/${albumResult._id || "new"}`, {
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({ 
-          "albumOne": albumResult,
-          "albumTwo": selectedAlbum,
-          "creator": userID
-        }),
-        success: function(album) {
-          if (!album.message) {
-            // returns just this album with updates
-            albumResult = album;
-            populateConnections();
-            $('#updateConnectionModal').modal('hide');
-          } else {
-            alert(album.message);
-          }
-        }
-      });
-    } else {
-      alert(databaseAlbum.message);
-    }
-  });
-  $('#add-connection-input').val('');
+      }
+    });
+    $('#add-connection-input').val('');
+  }
 } 
     
 
@@ -780,7 +755,8 @@ function fixShortTagsArray() {
   newTags.forEach(tag => {
     let updateObject = 
     {
-      "tag": tag
+      "tag": tag,
+      "method": "fix short tags array"
     }
     $.ajax({
       method: "POST",
@@ -946,7 +922,7 @@ function displayAllTags(userIsLoggedIn) {
 
   $('#no-all-tags').remove();
   $('#no-my-tags').remove();
-  if ($('.album-tag').length === 0) { $('#current-tags').append('<div id="no-all-tags" class="text-primary text-center"><small>There are currently no tags for this album. Click "Add tags" below to get started!</small></div>'); }
+  if ($('.album-tag').length === 0) { $('#current-tags').html('<div id="no-all-tags" class="text-primary text-center"><small>There are currently no tags for this album. Click "Add tags" below to get started!</small></div>'); }
 
   if (userIsLoggedIn) {
     $('#show-all-tags').click(function(event) {

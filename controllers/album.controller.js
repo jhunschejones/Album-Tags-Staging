@@ -124,6 +124,24 @@ exports.find_by_apple_album_id = function (req, res, next) {
   })
 }
 
+exports.find_duplicate_apple_album_id = function (req, res, next) {
+  const searchParams = req.params.id
+
+  Album.find({}, function (err, data) {
+    if (err) return next(err)
+
+    let allAlbumID = [];
+    let duplicateIDs = [];
+    data.forEach(element => {
+      if (duplicateIDs.indexOf(element.appleAlbumID) != -1) { duplicateIDs.push(element.appleAlbumID); }
+      allAlbumID.push(element.appleAlbumID);
+    });
+
+    res.send(duplicateIDs);
+    return;
+  })
+}
+
 exports.find_by_tags = function (req, res) {
   const sentTags = req.params.tags.split(",")
   let selectedTags = []
@@ -153,7 +171,7 @@ exports.add_tag = function (req, res, next) {
     return;
   }
 
-  // album is already in the database
+  // album is already in the database according to client
   if (req.params.id != "new"){
     // full tag update
     if (req.body.creator) {
@@ -168,8 +186,10 @@ exports.add_tag = function (req, res, next) {
         res.send(album)
         return
       })
-      // just update tags array
-    } else {
+    } 
+    
+    // just update tags array
+    if (req.body.method === "fix short tags array") {
       // $push just adds it, $addToSet adds if there are no duplicates
       // {new: true} required in order to return the updated object
       Album.findByIdAndUpdate(req.params.id, { $addToSet: { tags: req.body.tag }}, {new: true}, function (err, album) {
@@ -179,41 +199,62 @@ exports.add_tag = function (req, res, next) {
       })
     }
   } else {
-    // create new database album
-    let updateObject = {
-      "tag": req.body.tag,
-      "creator": req.body.creator
-    }
-    const titleKeyWords = _this.utility_getKeyWords(req.body.album.title) || []
-    const artistKeyWords = _this.utility_getKeyWords(req.body.album.artist) || []
-  
-    let album = new Album(
-      {
-        appleAlbumID: req.body.album.appleAlbumID,
-        appleURL: req.body.album.appleURL,
-        title: req.body.album.title,
-        titleKeyWords: titleKeyWords,
-        artist: req.body.album.artist,
-        artistKeyWords: artistKeyWords,
-        releaseDate: req.body.album.releaseDate,
-        recordCompany: req.body.album.recordCompany,
-        songNames: req.body.album.songNames,
-        cover: req.body.album.cover,
-        genres: req.body.album.genres,
-        tagObjects: [
-          updateObject
-        ],
-        tags: [
-          updateObject.tag
-        ],
-        connectionObjects: [],
-        favoritedBy: []
+    // client says no album in the database, check again
+    Album.findOne({ "appleAlbumID": req.body.album.appleAlbumID }, function (err, existingAlbum) {
+      if (err) { return next(err) }
+      // if actually no album in database  
+      if (!existingAlbum || existingAlbum.length === 0) { 
+        // create new database album
+        let updateObject = {
+          "tag": req.body.tag,
+          "creator": req.body.creator
+        }
+        const titleKeyWords = _this.utility_getKeyWords(req.body.album.title) || []
+        const artistKeyWords = _this.utility_getKeyWords(req.body.album.artist) || []
+
+        let newAlbum = new Album(
+          {
+            appleAlbumID: req.body.album.appleAlbumID,
+            appleURL: req.body.album.appleURL,
+            title: req.body.album.title,
+            titleKeyWords: titleKeyWords,
+            artist: req.body.album.artist,
+            artistKeyWords: artistKeyWords,
+            releaseDate: req.body.album.releaseDate,
+            recordCompany: req.body.album.recordCompany,
+            songNames: req.body.album.songNames,
+            cover: req.body.album.cover,
+            genres: req.body.album.genres,
+            tagObjects: [
+              updateObject
+            ],
+            tags: [
+              updateObject.tag
+            ],
+            connectionObjects: [],
+            favoritedBy: []
+          }
+        )
+
+        newAlbum.save(function(err, album) {
+          if (err) { console.error(err) }
+          res.send(album)
+          return
+        })
+      } else {
+        // back end database album found!
+        let updateObject = {
+          "tag": req.body.tag,
+          "creator": req.body.creator
+        }
+        // $push just adds it, $addToSet adds if there are no duplicates
+        // {new: true} required in order to return the updated object
+        Album.findByIdAndUpdate(existingAlbum._id, { $addToSet: { tagObjects: updateObject, tags: req.body.tag }}, {new: true}, function (err, album) {
+          if (err) return next(err)
+          res.send(album)
+          return
+        })
       }
-    )
-  
-    album.save(function(err, album) {
-      if (err) { console.error(err) }
-      res.send(album)
     })
   }
 }
@@ -231,189 +272,90 @@ exports.delete_tag = function (req, res, next) {
   })
 }
 
-exports.add_connection = function (req, res, next) {
-  const albumOne = req.body.albumOne
-  const albumTwo = req.body.albumTwo
-
-  // IF THIS ALBUM IS IN THE DATABASE
-  if (albumOne._id) {
-    const albumDatabaseIdOne = req.params.id
-    const connectionOne = makeConnectionObject(albumOne, req.body.creator, albumDatabaseIdOne)
-
-    if (albumTwo._id) { 
-      const albumDatabaseIdTwo = albumTwo._id 
-      const connectionTwo = makeConnectionObject(albumTwo, req.body.creator, albumDatabaseIdTwo)
-      // PUSH UPDATES TO BOTH EXISTING ALBUMS
-      Album.findByIdAndUpdate(albumDatabaseIdOne, { $addToSet: { connectionObjects: connectionTwo }}, {new: true}, function (err, album) {
-        if (err) return next(err)
-        res.send(album)
-  
-      }).then(function() {
-        Album.findByIdAndUpdate(albumDatabaseIdTwo, { $addToSet: { connectionObjects: connectionOne }}, function (err) {
-          if (err) return next(err)
-          // not returning anything
-        })
-      })
-  
-    } else {
-      // POST NEW ALBUM FOR SECOND ALBUM, PUSH UPDATE TO FIRST ALBUM
-      const titleKeyWords = _this.utility_getKeyWords(albumTwo.title) || []
-      const artistKeyWords = _this.utility_getKeyWords(albumTwo.artist) || []
-    
-      let album = new Album(
-        {
-          appleAlbumID: albumTwo.appleAlbumID,
-          appleURL: albumTwo.appleURL,
-          title: albumTwo.title,
-          titleKeyWords: titleKeyWords,
-          artist: albumTwo.artist,
-          artistKeyWords: artistKeyWords,
-          releaseDate: albumTwo.releaseDate,
-          recordCompany: albumTwo.recordCompany,
-          songNames: albumTwo.songNames,
-          cover: albumTwo.cover,
-          genres: albumTwo.genres,
-          tagObjects: [],
-          tags: [],
-          connectionObjects: [
-            connectionOne
-          ],
-          favoritedBy: []
-        }
-      )
-    
-      album.save(function(err, album) {
-        if (err) { console.error(err) }
-        else { 
-          const albumDatabaseIdTwo = album._id 
-          const connectionTwo = makeConnectionObject(albumTwo, req.body.creator, albumDatabaseIdTwo)
-  
-          Album.findByIdAndUpdate(albumDatabaseIdOne, { $addToSet: { connectionObjects: connectionTwo }}, {new: true}, function (err, album) {
-            if (err) return next(err)
-            res.send(album)
-          })
-        }
-      })
-    }
+// ========= ADD CONECTION ASYNC HELPER FUNCTIONS =========
+async function existingAlbumConnection(albumObject, creator) {
+  if (albumObject._id) { 
+    const albumDatabaseId = albumObject._id 
+    const connection = makeConnectionObject(albumObject, creator, albumDatabaseId)
+    // returns a connection object for existing album 
+    return connection;
   } else {
-    // THIS ALBUM IS NOT IN THE DATABASE
-
-    // ALBUM TWO IS IN THE DATABASE BUT NOT ALBUM ONE
-    if (albumTwo._id) { 
-      const albumDatabaseIdTwo = albumTwo._id 
-      const connectionTwo = makeConnectionObject(albumTwo, req.body.creator, albumDatabaseIdTwo)
-      const titleKeyWords = _this.utility_getKeyWords(albumOne.title) || []
-      const artistKeyWords = _this.utility_getKeyWords(albumOne.artist) || []
-    
-      let album = new Album(
-        {
-          appleAlbumID: albumOne.appleAlbumID,
-          appleURL: albumOne.appleURL,
-          title: albumOne.title,
-          titleKeyWords: titleKeyWords,
-          artist: albumOne.artist,
-          artistKeyWords: artistKeyWords,
-          releaseDate: albumOne.releaseDate,
-          recordCompany: albumOne.recordCompany,
-          songNames: albumOne.songNames,
-          cover: albumOne.cover,
-          genres: albumOne.genres,
-          tagObjects: [],
-          tags: [],
-          connectionObjects: [
-            connectionTwo
-          ],
-          favoritedBy: []
-        }
-      )
-    
-      album.save(function(err, albumOne) {
-        if (err) { console.error(err) }
-        else { 
-          const albumDatabaseIdOne = albumOne._id
-          const connectionOne = makeConnectionObject(albumOne, req.body.creator, albumDatabaseIdOne)
-
-          Album.findByIdAndUpdate(albumDatabaseIdTwo, { $addToSet: { connectionObjects: connectionOne }}, function (err) {
-            if (err) return next(err)
-            // not returning anything
-            res.send(albumOne)
-          })
-        }
-      })
+    // use `.exec()` to return a real promise that can be await-ed
+    const promiseSearch = await Album.findOne({ "appleAlbumID": albumObject.appleAlbumID }).exec();
+    if (!promiseSearch) {
+      // returns null if no album exists
+      return null;
     } else {
-      // ALBUM ONE AND TWO ARE BOTH NOT IN THE DATABASE
-      const titleKeyWords = _this.utility_getKeyWords(albumOne.title) || []
-      const artistKeyWords = _this.utility_getKeyWords(albumOne.artist) || []
-    
-      let album = new Album(
-        {
-          appleAlbumID: albumOne.appleAlbumID,
-          appleURL: albumOne.appleURL,
-          title: albumOne.title,
-          titleKeyWords: titleKeyWords,
-          artist: albumOne.artist,
-          artistKeyWords: artistKeyWords,
-          releaseDate: albumOne.releaseDate,
-          recordCompany: albumOne.recordCompany,
-          songNames: albumOne.songNames,
-          cover: albumOne.cover,
-          genres: albumOne.genres,
-          tagObjects: [],
-          tags: [],
-          connectionObjects: [],
-          favoritedBy: []
-        }
-      )
-    
-      album.save(function(err, newAlbumOne) {
-        if (err) { console.error(err) }
-        else { 
-          // FIRST ALBUM IS NOW CREATED
-          const titleKeyWords = _this.utility_getKeyWords(albumTwo.title) || []
-          const artistKeyWords = _this.utility_getKeyWords(albumTwo.artist) || []
-
-          const albumDatabaseIdOne = newAlbumOne._id
-          const connectionOne = makeConnectionObject(newAlbumOne, req.body.creator, albumDatabaseIdOne)
-        
-          let album = new Album(
-            {
-              appleAlbumID: albumTwo.appleAlbumID,
-              appleURL: albumTwo.appleURL,
-              title: albumTwo.title,
-              titleKeyWords: titleKeyWords,
-              artist: albumTwo.artist,
-              artistKeyWords: artistKeyWords,
-              releaseDate: albumTwo.releaseDate,
-              recordCompany: albumTwo.recordCompany,
-              songNames: albumTwo.songNames,
-              cover: albumTwo.cover,
-              genres: albumTwo.genres,
-              tagObjects: [],
-              tags: [],
-              connectionObjects: [
-                connectionOne
-              ],
-              favoritedBy: []
-            }
-          )
-        
-          album.save(function(err, newAlbumTwo) {
-            if (err) { console.error(err) }
-            else { 
-              // NEW ALBUM TWO IS NOW CREATED
-              const albumDatabaseIdTwo = newAlbumTwo._id
-              const connectionTwo = makeConnectionObject(newAlbumTwo, req.body.creator, albumDatabaseIdTwo)
-
-              Album.findByIdAndUpdate(albumDatabaseIdOne, { $addToSet: { connectionObjects: connectionTwo }}, {new:true}, function (err, fullyUpdatedAlbumOne) {
-                if (err) return next(err)
-                else { res.send(fullyUpdatedAlbumOne) }
-              })
-            }
-          })
-        }
-      })
+      const albumDatabaseId = promiseSearch._id 
+      const connection = makeConnectionObject(promiseSearch, creator, albumDatabaseId)
+      // returns a connection object for existing album that the client did not know was in the database already
+      return connection;
     }
   }
+}
+
+async function newAlbumConnection(albumObject, creator) {
+  const titleKeyWords = _this.utility_getKeyWords(albumObject.title) || []
+  const artistKeyWords = _this.utility_getKeyWords(albumObject.artist) || []
+
+  let newAlbum = new Album(
+    {
+      appleAlbumID: albumObject.appleAlbumID,
+      appleURL: albumObject.appleURL,
+      title: albumObject.title,
+      titleKeyWords: titleKeyWords,
+      artist: albumObject.artist,
+      artistKeyWords: artistKeyWords,
+      releaseDate: albumObject.releaseDate,
+      recordCompany: albumObject.recordCompany,
+      songNames: albumObject.songNames,
+      cover: albumObject.cover,
+      genres: albumObject.genres,
+      tagObjects: [],
+      tags: [],
+      connectionObjects: [],
+      favoritedBy: []
+    }
+  )
+
+  const savedAlbum = await newAlbum.save();
+  const albumDatabaseId = savedAlbum._id 
+  const connection = makeConnectionObject(savedAlbum, creator, albumDatabaseId)
+  // adds new album to database and returns a connection object
+  return connection;
+}
+
+exports.add_connection = async function (req, res, next) {
+  const albumOne = req.body.albumOne;
+  const albumTwo = req.body.albumTwo;
+  const creator = req.body.creator;
+
+  let connectionOne;
+  let connectionTwo;
+  let asyncError = false;
+  // try-catch is the accepted way to handle async-await errors
+  try {
+    connectionOne = await existingAlbumConnection(albumOne, creator) || await newAlbumConnection(albumOne, creator);
+    connectionTwo = await existingAlbumConnection(albumTwo, creator) || await newAlbumConnection(albumTwo, creator);
+  } catch (error) {
+    asyncError = true;
+  }
+
+  const somethingWentWrong = asyncError || !connectionOne || !connectionTwo || !albumOne || !albumTwo || !creator;
+  if (somethingWentWrong) {
+    res.send({"message" : "Sorry, something appears to have gone wrong connecting these two albums."});
+    return;
+  } 
+
+  Album.findByIdAndUpdate(connectionOne.databaseID, { $addToSet: { connectionObjects: connectionTwo }}, {new: true}, function (err, album) {
+    if (err) return next(err);
+    res.send(album);
+  }).then(function() {
+    Album.findByIdAndUpdate(connectionTwo.databaseID, { $addToSet: { connectionObjects: connectionOne }}, function (err) {
+      if (err) return next(err);
+      // not returning anything
+    });
+  });
 }
 
 exports.delete_connection = function (req, res, next) {
@@ -455,35 +397,51 @@ exports.add_favorite = function (req, res, next) {
       return
     })
   } else {
-    // ADD NEW ALBUM TO THE DATABASE
-    const titleKeyWords = _this.utility_getKeyWords(req.body.albumData.title) || []
-    const artistKeyWords = _this.utility_getKeyWords(req.body.albumData.artist) || []
+    // client reports album not in database, doublecheck
+    Album.findOne({ "appleAlbumID": req.body.albumData.appleAlbumID }, function (err, existingAlbum) {
+      if (err) { return next(err) }
+      if (!existingAlbum || existingAlbum.length === 0) { 
+        // ADD NEW ALBUM TO THE DATABASE
+        const titleKeyWords = _this.utility_getKeyWords(req.body.albumData.title) || []
+        const artistKeyWords = _this.utility_getKeyWords(req.body.albumData.artist) || []
 
-    let album = new Album(
-      {
-        appleAlbumID: req.body.albumData.appleAlbumID,
-        appleURL: req.body.albumData.appleURL,
-        title: req.body.albumData.title,
-        titleKeyWords: titleKeyWords,
-        artist: req.body.albumData.artist,
-        artistKeyWords: artistKeyWords,
-        releaseDate: req.body.albumData.releaseDate,
-        recordCompany: req.body.albumData.recordCompany,
-        songNames: req.body.albumData.songNames,
-        cover: req.body.albumData.cover,
-        genres: req.body.albumData.genres,
-        tagObjects: [],
-        tags: [],
-        connectionObjects: [],
-        favoritedBy: [
-          userID
-        ]
+        let newAlbum = new Album(
+          {
+            appleAlbumID: req.body.albumData.appleAlbumID,
+            appleURL: req.body.albumData.appleURL,
+            title: req.body.albumData.title,
+            titleKeyWords: titleKeyWords,
+            artist: req.body.albumData.artist,
+            artistKeyWords: artistKeyWords,
+            releaseDate: req.body.albumData.releaseDate,
+            recordCompany: req.body.albumData.recordCompany,
+            songNames: req.body.albumData.songNames,
+            cover: req.body.albumData.cover,
+            genres: req.body.albumData.genres,
+            tagObjects: [],
+            tags: [],
+            connectionObjects: [],
+            favoritedBy: [
+              userID
+            ]
+          }
+        )
+      
+        newAlbum.save(function(err, album) {
+          if (err) { console.error(err) }
+          else { 
+            res.send(album);
+            return;
+          }
+        })
+      } else {
+        // found album in database
+        Album.findByIdAndUpdate(existingAlbum._id, { $addToSet: { favoritedBy: userID }}, {new:true}, function (err, album) {
+          if (err) return next(err)
+          res.send(album)
+          return
+        })
       }
-    )
-  
-    album.save(function(err, album) {
-      if (err) { console.error(err) }
-      else { res.send(album) }
     })
   }
 }
