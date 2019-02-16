@@ -43,6 +43,12 @@
         <div class="row">
           <p id="missing-albums-modified">&nbsp;</p>
         </div>
+        <div class="row">
+          <input id="find-duplicate-albums" class="btn btn-secondary" type="button" value="Find Duplicate Albums">
+        </div>
+        <div class="row">
+          <p id="duplicate-album-count">&nbsp;</p>
+        </div>
       </div>
     </div>
     <!-- PAGE CONTENT -->
@@ -53,6 +59,7 @@
     <script>
       var blankAlbums
       var missingTagAlbums
+      var duplicateAlbums
 
       function findBlankAlbums() {
         $.ajax({
@@ -103,7 +110,8 @@
             newTags.forEach(tag => {
               let updateObject = 
               {
-                "tag": tag
+                "tag": tag,
+                "method": "fix short tags array"
               }
               $.ajax({
                 method: "POST",
@@ -120,11 +128,24 @@
         }
       }
 
+      function findDuplicateAlbums() {
+        $.ajax({
+          method: "GET",
+          url: "/api/v1/album/utility/duplicates",
+          success: function(data) {
+            duplicateAlbums = data
+          }
+        }).then(function() {
+          $('#duplicate-album-count').text(`Duplicate albums: ${duplicateAlbums.length || 0}`)
+        })
+      }
+
       // ====== ADD EVENT LISTENERS ======
       document.getElementById('find-blank-albums').addEventListener('click', findBlankAlbums)
       document.getElementById('delete-blank-albums').addEventListener('click', deleteAlbums)
       document.getElementById('find-albums-missing-tags').addEventListener('click', findMissingTagAlbums)
       document.getElementById('update-albums-missing-tags').addEventListener('click', updateMissingTagAlbums)    
+      document.getElementById('find-duplicate-albums').addEventListener('click', findDuplicateAlbums)  
     </script>
   </body>
 </html>

@@ -23,5 +23,6 @@ router.delete('/favorites/:id', album_controller.delete_favorite) // by database
 // utility page calls
 router.get('/utility/missingtags', album_controller.find_albums_missing_tags)
 router.get('/utility/blankalbums', album_controller.find_blank_albums)
+router.get('/utility/duplicates', album_controller.find_duplicate_apple_album_id)
 
 module.exports = router
