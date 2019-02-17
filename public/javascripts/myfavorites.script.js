@@ -778,6 +778,18 @@ function addToFavorites(selectedAlbum) {
           startFavoritesPage();
           $('#add-favorites-album-input').val('');
           $('#favorites-search-results').html('');
+
+          // maintain current state of filters
+          restoreCards();
+          masterFilter(filterGenre);
+          masterFilter(filterYear);
+          masterFilter(filterArtist);
+          filterByTopTen(filterTopTen);
+          whatsOnThePage_Top10();
+
+          // clear filters if there are no matching albums
+          let whatsLeft = $('.albumCard:visible');
+          if (whatsLeft.length < 1) { clearFilters(); }
         } else {
           alert(album.message);
         }
@@ -850,6 +862,18 @@ function removeFromFavorites(selectedAlbum) {
         if (!album.message) {
           removeElementFromArray(myFavoriteAlbums, albumToRemove);
           startFavoritesPage();
+
+          // maintain current filters
+          restoreCards();
+          masterFilter(filterGenre);
+          masterFilter(filterYear);
+          masterFilter(filterArtist);
+          filterByTopTen(filterTopTen);
+          whatsOnThePage_Top10();
+
+          // clear filters if there are no more matching albums
+          let whatsLeft = $('.albumCard:visible');
+          if (whatsLeft.length < 1) { clearFilters(); }
         } else {
           alert(album.message);
         }
