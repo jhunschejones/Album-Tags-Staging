@@ -763,53 +763,27 @@ $("#add-favorites-album-input").keyup(function(event) {
 });
 
 function addToFavorites(selectedAlbum) {
-  $.getJSON ('/api/v1/album/albumid/' + selectedAlbum.appleAlbumID, function(databaseAlbum) {
-    if (!databaseAlbum.message) {
-      // ALBUM EXISTS IN DATABASE,
-      $.ajax(`/api/v1/album/favorites/${databaseAlbum._id}`, {
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({ 
-          "user" : userID,
-          "albumData" : selectedAlbum
-        }),
-        success: function(album) {
-          if (!album.message) {
-            myFavoriteAlbums.push(album);
-            $('#addFavoritesAlbumModal').modal("hide");
-            startFavoritesPage();
-            $('#add-favorites-album-input').val('');
-            $('#favorites-search-results').html('');
-          } else {
-            alert(album.message);
-          }
+  if (selectedAlbum && userID) {
+    $.ajax('/api/v1/album/favorites/new', {
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ 
+        "user" : userID,
+        "albumData" : selectedAlbum
+      }),
+      success: function(album) {
+        if (!album.message) {
+          myFavoriteAlbums.push(album);
+          $('#addFavoritesAlbumModal').modal("hide");
+          startFavoritesPage();
+          $('#add-favorites-album-input').val('');
+          $('#favorites-search-results').html('');
+        } else {
+          alert(album.message);
         }
-      });
-    } else if (databaseAlbum.message === "No matching album in the database.") {
-      // ALBUM IS NOT YET IN DATABASE
-      $.ajax(`/api/v1/album/favorites/new`, {
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({ 
-          "user" : userID,
-          "albumData" : selectedAlbum
-        }),
-        success: function(album) {
-          if (!album.message) {
-            myFavoriteAlbums.push(album);
-            $('#addFavoritesAlbumModal').modal("hide");
-            startFavoritesPage();
-            $('#add-favorites-album-input').val('');
-            $('#favorites-search-results').html('');
-          } else {
-            alert(album.message);
-          }
-        }
-      });
-    } else {
-      alert(databaseAlbum.message);
-    }
-  })
+      }
+    });
+  }
 }
 
 function startFavoritesPage() {

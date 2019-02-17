@@ -27,6 +27,10 @@
   box-shadow: 2px 2px 5px grey;
 }
 
+  .search-modal-card-image:hover {
+    cursor: pointer;
+  }
+
 @media screen and (max-width: 800px) {
   .search-modal-card-image {
     width: 10.8rem!important;
