@@ -1,3 +1,8 @@
+#main-page-loader {
+  margin-top: 170px;
+  margin-bottom: 140px;
+}
+
 #no-lists-message {
   display: none;
   text-align: center;
@@ -6,19 +11,53 @@
 }
 
 #all-lists {
-  list-style-type: none;
-  padding: 0;
+  margin-left: 0px;
+  margin-top: 15px;
 }
 
-.list {
-  margin: 0px, 0px, 5px, 0px;
+.list-card {
+  box-shadow: 2px 2px 5px grey;
+  border-radius: 8px;
+  width: 255px;
+  height: 255px;
+  background: rgb(245, 245, 245);
+  border: none;
+  overflow: hidden;
+  /* overriding bootstrap margins */
+  margin: 0px 18px 16px 0px!important;
+}
+
+.list-card:hover {
+  cursor: pointer;
+}
+
+.list-card-text {
+  /* this centers the element vertically */
+  position: absolute;
+  top: 50%; 
+  transform: translate(0%,-50%);
+
+  right: 0;
+  left: 0;
+  padding: 0.7rem 1rem;
+  line-height: 1em;
+  background-color: rgb(255, 255, 255, 0.94);
+  /* box-shadow: 0px 4px 5px rgba(128, 128, 128, 0.5); */
+}
+
+.short-list-title {
+  display: none;
+}
+
+.list-creator {
+  font-weight: 300;
 }
 
 .list-delete-button {
   cursor: pointer;
-  margin-left: -5px;
-  margin-top: -4px;
-  /* background-color: rgba(245, 245, 245, 0.7); */
+  margin-left: 241px;
+  margin-top: -280px;
+  background-color: rgba(245, 245, 245, 0.7);
   display: inline-block;
   border-radius: 12px;
   padding-left: 6px;
@@ -27,17 +66,34 @@
   padding-bottom: 1px;
   font-size: 1em;
   position: absolute;
-  color: darkslategrey;
-  opacity: 0.3;
-  transform: scale(0.7); 
+  color:grey;
+  opacity: 0.9;
 }
   .list-delete-button:hover {
-    background-color: rgba(245, 245, 245, 0.9);
+    background-color: rgb(228, 228, 228, 0.75);
     opacity: 1;
-    transform: scale(1); 
-    margin-left: 1px;
-    margin-top: 0px;
   }
+
+@media screen and (max-width: 750px) {
+  #all-lists {
+    margin-left: -2px;
+  }
+  .list-card {
+    width: 167px;
+    height: 167px;
+    margin: 0px 14px 15px 0px!important;
+  }
+  .list-delete-button {
+    margin-left: 152px;
+    margin-top: -192px;
+  }
+  .long-list-title {
+    display: none;
+  }
+  .short-list-title {
+    display: block;
+  }
+}
 
 #back-button {
   margin-left: 12px;
