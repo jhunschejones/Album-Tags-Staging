@@ -216,6 +216,7 @@ firebase.auth().onAuthStateChanged(function(user) {
     $('#page-title').show()
     $('#login-message').hide()
     $('#all-lists').show()
+    $('#launch-new-list-modal-button').show();
   } else {   
     // no user logged in
     $('#full_menu_login_logout_container').show()
@@ -228,6 +229,7 @@ firebase.auth().onAuthStateChanged(function(user) {
     $('#login-message').show()
     $('#page-title').hide()
     $('#all-lists').hide()
+    $('#launch-new-list-modal-button').hide();
   }
 })
 
@@ -246,6 +248,7 @@ function logIn() {
     $('#login-message').hide()
     $('#page-title').show()
     $('#all-lists').show()
+    $('#launch-new-list-modal-button').show();
 
     $('#full_menu_login_logout_container').show()
     $('#login_button').hide()
@@ -270,6 +273,7 @@ function logOut() {
     $('#login-message').show()
     $('#page-title').hide()
     $('#all-lists').hide()
+    $('#launch-new-list-modal-button').hide();
 
   }).catch(function(error) {
   // An error happened.
