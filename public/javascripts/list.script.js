@@ -47,7 +47,7 @@ function getList() {
       url: "/api/v1/list/" + listID,
       success: function(data) {
         listData = data
-        $('#loader').hide()
+        $('#main-page-loader').hide()
         populateList()
       }
     })
@@ -58,7 +58,7 @@ function getList() {
       url: "/api/v1/list/favorites/" + listID,
       success: function(data) {
         listData = data
-        $('#loader').hide()
+        $('#main-page-loader').hide()
         populateList()
       }
     })
@@ -440,7 +440,7 @@ firebase.auth().onAuthStateChanged(function(user) {
     $('#full_menu_login_button').show();
     $('#logout_button').hide();
     $('#full_menu_logout_button').hide();
-    $('#loader').hide();
+    $('#main-page-loader').hide();
 
     $('#edit-button').hide();
     $('#add-album-button').hide();
