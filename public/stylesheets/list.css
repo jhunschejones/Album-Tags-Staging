@@ -3,19 +3,55 @@
   margin-bottom: 140px;
 }
 
-#list-title {
-  line-height: 1em;
-  margin: 22px 5px 0px 15px;
+/* ====== START LIST FILTER STYLING ====== */
+@media screen and (max-width: 500px) {
+  .large-button-text {
+    display: none;
+  }
 }
 
-.page-info-button {
+#list-filters {
+  /* make icons stay visible at top of screen when scrolling */
+  padding-top: 16px;
+  margin-top: -16px;
+}
+
+#clear-filters-button,
+#filter-by-year-button,
+#filter-by-genre-button,
+#filter-by-artist-button {
+  margin-right: 1px;
+}
+
+#clear-filters-button .large-button-text,
+#filter-by-year-button .large-button-text,
+#filter-by-genre-button .large-button-text,
+#filter-by-artist-button .large-button-text {
+  margin-right: 5px;
+}
+
+#to-top-button,
+#add-album-button,
+#edit-button {
+  margin-left: 1px;
+}
+
+/* ====== END LIST FILTER STYLING ====== */
+
+#list-title {
+  display: inline-block;
+  line-height: 1em;
+  margin: -2px 5px 0px 15px;
+}
+
+#page-info-button {
   cursor: pointer;
   opacity: 0.4;
-  font-size: 0.65em;
+  display: inline;
 }
 
 #list-creator {
-  margin: 0px 5px 10px 15px;
+  margin: 1.5px 5px 10px 15px;
   line-height: 1em;
 }
 

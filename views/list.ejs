@@ -11,125 +11,30 @@
     <!-- BASIC NAVBAR TEMPLATE -->
     <% include partials/templates/navbar_basic.ejs %>
 
-    <div id="background_image_container">
-    <!--CSS PUTS BACKGROUND HERE-->
-    </div>
+    <!-- LIST FILTERS -->
+    <% include partials/content/list_filters.ejs %>
+    <br/><br/>
 
     <!-- BEGIN LISTS -->
     <h3 id="list-title"></h3>
     <p id="list-creator" class="text-secondary"></p>
-    <!-- <div id="loader"></div> -->
+
     <div id="main-page-loader" class="new-loader text-center"><span class="text-secondary">Loading...</span></div>
     <p id="no-albums-message" class="text-secondary">There are currently no albums in this list. Click <span class="text-primary add-album-refrence" style="cursor:pointer;">Add Album</span> to find an album and add it to this list.</p>
     <div id="albums" class="row container-fluid">
       <!-- lists go here -->
     </div>
     <br/>
-    <button id="back-button" class="btn btn-sm btn-light" onclick="window.history.back()"><img id="back_arrow" src="/images/back_arrow.png"><span class="button_text">Back</span></button>
-    <button id="add-album-button" class="btn btn-sm btn-light" style="display:none;">Add Album</button>
-    <button id="edit-button" class="btn btn-sm btn-light" style="display:none;">Edit List</button>
     <!-- END LISTS -->   
-    
-   
 
-    <!-- ====== START EDIT LIST MODAL ====== -->
-    <div class="modal fade" id="editListModal" tabindex="-1" role="dialog" aria-labelledby="editListModalTitle" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-body" style="padding:0px;">
-            <div class="card text-center" style="border:none;margin:0px!important;">
-              <div class="card-header pt-3">
-                <ul class="nav nav-tabs card-header-tabs">
-                  <li class="nav-item">
-                    <a id="add-album-modal-nav-tab" class="nav-link active" href="" data-card="add-album">Add album</a>
-                  </li>
-                  <li class="nav-item">
-                    <a id="edit-list-modal-nav-tab" class="nav-link inactive-list-edit-tab" href="" data-card="edit-list-info">Edit list info</a>
-                  </li>
-                </ul>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="margin-top:-30px;">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
+    <!-- ====== EDIT LIST MODAL ====== -->
+    <% include partials/content/modal/edit_list_modal.ejs %>
 
-              <!-- edit list info card body -->
-              <div id="edit-list-info-card-body" class="card-body edit-list-card-body text-left ml-2 mr-2 mt-2" style="display:none;">
-                <label for="list-title-input" class="text-secondary mb-0 mt-3"><small>Edit the list title:</small></label>
-                <div class="input-group mb-3">
-                  <input id="list-title-input" type="search" class="form-control">
-                  <div class="input-group-append">
-                    <button id="update-list-title" class="btn btn-outline-primary" type="button">Update</button>
-                  </div>
-                </div>          
-                <label for="list-display-name-input" class="text-secondary mb-0"><small>Edit your display name:</small></label>
-                <div class="input-group mb-3">
-                  <input id="list-display-name-input" type="search" class="form-control">
-                  <div class="input-group-append">
-                    <button id="update-list-display-name" class="btn btn-outline-primary" type="button">Update</button>
-                  </div>
-                </div>
-              </div>
-              <!-- add album card body -->
-              <div id="add-album-card-body" class="card-body edit-list-card-body text-left mt-3 ml-2 mr-2">
-                <div class="input-group mb-3 mt-3">
-                  <input id="add-album-modal-input" type="search" class="form-control" placeholder="Search by album or artist...">
-                  <div class="input-group-append">
-                    <button id="add-album-modal-button" class="btn btn-primary" type="button">Search</button>
-                  </div>
-                </div>
-                <div class="new-loader text-center" style="display:none;"><span class="text-secondary">Loading...</span></div>
-                <div id="add-album-search-results" class="mt-3 mb-0"></div> 
-              </div>
-            </div> 
-          </div>
-          <small id="list-update-success" class="text-primary ml-3 mb-3">&nbsp;</small>
-        </div>
-      </div>
-    </div>
-    <!-- ====== END EDIT LIST MODAL ====== -->
+    <!-- ====== PAGE INFO MODAL ====== -->
+    <% include partials/content/modal/list_info_modal.ejs %>
 
-    <!-- ====== START PAGE INFO MODAL ====== -->
-    <div class="modal fade" id="pageInfoModal" tabindex="-1" role="dialog" aria-labelledby="pageInfoModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="pageInfoModalLabel">How to use this page</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div id="page-info-modal-body" class="modal-body text-secondary pt-2">
-
-            <small style="line-height:1em;"><strong>To add an album to this list:</strong></small><br/>
-            <ol class="mb-2 pl-4"><small>
-              <li>Click <span class="text-primary add-album-refrence" style="cursor:pointer;">Add Album</span></li>
-              <li>Search for the album you would like to add</li>
-              <li>Click on an album card to add the album to this list</li>
-            </small></ol>
-
-            <small style="line-height:1em;"><strong>To remove an album from this list:</strong></small><br/>
-            <ol class="mb-2 pl-4"><small>
-              <li>Exit this information modal</li>
-              <li>Click the 'X' in the upper-right corner of the album cover for the album you want to remove</li>
-              <li>Click <span class="font-italic">Ok</span> on the confirmation alert to finish removing the album</li>
-            </small></ol>
-
-            <small style="line-height:1em;"><strong>To edit the list title or display name for this list:</strong></small><br/>
-            <ol class="mb-1 pl-4"><small>
-              <li>Click <span class="text-primary edit-list-refrence" style="cursor:pointer;">Edit List</span></li>
-              <li>Change the text in the <span class="font-italic">List title</span> or <span class="font-italic">Display name</span> fields</li>
-              <li>Click the corresponding <span class="font-italic">Update</span> button to the right of the field you want to update</li>
-              <li>Exit the <span class="font-italic">Edit List</span> modal when you are finished</li>
-            </small></ol>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- ====== END PAGE INFO MODAL ====== -->  
-
-    <!-- ====== START SEARCH MODAL ====== -->
+    <!-- ====== SEARCH MODAL ====== -->
     <% include partials/content/search_modal.ejs %>
-    <!-- ====== END SEARCH MODAL ====== -->    
 
     <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
     <% include partials/templates/footer.ejs %>

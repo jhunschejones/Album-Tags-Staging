@@ -34,14 +34,26 @@ function bubbleSort(arr, prop) {
     }
   } while (swapped);
 }
+
+function scrollToTop() {
+  document.body.scrollTop = 0; // For Safari
+  document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+}
 // ------- END UTILITIES SECTION ----------
 
 let listData
-const listID = window.location.pathname.replace('/list/', '')
+// window.history.pushState({}, null, newUrl)
+// need to write it this way for page update on `back` to work
+// let newUrl = "/list?type=" + year
+// history.pushState({}, '', newUrl)
+const listType = (new URL(document.location)).searchParams.get("type");
+const listID = (new URL(document.location)).searchParams.get("id");
+
 let isFavoritesList = false
+listType === "favorites" ? isFavoritesList = true : isFavoritesList = false;
 
 function getList() {
-  if (listID.length < 25) {
+  if (!isFavoritesList) {
     $.ajax({
       method: "GET",
       url: "/api/v1/list/" + listID,
@@ -52,7 +64,6 @@ function getList() {
       }
     })
   } else {
-    isFavoritesList = true
     $.ajax({
       method: "GET",
       url: "/api/v1/list/favorites/" + listID,
@@ -101,14 +112,15 @@ function populateCard(album, cardNumber) {
 }
 
 function populateList() {
-  $('.page-info-button').hide();
+  $('#page-info-button').hide();
   $("#no-albums-message").hide();
   $('#albums').html('');
 
   let listCreator = listData.displayName
   if (!listCreator || listCreator.trim === "") { listCreator = "Unknown" }
   $('#list-title').text(`${listData.title}`)
-  $('#list-title').append('<small class="text-secondary pl-2 page-info-button" data-toggle="modal" style="display:none;" data-target="#pageInfoModal">&#9432;</small>')
+  $('#list-title').after('<h5 id="page-info-button" class="text-secondary" data-toggle="modal" data-target="#pageInfoModal">&#9432;</h5>')
+  if (listType != "userlist") { $('#page-info-button').hide(); }
   $('#list-creator').text("by: " + listCreator)
 
   if (listData.albums && listData.albums.length > 0) {
@@ -134,7 +146,7 @@ function populateList() {
   if (!isFavoritesList && userID) { 
     $('#edit-button').show(); 
     $('#add-album-button').show();
-    $('.page-info-button').show();
+    $('#page-info-button').show();
   }
 }
 
@@ -406,6 +418,23 @@ $(document).ready(function() {
   }
 });
 
+$('#to-top-button').click(function(event) {
+  event.preventDefault();
+  scrollToTop();
+})
+
+function displayButtons() {
+  if (userID && listType === "userlist") {
+    $('#edit-button').show();
+    $('#add-album-button').show();
+    // $('.album-delete-button').show();
+  } else {
+    $("#page-info-button").hide();
+    $('#edit-button').hide();
+    $('#add-album-button').hide();
+    $('.album-delete-button').hide();
+  }
+}
 // ----- START FIREBASE AUTH SECTION ------
 const config = {
   apiKey: "AIzaSyAoadL6l7wVMmMcjqqa09_ayEC8zwnTyrc",
@@ -426,9 +455,6 @@ firebase.auth().onAuthStateChanged(function(user) {
     $('#logout_button').show();
     $('#full_menu_logout_button').show();
 
-    // $('#edit-button').show();
-    // $('#add-album-button').show();
-    // $('.album-delete-button').show();
   } else {   
     // no user logged in
     userID = false;
@@ -442,9 +468,7 @@ firebase.auth().onAuthStateChanged(function(user) {
     $('#full_menu_logout_button').hide();
     $('#main-page-loader').hide();
 
-    $('#edit-button').hide();
-    $('#add-album-button').hide();
-    $('.album-delete-button').hide();
+    displayButtons();
   }
 });
 
@@ -465,9 +489,7 @@ function logIn() {
     $('#logout_button').show();
     $('#full_menu_logout_button').show();
 
-    $('#edit-button').show();
-    $('#add-album-button').show();
-    $('.album-delete-button').show();
+    displayButtons();
   }).catch(function(error) {
     // Handle Errors here.
   });
@@ -483,9 +505,7 @@ function logOut() {
     $('#logout_button').hide();
     $('#full_menu_logout_button').hide();
 
-    $('#edit-button').hide();
-    $('#add-album-button').hide();
-    $('.album-delete-button').hide();
+    displayButtons();
   }).catch(function(error) {
   // An error happened.
   });
