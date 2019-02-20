@@ -104,7 +104,7 @@ function populateCard(album, cardNumber) {
   $(`#card${cardNumber}`).append(`<span class="album-delete-button" data-album-id="${album.appleAlbumID}" data-toggle="tooltip" data-placement="right" title="Remove from list" data-trigger="hover">&#10005;</span></li>`)
 
   // checks each time through in case login is slow
-  if (userID && !isFavoritesList) {
+  if (listData.user === userID && !isFavoritesList) {
     $('.album-delete-button').show()
   } else {
     $('.album-delete-button').hide()
@@ -143,14 +143,17 @@ function populateList() {
     $("#no-albums-message").show()
   }
 
-  if (!isFavoritesList && userID) { 
+  if (!isFavoritesList && userID === listData.user) { 
     $('#edit-button').show(); 
     $('#add-album-button').show();
     $('#page-info-button').show();
+  } else {
+    displayButtons();
   }
 }
 
 function removeAlbum(albumID) {
+  if (listData.user != userID) { alert("Sorry, only the list creator can delete albums from a list."); return; }
   let thisAlbum = listData.albums.find(x => x.appleAlbumID === albumID)
   let confirmed = confirm(`Are you sure you want to remove "${thisAlbum.title}" from this list? You cannot undo this operation.`)
   
@@ -258,7 +261,7 @@ let addAlbumResults = [];
 function populateAddToListModalResults(data) {
   $('#add-album-search-results').html('');
   $('#add-album-card-body .new-loader').hide();
-  if (data.albums) {
+  if (data.albums && data.albums.length > 0) {
     for (let index = 0; index < data.albums.length; index++) {
       const album = data.albums[index];
       const cardNumber = index;
@@ -271,6 +274,8 @@ function populateAddToListModalResults(data) {
 
     // store search results
     addAlbumResults = data.albums;
+  } else {
+    $('#add-album-search-results').after('<div id="no-results-message" class="text-primary" style="text-align:center;">It looks like no albums matched your search terms. Try a different search!</div>');
   }
 }
 
@@ -353,6 +358,7 @@ $('#add-album-modal-button').click(function(event) {
   event.preventDefault();
   const search = $('#add-album-modal-input').val().trim().replace(/[^\w\s]/gi, '');
   $('#add-album-search-results').html('');
+  $('#no-results-message').remove();
   $('#add-album-card-body .new-loader').show();
   executeSearch(search, "add to list");
 })
@@ -424,7 +430,7 @@ $('#to-top-button').click(function(event) {
 })
 
 function displayButtons() {
-  if (userID && listType === "userlist") {
+  if (listData.user === userID && listType === "userlist") {
     $('#edit-button').show();
     $('#add-album-button').show();
     // $('.album-delete-button').show();
@@ -454,7 +460,6 @@ firebase.auth().onAuthStateChanged(function(user) {
     $('#full_menu_login_button').hide();
     $('#logout_button').show();
     $('#full_menu_logout_button').show();
-
   } else {   
     // no user logged in
     userID = false;
@@ -467,8 +472,6 @@ firebase.auth().onAuthStateChanged(function(user) {
     $('#logout_button').hide();
     $('#full_menu_logout_button').hide();
     $('#main-page-loader').hide();
-
-    displayButtons();
   }
 });
 
@@ -488,8 +491,6 @@ function logIn() {
     $('#full_menu_login_button').hide();
     $('#logout_button').show();
     $('#full_menu_logout_button').show();
-
-    displayButtons();
   }).catch(function(error) {
     // Handle Errors here.
   });
