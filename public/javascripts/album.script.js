@@ -554,7 +554,7 @@ let connectionSearchResults = [];
 function populateConnectionModalResults(data) {
   $('#connection-search-results').html('');
   $('#connection-loader').hide();
-  if (data.albums) {
+  if (data.albums && data.albums.length > 0) {
     for (let index = 0; index < data.albums.length; index++) {
       const album = data.albums[index];
       const cardNumber = index + 1;
@@ -567,6 +567,8 @@ function populateConnectionModalResults(data) {
     // this adds an empty space at the end so the user can scroll 
     // all the way to the right to see the last album
     $('#connection-search-results').append('<div id="connection-search-modal-placeholder">&nbsp;</div>');
+  } else {
+    $('#connection-search-results').after('<div id="no-results-message" class="text-primary mb-3" style="text-align:center;">It looks like no albums matched your search terms. Try a different search!</div>');
   }
 }
 
@@ -1010,6 +1012,7 @@ $("#add-tag-input").keyup(function(event) {
 $("#add-connection-button").click(function(event) {
   event.preventDefault();
   const search = $('#add-connection-input').val().trim();
+  $('#no-results-message').remove();
   $('#connection-search-results').html('');
   $('#connection-loader').show();
   executeSearch(search, "connection")

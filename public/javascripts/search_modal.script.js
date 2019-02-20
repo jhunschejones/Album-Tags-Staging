@@ -57,7 +57,7 @@ function populateSearchModalResults(data, pageNumber) {
     $('#search-modal-placeholder').remove();
   }
 
-  if (data.albums) {
+  if (data.albums && data.albums.length > 0) {
     for (let index = 0; index < data.albums.length; index++) {
       const album = data.albums[index];
       const cardNumber = index + offset;
@@ -73,6 +73,8 @@ function populateSearchModalResults(data, pageNumber) {
       pageNumber++;
       addNextPageButton(search, pageNumber);
     }
+  } else {
+    $('#search-modal-results').after('<div id="no-results-message" class="text-primary mb-3" style="text-align:center;">It looks like no albums matched your search terms. Try a different search!</div>');
   }
 }
 
@@ -115,6 +117,7 @@ function populateModalCard(album, cardNumber) {
 $('#search-modal-button').click(function(event) {
   event.preventDefault();
   const search = $('#search-modal-input').val().trim().replace(/[^\w\s]/gi, '');
+  $('#no-results-message').remove();
   $('#search-modal-results').html('');
   $('#searchModal .new-loader').show();
   executeSearch(search);

@@ -695,7 +695,7 @@ let addAlbumResults = [];
 function populateAddToFavoritesModalResults(data) {
   $('#favorites-search-results').html('');
   $('#addFavoritesAlbumModal .new-loader').hide();
-  if (data.albums) {
+  if (data.albums && data.albums.length > 0) {
     for (let index = 0; index < data.albums.length; index++) {
       const album = data.albums[index];
       const cardNumber = index;
@@ -706,6 +706,8 @@ function populateAddToFavoritesModalResults(data) {
     // all the way to the right to see the last album
     createFavoritesModalCard(data.albums.length + 1)
     addAlbumResults = data.albums;
+  } else {
+    $('#favorites-search-results').after('<div id="no-results-message" class="text-primary mb-3" style="text-align:center;">It looks like no albums matched your search terms. Try a different search!</div>');
   }
 }
 
@@ -750,6 +752,7 @@ function populateFavoritesModalCard(album, cardNumber) {
 $('#add-favorites-album-button').click(function(event) {
   event.preventDefault();
   const search = $('#add-favorites-album-input').val().trim().replace(/[^\w\s]/gi, '');
+  $('#no-results-message').remove();
   $('#favorites-search-results').html('');
   $('#addFavoritesAlbumModal .new-loader').show();
   executeSearch(search, "add to favorites");
