@@ -197,7 +197,7 @@ document.getElementById("get-shareable-link").addEventListener("click", function
       "displayName": displayName
     }),
     success: function (data) {
-      const myFavoritesURL = window.location.protocol + "//" + window.location.host + "/list/" + data
+      const myFavoritesURL = window.location.protocol + "//" + window.location.host + "/list?type=favorites&id=" + data
 
       const urlBox = document.getElementById("shareable-url")
       urlBox.value = myFavoritesURL

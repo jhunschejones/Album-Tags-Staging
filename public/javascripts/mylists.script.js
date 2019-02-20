@@ -44,7 +44,6 @@ function getAllLists() {
   $.ajax({
     method: "GET",
     url: "/api/v1/list/user/" + userID,
-    // url: "/api/v1/list/user/Ol5d5mjWi9eQ7HoANLhM4OFBnso2",
     success: function(data) {
       allLists = data
       $('#main-page-loader').hide()
@@ -92,7 +91,7 @@ function populateAllLists() {
 
       $(`#card-${index}`).click(function(event) {
         event.preventDefault();
-        window.location.href = `/list/${list._id}`;
+        window.location.href = `/list?type=userlist&id=${list._id}`;
       });
     }
   

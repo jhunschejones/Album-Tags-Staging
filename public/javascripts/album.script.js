@@ -285,9 +285,9 @@ function populateListsWithAlbum(userLoggedIn) {
       if (listCreator.trim === "") { listCreator = "Unknown"; }
 
       if (list.user === userID) {
-        $('#all-lists').append(`<li class="list my-list" data-creator="${list.user}"><a href="/list/${list._id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span><span class="remove-from-list-button" data-list-id="${list._id}">&#10005;</span></li>`);
+        $('#all-lists').append(`<li class="list my-list" data-creator="${list.user}"><a href="/list?type=userlist&id=${list._id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span><span class="remove-from-list-button" data-list-id="${list._id}">&#10005;</span></li>`);
       } else {
-        $('#all-lists').append(`<li class="list other-list" data-creator="${list.user}"><a href="/list/${list._id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span></li>`);
+        $('#all-lists').append(`<li class="list other-list" data-creator="${list.user}"><a href="/list?type=userlist&id=${list._id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span></li>`);
       }
     }
   });

@@ -100,7 +100,7 @@ router.get('/mylists', function(req, res) {
 })
 
 // GET specific lists page
-router.get('/list/:id', function(req, res) {
+router.get('/list', function(req, res) {
   res.render('list', {
     pageTitle: ': My Lists',
     subTitle: 'Create & Manage Album Lists'

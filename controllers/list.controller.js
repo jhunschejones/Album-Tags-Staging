@@ -203,7 +203,6 @@ exports.get_user_virtual_favorites_list = function (req, res, next) {
   const message = {
     user: req.params.id,
     displayName: req.body.displayName || ""
-    // notes: req.body.notes || ""
   }
   const urlToken = cryptr.encrypt(JSON.stringify(message))
   res.send(urlToken)
@@ -224,7 +223,6 @@ exports.get_user_favorites = function (req, res, next) {
         let resultList = {
           title: "My Favorites",
           displayName: message.displayName || "",
-          notes: message.notes || "",
           albums: albumResult
         }
         res.send(resultList)
