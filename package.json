@@ -22,7 +22,7 @@
     "helmet": "^3.14.0",
     "mocha": "^5.2.0",
     "mongoose": "^5.3.8",
-    "newrelic": "^4.13.0",
+    "newrelic": "^5.5.0",
     "path": "^0.12.7",
     "request": "^2.88.0",
     "should": "^13.2.3",
