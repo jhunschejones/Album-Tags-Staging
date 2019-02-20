@@ -15,6 +15,12 @@
     <!--CSS PUTS BACKGROUND HERE-->
     </div>
 
+    <!--PAGE CONTROL BUTTONS-->
+    <div id="page-control-buttons" class="sticky-top">
+      <button id="back-button" class="btn btn-sm btn-light" onclick="window.history.back()"><img id="back_arrow" src="/images/back_arrow.png"><span class="button_text">Back</span></button>    
+      <button id="launch-new-list-modal-button" class="btn btn-sm btn-light" data-toggle="modal" data-target="#updateListModal" style="display:none;">New List</button>
+    </div>
+  
     <!-- BEGIN LISTS -->
     <div class="container-fluid">
       <!-- <h3 id="page-title">My Album Lists:</h3> -->
@@ -30,11 +36,7 @@
       <br/><br/><br/><br/>
       <h4 class="text-secondary">Please <span class="login_button text-primary" style="cursor:pointer;">log in</span> to access your custom album lists!</h4>
       <br/><br/><br/><br/><br/>
-    </div>
-
-    </br>
-    <button id="back-button" class="btn btn-sm btn-light" onclick="window.history.back()"><img id="back_arrow" src="/images/back_arrow.png"><span class="button_text">Back</span></button>    
-    <button id="launch-new-list-modal-button" class="btn btn-sm btn-light" data-toggle="modal" data-target="#updateListModal" style="display:none;">New List</button>   
+    </div> 
 
     <!-- ====== start update list modal ====== -->
     <div class="modal fade" id="updateListModal" tabindex="-1" role="dialog" aria-labelledby="updateListModalLabel" aria-hidden="true">
