@@ -1,0 +1,53 @@
+<div class="modal fade" id="editListModal" tabindex="-1" role="dialog" aria-labelledby="editListModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-body" style="padding:0px;">
+        <div class="card text-center" style="border:none;margin:0px!important;">
+          <div class="card-header pt-3">
+            <ul class="nav nav-tabs card-header-tabs">
+              <li class="nav-item">
+                <a id="add-album-modal-nav-tab" class="nav-link active" href="" data-card="add-album">Add album</a>
+              </li>
+              <li class="nav-item">
+                <a id="edit-list-modal-nav-tab" class="nav-link inactive-list-edit-tab" href="" data-card="edit-list-info">Edit list info</a>
+              </li>
+            </ul>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="margin-top:-30px;">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <!-- edit list info card body -->
+          <div id="edit-list-info-card-body" class="card-body edit-list-card-body text-left ml-2 mr-2 mt-2" style="display:none;">
+            <label for="list-title-input" class="text-secondary mb-0 mt-3"><small>Edit the list title:</small></label>
+            <div class="input-group mb-3">
+              <input id="list-title-input" type="search" class="form-control">
+              <div class="input-group-append">
+                <button id="update-list-title" class="btn btn-outline-primary" type="button">Update</button>
+              </div>
+            </div>          
+            <label for="list-display-name-input" class="text-secondary mb-0"><small>Edit your display name:</small></label>
+            <div class="input-group mb-3">
+              <input id="list-display-name-input" type="search" class="form-control">
+              <div class="input-group-append">
+                <button id="update-list-display-name" class="btn btn-outline-primary" type="button">Update</button>
+              </div>
+            </div>
+          </div>
+          <!-- add album card body -->
+          <div id="add-album-card-body" class="card-body edit-list-card-body text-left mt-3 ml-2 mr-2">
+            <div class="input-group mb-3 mt-3">
+              <input id="add-album-modal-input" type="search" class="form-control" placeholder="Search by album or artist...">
+              <div class="input-group-append">
+                <button id="add-album-modal-button" class="btn btn-primary" type="button">Search</button>
+              </div>
+            </div>
+            <div class="new-loader text-center" style="display:none;"><span class="text-secondary">Loading...</span></div>
+            <div id="add-album-search-results" class="mt-3 mb-0"></div> 
+          </div>
+        </div> 
+      </div>
+      <small id="list-update-success" class="text-primary ml-3 mb-3">&nbsp;</small>
+    </div>
+  </div>
+</div>
