@@ -687,6 +687,7 @@ function displayMyConnections() {
 }
 
 function populateTags() {
+  clearTagArray();
   if (albumResult.tagObjects) {
     $('#current-tags').html('');
     for (let index = 0; index < albumResult.tagObjects.length; index++) {
