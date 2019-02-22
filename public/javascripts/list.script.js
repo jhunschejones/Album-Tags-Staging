@@ -6,7 +6,7 @@
 // ======
 function truncate(str, len){
   // set up the substring
-  var subString = str.substr(0, len-1);
+  const subString = str.substr(0, len-1);
   
   return (
     // add elipse after last complete word
@@ -16,17 +16,15 @@ function truncate(str, len){
   );
 }
 
-function removeDash(str) {
-  return str.replace(/-/g, '');
-}
+function removeDash(str) { return str.replace(/-/g, ''); }
 
 function bubbleSort(arr, prop) {
-  var swapped;
+  let swapped;
   do {
     swapped = false;
-    for (var i = 0; i < arr.length - 1; i++) {
+    for (let i = 0; i < arr.length - 1; i++) {
       if (parseInt(removeDash(arr[i][prop])) > parseInt(removeDash(arr[i + 1][prop]))) {
-        var temp = arr[i];
+        const temp = arr[i];
         arr[i] = arr[i + 1];
         arr[i + 1] = temp;
         swapped = true;
@@ -39,21 +37,37 @@ function scrollToTop() {
   document.body.scrollTop = 0; // For Safari
   document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
 }
+
+function textToClassName(str) { return str.replace(/[^\w\s]/gi, '').replace(/\s\s+/g, ' ').replace(/ /g, '_').toLowerCase(); }
+
+function isGenre(str) {
+  const myGenres = ['Metalcore', 'Pop Punk', 'Emo', 'Rock', 'Post-Hardcore', 'Accoustic', 'Screamo', 'Metal', 'Nu Metal', 'Alt Metal', 'Djent', 'Accoustic', 'Jazz', 'Ska', 'Rap-Rock', 'Progressive', 'Punk', 'Rap'];
+  return myGenres.indexOf(str) !== -1;
+}
+
+function removeFromArray(arr, ele){
+  if (arr.indexOf(ele) !== -1) {
+    arr.splice(arr.indexOf(ele), 1);
+  }
+}
+
+function addToArray(arr, ele){
+  if (arr.indexOf(ele) === -1) {
+    arr.push(ele);
+  }
+}
 // ------- END UTILITIES SECTION ----------
 
 let listData;
-// window.history.pushState({}, null, newUrl)
-// need to write it this way for page update on `back` to work
-// let newUrl = "/list?type=" + year
-// history.pushState({}, '', newUrl)
 const listType = (new URL(document.location)).searchParams.get("type");
 const listID = (new URL(document.location)).searchParams.get("id");
 
 function getList() {
-  if (listType !== "favorites") {
+  if (listType === "favorites") {
+    // GET FAVORITES LIST
     $.ajax({
       method: "GET",
-      url: "/api/v1/list/" + listID,
+      url: "/api/v1/list/favorites/" + listID,
       success: function(data) {
         listData = data;
         $('#main-page-loader').hide();
@@ -61,9 +75,10 @@ function getList() {
       }
     });
   } else {
+    // GET CUSTOM USER LIST
     $.ajax({
       method: "GET",
-      url: "/api/v1/list/favorites/" + listID,
+      url: "/api/v1/list/" + listID,
       success: function(data) {
         listData = data;
         $('#main-page-loader').hide();
@@ -74,33 +89,27 @@ function getList() {
 }
 
 function createCard(cardNumber) {
-  $('#albums').append(`<div id="card${cardNumber}" class="card albumCard"><a class="album_details_link" href=""><img class="card-img-top" src="" alt=""><a/><div class="card-body"><h4 class="card-title"></h4><span class="album"><span class="text-primary">Loading Album Details...</span></span></div></div>`);
+  $('#albums').append(`<div id="card${cardNumber}" class="card list-card"><a class="album-details-link" href=""><img class="card-img-top" src=""><a/><div class="card-body"><h4 class="card-title"></h4><span class="album-title"></span></div></div>`);
 }
 
 function populateCard(album, cardNumber) {
-  // set up album and artist trunction
-  let smallArtist = album.artist;
-  let largeArtist = album.artist;
-  let smallAlbum = album.title;
-  let largeAlbum = album.title;
-  if (smallArtist.length > 32) { smallArtist = truncate(smallArtist, 32); } 
-  if (smallAlbum.length > 44) { smallAlbum = truncate(smallAlbum, 44); } 
-
-  if (largeArtist.length > 49) { largeArtist = truncate(largeArtist, 49); } 
-  if (largeAlbum.length > 66) { largeAlbum = truncate(largeAlbum, 66); }
+  let smallArtist = album.artist.length > 32 ? truncate(album.artist, 32) : album.artist;
+  let largeArtist = album.artist.length > 49 ? truncate(album.artist, 49) : album.artist;
+  let smallAlbum = album.title.length > 44 ? truncate(album.title, 44) : album.title;
+  let largeAlbum = album.title.length > 66 ? truncate(album.title, 66): album.title;
   
   // artist name
   $(`#card${cardNumber} .card-body h4`).html(`<span class="large_artist">${largeArtist}</span><span class="small_artist">${smallArtist}</span>`);
   // album name
-  $(`#card${cardNumber} .card-body .album`).html(`<span class="large_album">${largeAlbum}</span><span class="small_album">${smallAlbum}</span>`); 
+  $(`#card${cardNumber} .card-body .album-title`).html(`<span class="large_album">${largeAlbum}</span><span class="small_album">${smallAlbum}</span>`); 
   // album cover
-  $(`#card${cardNumber} img`).attr('src', album.cover.replace('{w}', 260).replace('{h}', 260));
+  $(`#card${cardNumber} .card-img-top`).attr('src', album.cover.replace('{w}', 260).replace('{h}', 260));
   // add album-details-link to album cover
-  $(`#card${cardNumber} .album_details_link`).attr('href', `/album/${album.appleAlbumID}`);
-  
+  $(`#card${cardNumber} .album-details-link`).attr('href', `/album/${album.appleAlbumID}`);
+  // remove album from list button
   $(`#card${cardNumber}`).append(`<span class="album-delete-button" data-album-id="${album.appleAlbumID}" data-toggle="tooltip" data-placement="right" title="Remove from list" data-trigger="hover">&#10005;</span></li>`);
 
-  // checks each time through in case login is slow
+  // sets remove album button visibility
   if (listData.user === userID && listType !== "favorites") {
     $('.album-delete-button').show();
   } else {
@@ -117,40 +126,46 @@ function populateList() {
   if (!listCreator || listCreator.trim === "") { listCreator = "Unknown"; }
   $('#list-title').text(`${listData.title}`);
   $('#list-title').after('<h5 id="page-info-button" class="text-secondary" data-toggle="modal" data-target="#pageInfoModal">&#9432;</h5>');
-  if (listType != "userlist") { $('#page-info-button').hide(); }
+  if (listType !== "userlist") { $('#page-info-button').hide(); }
   $('#list-creator').text("by: " + listCreator);
 
   if (listData.albums && listData.albums.length > 0) {
-    let albumArray = listData.albums;
-    bubbleSort(albumArray, "releaseDate");
-    // reverse shows newer albums first (mostly)
-    albumArray = albumArray.reverse();
+    const albumArray = filterAlbums();
+
+    if (albumArray.length > 0) {
+      $('#no-albums-message').hide();
+    } else {
+      $('#no-albums-message').show();
+    }
+
     let card = 0;
     albumArray.forEach(albumObject => {
       card = card + 1;
       createCard(card);
-      populateCard(albumObject.album || albumObject, card);
+      populateCard(albumObject, card);
     });
   
     // ====== add event listener to delete buttons =====
     $(".album-delete-button").on("click", function() { 
-      removeAlbum($(this).attr("data-album-id")); 
+      if (listData.user !== userID) {
+        alert("Sorry! Only the list creator can delete albums.");
+        return;
+      } else if (listType === "userlist") {
+        removeAlbum($(this).attr("data-album-id")); 
+      } else {
+        alert("Sorry! This type of list won't let you delete albums.");
+        return;
+      }
     });
   } else {
     $("#no-albums-message").show();
   }
-
-  if (listType !== "favorites" && userID === listData.user) { 
-    $('#edit-button').show(); 
-    $('#add-album-button').show();
-    $('#page-info-button').show();
-  } else {
-    displayButtons();
-  }
+  // show user control buttons for this list type
+  displayButtons();
 }
 
 function removeAlbum(albumID) {
-  if (listData.user != userID) { alert("Sorry, only the list creator can delete albums from a list."); return; }
+  if (listData.user !== userID) { alert("Sorry, only the list creator can delete albums from a list."); return; }
   let thisAlbum = listData.albums.find(x => x.appleAlbumID === albumID);
   let confirmed = confirm(`Are you sure you want to remove "${thisAlbum.title}" from this list? You cannot undo this operation.`);
   
@@ -262,35 +277,29 @@ function populateAddToListModalResults(data) {
     for (let index = 0; index < data.albums.length; index++) {
       const album = data.albums[index];
       const cardNumber = index;
-      createAddAlbumModalCard(album, cardNumber);
+      createAddAlbumModalCard(cardNumber);
       populateAddAlbumModalCard(album, cardNumber);
     }
     // this adds an empty space at the end so the user can scroll 
     // all the way to the right to see the last album
-    createAddAlbumModalCard(data.albums.length + 1);
+    $('#add-album-search-results').append('<div id="add-search-modal-placeholder">&nbsp;</div>');
 
-    // store search results
+    // store search results globally
     addAlbumResults = data.albums;
   } else {
     $('#add-album-search-results').after('<div id="no-results-message" class="text-primary" style="text-align:center;">It looks like no albums matched your search terms. Try a different search!</div>');
   }
 }
 
-function createAddAlbumModalCard(album, cardNumber) {
+function createAddAlbumModalCard(cardNumber) {
   $('#add-album-search-results').append(`<div id="addAlbumModalCard${cardNumber}" class="search-modal-card" data-result-index="${cardNumber}"><img class="search-modal-card-image" src="" alt=""><div class="search-modal-card-body"><h4 class="search-modal-card-title"></h4><span class="search-modal-card-album"></span></div></div>`);
 }
 
 function populateAddAlbumModalCard(album, cardNumber) {
-  // set up album and artist trunction
-  let smallArtist = album.artist;
-  let largeArtist = album.artist;
-  let smallAlbum = album.title;
-  let largeAlbum = album.title;
-  if (smallArtist.length > 32) { smallArtist = truncate(smallArtist, 32); } 
-  if (smallAlbum.length > 44) { smallAlbum = truncate(smallAlbum, 44); } 
-
-  if (largeArtist.length > 49) { largeArtist = truncate(largeArtist, 49); } 
-  if (largeAlbum.length > 66) { largeAlbum = truncate(largeAlbum, 66); }
+  let smallArtist = album.artist.length > 32 ? truncate(album.artist, 32) : album.artist;
+  let largeArtist = album.artist.length > 49 ? truncate(album.artist, 49) : album.artist;
+  let smallAlbum = album.title.length > 44 ? truncate(album.title, 44) : album.title;
+  let largeAlbum = album.title.length > 66 ? truncate(album.title, 66): album.title;
   
   // artist name
   $(`#addAlbumModalCard${cardNumber} .search-modal-card-title`).html(`<span class="search-modal-card-large-artist">${largeArtist}</span><span class="search-modal-card-small-artist">${smallArtist}</span>`);
@@ -351,6 +360,68 @@ function toggleActiveInfoTab(element) {
   $(`#${selectedCard}-card-body`).show();
 }
 
+
+// ====== START FILTER FUNCTIONALITY ======
+// need to write url update for page to work on `back` navigation
+// let newUrl = "/list?type=" + year
+// history.pushState({}, '', newUrl)
+
+function getCleanAlbumArray(arr) {
+  let cleanArray = [];
+  arr.forEach(ele => {
+    if (ele.album) {
+      cleanArray.push(ele.album);
+    } else {
+      cleanArray.push(ele);
+    }
+  });
+
+  cleanArray.forEach(album => {
+    if (album.tagObjects) {
+      album.tagObjects.forEach(tagObject => {
+        // check if the tag is created by the same person who created the list
+        if (tagObject.creator === listData.user && isGenre(tagObject.tag) && album.genres.indexOf(tagObject.tag) === -1) {
+          album.genres.push(tagObject.tag);
+        }
+      });
+    }
+    album.year = album.releaseDate.slice(0,4);
+    if (album.genres) { album.genres = album.genres.join('||').toLowerCase().split('||'); }
+  });
+  return cleanArray;
+}
+
+function getFilterObject() {
+  return {
+    "year": (new URL(document.location)).searchParams.get("year"),
+    "artist": (new URL(document.location)).searchParams.get("artist"),
+    "genre": (new URL(document.location)).searchParams.get("genre")
+  };
+}
+
+function filterAlbums() {
+  const filterObject = getFilterObject();
+  let albumArray = getCleanAlbumArray(listData.albums);
+  
+  if (!!filterObject.genre) { // `!!` forces a boolean value
+    albumArray = albumArray.filter(album => {
+      return !album.genres ? false : album.genres.indexOf(filterObject.genre) !== -1;
+    });
+  }
+  if (!!filterObject.artist) {
+    albumArray = albumArray.filter(album => !!album.artist && album.artist.toLowerCase() === filterObject.artist);
+  }
+  if (!!filterObject.year) {
+    albumArray = albumArray.filter(album => !!album.year && album.year === filterObject.year);
+  }
+  bubbleSort(albumArray, "releaseDate");
+  albumArray = albumArray.reverse(); // reverse shows newer albums first (generally)
+  return albumArray;
+}
+// ====== END FILTER FUNCTIONALITY ======
+
+
+// ====== START EVENT LISTENERS ======
 $('#add-album-modal-button').click(function(event) {
   event.preventDefault();
   const search = $('#add-album-modal-input').val().trim().replace(/[^\w\s]/gi, '');
@@ -359,16 +430,18 @@ $('#add-album-modal-button').click(function(event) {
   $('#add-album-card-body .new-loader').show();
   executeSearch(search, "add to list");
 });
-
 // execute search when enter key is pressed
 $("#add-album-modal-input").keyup(function(event) {
   if (event.keyCode === 13) {
     $("#add-album-modal-button").click();
   }
 });
-
 $('#edit-button').click(function(event) {
   event.preventDefault();
+  if (listData.user !== userID) {
+    alert("Sorry! Only the list creator can edit the information for this list.");
+    return;
+  }
   toggleActiveInfoTab($('#edit-list-modal-nav-tab'));
   $('#editListModal').modal('show');
   $('#list-title-input').val(listData.title);
@@ -376,6 +449,10 @@ $('#edit-button').click(function(event) {
 });
 $('#add-album-button').click(function(event) {
   event.preventDefault();
+  if (listData.user !== userID) {
+    alert("Sorry! Only the list creator can add albums to this list.");
+    return;
+  }
   toggleActiveInfoTab($('#add-album-modal-nav-tab'));
   $('#editListModal').modal('show');
   $('#list-title-input').val(listData.title);
@@ -401,43 +478,19 @@ $("#list-display-name-input").keyup(function(event) {
     $("#update-list-display-name").click();
   }
 });
-
 document.getElementById("update-list-display-name").addEventListener("click", editDisplayName);
 document.getElementById("update-list-title").addEventListener("click", editListTitle);
-
 $('#editListModal .nav-link').click(function(event) {
   event.preventDefault();
   toggleActiveInfoTab($(this));
 });
-
-// make hover scrollbar always visible on touchscreens
-$(document).ready(function() {
-  let isTouchDevice = false;
-  if ("ontouchstart" in document.documentElement) { isTouchDevice = true; }
-  if (isTouchDevice) {
-    const searchResultsBox = document.getElementById("add-album-search-results");
-    searchResultsBox.style.paddingBottom="0px";
-    searchResultsBox.style.overflowX="scroll";
-  }
-});
-
 $('#to-top-button').click(function(event) {
   event.preventDefault();
   scrollToTop();
 });
+// ====== END EVENT LISTENERS ======
 
-function displayButtons() {
-  if (listData.user === userID && listType === "userlist") {
-    $('#edit-button').show();
-    $('#add-album-button').show();
-    // $('.album-delete-button').show();
-  } else {
-    $("#page-info-button").hide();
-    $('#edit-button').hide();
-    $('#add-album-button').hide();
-    $('.album-delete-button').hide();
-  }
-}
+
 // ----- START FIREBASE AUTH SECTION ------
 const config = {
   apiKey: "AIzaSyAoadL6l7wVMmMcjqqa09_ayEC8zwnTyrc",
@@ -460,7 +513,6 @@ firebase.auth().onAuthStateChanged(function(user) {
   } else {   
     // no user logged in
     userID = false;
-
     getList();
 
     $('#full_menu_login_logout_container').show();
@@ -476,12 +528,12 @@ function logIn() {
   firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
   // local persistance remains if browser is closed
   .then(function() {
-    var provider = new firebase.auth.GoogleAuthProvider();
+    const provider = new firebase.auth.GoogleAuthProvider();
     return firebase.auth().signInWithPopup(provider);
   })
   .then(function(result) {
     userID = user.uid;
-    getList();
+    populateList();
 
     $('#full_menu_login_logout_container').show();
     $('#login_button').hide();
@@ -496,6 +548,7 @@ function logIn() {
 function logOut() {
   firebase.auth().signOut().then(function() {
     userID = false;
+
     // log out functionality
     $('#full_menu_login_logout_container').show();
     $('#login_button').show();
@@ -509,6 +562,19 @@ function logOut() {
   });
 }
 
+function displayButtons() {
+  if (listData.user === userID && listType === "userlist") {
+    $('#edit-button').show(); 
+    $('#add-album-button').show();
+    $('#page-info-button').show();
+  } else {
+    $("#page-info-button").hide();
+    $('#edit-button').hide();
+    $('#add-album-button').hide();
+    $('.album-delete-button').hide();
+  }
+}
+
 // add event listener to log in and out buttons
 const loginButton = document.getElementById("login_button");
 const loginButton2 = document.getElementById("full_menu_login_button");
@@ -520,3 +586,15 @@ logoutButton.addEventListener("click", logOut);
 logoutButton2.addEventListener("click", logOut);
 $('.login_button').on('click', logIn);
 // ----- END FIREBASE AUTH SECTION ------
+
+
+// make hover scrollbar always visible on touchscreens
+$(document).ready(function() {
+  let isTouchDevice = false;
+  if ("ontouchstart" in document.documentElement) { isTouchDevice = true; }
+  if (isTouchDevice) {
+    const searchResultsBox = document.getElementById("add-album-search-results");
+    searchResultsBox.style.paddingBottom="0px";
+    searchResultsBox.style.overflowX="scroll";
+  }
+});

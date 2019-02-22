@@ -223,6 +223,7 @@ exports.get_user_favorites = function (req, res, next) {
         let resultList = {
           title: "My Favorites",
           displayName: message.displayName || "",
+          user: message.user,
           albums: albumResult
         }
         res.send(resultList)
