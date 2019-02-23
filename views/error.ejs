@@ -1,22 +1,26 @@
 <!doctype html>
 <html lang="en">
     <head>
-        <% var pageTitle = "Error Page" %> 
+        <% const pageTitle = ": Error" %> 
         <% include partials/templates/head_tags.ejs %>
-		<link rel="stylesheet" href="/stylesheets/home.min.css">
+        <link rel="stylesheet" href="/stylesheets/home.min.css">
+        <link rel="stylesheet" href="/stylesheets/search_modal_cards.min.css">
     </head>
     <body>
         <!-- BASIC NAVBAR TEMPLATE -->
-        <% var subTitle = "Error Page" %>
+        <% const subTitle = "Error Page" %>
         <% include partials/templates/navbar_basic.ejs %>
-
         <!-- END NAVBAR -->
 
-        <div class="container" style="margin-top:50px;margin-bottom:50px;">
-            <h1>There appears to have been an error!</h1>
+        <div class="container" style="margin-top:100px;margin-bottom:100px;">
+            <h1>Woops! Looks like you found an error.</h1>
             <p><span class="text-secondary">Here's what we know:</span><span class="text-danger"> <%= error %></span></p>
             <button class="btn btn-sm btn-light" onclick="window.history.back()"><img id="back_arrow" src="/images/back_arrow.png" style="height:20px;"><span class="button_text" style="margin-left:10px;">Take Me Back Please!</span></button>
         </div>
+
+        <!-- ====== START SEARCH MODAL ====== -->
+		<% include partials/content/search_modal.ejs %>
+		<!-- ====== END SEARCH MODAL ====== -->   
 
         <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
         <% include partials/templates/footer.ejs %>

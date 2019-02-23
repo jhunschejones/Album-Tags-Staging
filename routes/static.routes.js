@@ -13,7 +13,7 @@ router.get('/', function(req, res, next) {
 // GET about page
 router.get('/about', function(req, res, next) {
   res.render('about', { 
-    pageTitle: "",
+    pageTitle: ": About",
     subTitle: "What is Album Tags?",
     thisYear: `${(new Date()).getFullYear()}`
   })
@@ -102,8 +102,8 @@ router.get('/mylists', function(req, res) {
 // GET specific lists page
 router.get('/list', function(req, res) {
   res.render('list', {
-    pageTitle: ': My Lists',
-    subTitle: 'Create & Manage Album Lists'
+    pageTitle: ': List',
+    subTitle: 'View & Edit Album Lists'
   })
 })
 

@@ -52,6 +52,12 @@ app.use('/api/v1/list', listRoutes)
 app.use('/api/v1/apple', appleAPIRoutes)
 app.use('/', staticRoutes)
 
+// ====== Error Handler ======
+app.use(function(err, res) {
+	res.status(err.status || 500);
+	res.render('error', { error: err.message || "Page not found." });
+});
+
 // This functionality is in `lib/www.js` now
 // const PORT = process.env.PORT || 3000
 // app.listen(PORT, () => {
