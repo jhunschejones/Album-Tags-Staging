@@ -50,13 +50,14 @@ exports.return_all_albums = function (req, res) {
   })
 }
 
-exports.get_album_details = function (req, res, next) {
-  Album.findById(req.params.id, function (err, album) {
-    if (err) return next(err)
-    if (album) res.status(200).send(album)
-    else res.send({ "message" : `Album ID '${req.params.id}' does not exist in the database. NOTE: the required ID value is for the database '_id' field, not the Apple 'albumID' field.` })
-  })
-}
+// ====== Deprecated 02.20.19 ======
+// exports.get_album_details = function (req, res, next) {
+//   Album.findById(req.params.id, function (err, album) {
+//     if (err) return next(err)
+//     if (album) res.status(200).send(album)
+//     else res.send({ "message" : `Album ID '${req.params.id}' does not exist in the database. NOTE: the required ID value is for the database '_id' field, not the Apple 'albumID' field.` })
+//   })
+// }
 
 exports.add_new_album = function (req, res) {
   const titleKeyWords = _this.utility_getKeyWords(req.body.title) || []
@@ -92,13 +93,14 @@ exports.add_new_album = function (req, res) {
   })
 } 
 
-exports.update_entire_album = function (req, res, next) {
-  Album.findByIdAndUpdate(req.params.id, {$set: req.body}, function (err, album) {
-    if (err) return next(err)
-    res.send('Album updated successfully!')
-    return
-  })
-}
+// ====== Deprecated 02.20.19 ======
+// exports.update_entire_album = function (req, res, next) {
+//   Album.findByIdAndUpdate(req.params.id, {$set: req.body}, function (err, album) {
+//     if (err) return next(err)
+//     res.send('Album updated successfully!')
+//     return
+//   })
+// }
 
 exports.delete_album = function (req, res) {
   Album.findByIdAndRemove(req.params.id, function (err, deletedAlbum) {
@@ -116,7 +118,7 @@ exports.find_by_apple_album_id = function (req, res, next) {
   Album.findOne({ "appleAlbumID": searchParams }, function (err, album) {
     if (err) { return next(err) }
     if (!album || album.length === 0) { 
-      res.send({ "message" : `No matching album in the database.` }) 
+      res.send({ "message" : `No matching album in the database. Note: ':id' must be an appleAlbumID.` }) 
       return
     }
     res.send(album)
