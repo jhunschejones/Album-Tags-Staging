@@ -2,8 +2,6 @@
 <html lang="en">
   <head>
     <% include partials/templates/head_tags.ejs %>
-    <link rel="stylesheet" href="/stylesheets/cards.min.css">
-    <link rel="stylesheet" href="/stylesheets/spinner.min.css">
     <link rel="stylesheet" href="/stylesheets/list.min.css">
     <link rel="stylesheet" href="/stylesheets/search_modal_cards.min.css">
   </head>
@@ -15,26 +13,32 @@
     <% include partials/content/list_filters.ejs %>
     <br/><br/>
 
-    <!-- BEGIN LISTS -->
-    <h3 id="list-title"></h3>
-    <p id="list-creator" class="text-secondary"></p>
+    <!-- START PAGE CONTENT -->
+    <div class="container-fluid" style="padding:0px 4px 0px 5px;">
 
-    <div id="main-page-loader" class="new-loader text-center"><span class="text-secondary">Loading...</span></div>
-    <p id="no-albums-message" class="text-secondary">There are currently no albums in this list. Click <span class="text-primary add-album-refrence" style="cursor:pointer;">Add Album</span> to find an album and add it to this list.</p>
-    <div id="albums" class="row container-fluid">
-      <!-- lists go here -->
+      <!-- BEGIN LISTS -->
+      <div id="list-top-line"><h3 id="list-title"></h3></div>
+      <p id="list-creator" class="text-secondary"></p>
+
+      <div id="main-page-loader" class="new-loader text-center"><span class="text-secondary">Loading...</span></div>
+      <p id="no-albums-message" class="text-secondary">There are currently no albums in this list. Click <span class="text-primary add-album-refrence" style="cursor:pointer;">Add Album</span> to find an album and add it to this list.</p>
+      <div id="albums" class="row no-gutters">
+        <!-- lists go here -->
+      </div>
+      <br/>
+      <!-- END LISTS -->   
+
+      <!-- ====== EDIT LIST MODAL ====== -->
+      <% include partials/content/modal/edit_list_modal.ejs %>
+
+      <!-- ====== PAGE INFO MODAL ====== -->
+      <% include partials/content/modal/list_info_modal.ejs %>
+
+      <!-- ====== SEARCH MODAL ====== -->
+      <% include partials/content/search_modal.ejs %>
+
     </div>
-    <br/>
-    <!-- END LISTS -->   
-
-    <!-- ====== EDIT LIST MODAL ====== -->
-    <% include partials/content/modal/edit_list_modal.ejs %>
-
-    <!-- ====== PAGE INFO MODAL ====== -->
-    <% include partials/content/modal/list_info_modal.ejs %>
-
-    <!-- ====== SEARCH MODAL ====== -->
-    <% include partials/content/search_modal.ejs %>
+    <!-- END PAGE CONTENT -->
 
     <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
     <% include partials/templates/footer.ejs %>

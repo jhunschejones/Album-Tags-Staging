@@ -1,8 +1,4 @@
-.jumbotron {
-  margin-bottom: 0px;
-}
-
-.dropdown {
+#all-favorites-filters .dropdown {
   margin: 2px 0px 0px 0px;
 }
 
@@ -24,7 +20,7 @@
   max-height: 55vh;
 }
 
-.badge {
+#all-favorites-filters .badge {
   font-size: .8em;
   padding: 5px;
 }
@@ -115,8 +111,8 @@
 
 .remove-favorite-button {
   cursor: pointer;
-  margin-left: 233px;
-  margin-top: -4px;
+  margin-left: 241px;
+  margin-top: -8px;
   background-color: rgba(245, 245, 245, 0.7);
   display: block;
   border-radius: 12px;
@@ -129,15 +125,85 @@
   color: darkslategrey;
 }
   .remove-favorite-button:hover {
-      background-color: rgba(245, 245, 245, 0.9);
+      background-color: rgb(245, 245, 245);
       box-shadow: 2px 2px 5px lightgray;
   }
 
 @media screen and (max-width: 800px) {
   .remove-favorite-button {
-      margin-left: 150px;
+      margin-left: 157px;
   }
 }
+
+/* ====== START CARD STYLES ====== */
+#all_cards .card {
+  width: 16rem;
+  word-wrap: break-word;
+  margin: 2px 8px 5px 7px;
+  border: none;
+}
+
+#all_cards .card img {
+  border-radius: .25rem;
+  width: 16rem;
+  height: 16rem;
+  box-shadow: 2px 2px 5px grey;
+}
+
+#all_cards .card-title {
+  margin-bottom: 3px;
+  font-size: 1.1rem;
+  line-height: 1.1;
+}
+
+#all_cards .card-body {
+  padding: 5px 9px 6px 4px;
+  line-height: 1.2;
+}
+
+#all_cards .large_artist,
+#all_cards .small_artist {
+  margin-top: 3px;
+}
+
+#all_cards .small_album,
+#all_cards .large_album {
+  font-size: .9rem;
+  color: #6c757d;
+  font-weight: 100;
+  margin-top: -2px;
+}
+
+@media screen and (max-width: 800px) {
+  #all_cards .card {
+    width: 10.8rem;
+    margin: 3px 5px;
+  }
+  #all_cards .card img {
+    width: 10.8rem;
+    height: 10.8rem;
+  }
+  #all_cards .large_artist,
+  #all_cards .large_album {
+    display: none;
+  }
+  #all_cards .small_artist,
+  #all_cards .small_album {
+    display: block;
+  }
+}
+
+@media screen and (min-width: 800px) {
+  #all_cards .small_artist,
+  #all_cards .small_album {
+    display: none;
+  }
+  #all_cards .large_artist,
+  #all_cards .large_album {
+    display: block;
+  }
+}
+/* ====== END CARD STYLES ====== */
 
 /* ====== show scrollbar ====== */
 #favorites-search-results::-webkit-scrollbar {

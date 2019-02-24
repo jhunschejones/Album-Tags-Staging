@@ -2,9 +2,7 @@
 <html lang="en">
   <head>
     <% include partials/templates/head_tags.ejs %>
-    <link rel="stylesheet" href="/stylesheets/cards.min.css">
-    <link rel="stylesheet" href="/stylesheets/spinner.min.css">
-    <link rel="stylesheet" href="/stylesheets/favoritesfiltering.min.css">
+    <link rel="stylesheet" href="/stylesheets/myfavorites.min.css">
     <link rel="stylesheet" href="/stylesheets/search_modal_cards.min.css">
   </head>
   <body>
@@ -16,105 +14,42 @@
       <% include partials/content/favorites_filters.ejs %>
     </div>
 
-    <!-- BEGIN ALBUM CARDS -->
-    <div id="all_cards" class="row container-fluid hide_when_logged_out">
-      <div id="my-favorites-loader" class="new-loader text-center" style="margin-top:190px;margin-bottom:190px;"><span class="text-secondary">Loading...</span></div>
-    </div>
-    
-    <span id="log_in_message" style="display:none;"><div class="text-center"><br/><br/><br/><br/><h4 class="text-secondary">Please <span class="login_button text-primary" style="cursor:pointer;">log in</span> to access your favorites!</h4><br/><br/><br/><br/><br/></div></span>
+    <br/><br/>
 
-    <div class="container-fluid album_list_instruction">
-      <ul class="album_list" style="list-style-type: none;">
+    <!-- START PAGE CONTENT -->
+    <div class="container-fluid" style="padding:0px 4px 0px 5px;margin-top:-4px;">
 
-      </ul>
-    </div>
-    <!-- END ALBUM CARDS -->   
-    
-    <!-- Start Share Favorites Modal -->
-    <div class="modal fade" id="shareFavoritesModal" tabindex="-1" role="dialog" aria-labelledby="shareFavoritesModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="shareFavoritesModalLabel">Share your favorites list</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="input-group mb-3">
-              <input id="display-name-input" type="text" class="form-control" placeholder="User display name...">
-            </div>
-            <div class="input-group mb-3">
-              <textarea id="shareable-url" class="form-control" placeholder="Share this url..." rows="5"></textarea>
-            </div>
-          </div>
-          <small id="copied-message" class="text-secondary">Copied!</small>
-          <div class="modal-footer">
-            <button id="get-shareable-link" type="button" class="btn btn-outline-primary" data-clipboard-target="#shareable-url">Get shareable link</button>
-          </div>
-        </div>
+      <!-- BEGIN ALBUM CARDS -->
+      <div id="all_cards" class="row no-gutters hide_when_logged_out">
+        <div id="my-favorites-loader" class="new-loader text-center" style="margin-top:190px;margin-bottom:190px;"><span class="text-secondary">Loading...</span></div>
       </div>
-    </div>
+      
+      <span id="log_in_message" style="display:none;"><div class="text-center"><br/><br/><br/><br/><h4 class="text-secondary">Please <span class="login_button text-primary" style="cursor:pointer;">log in</span> to access your favorites!</h4><br/><br/><br/><br/><br/></div></span>
 
-    <!-- ====== start page info modal ====== -->
-    <div class="modal fade" id="pageInfoModal" tabindex="-1" role="dialog" aria-labelledby="pageInfoModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="pageInfoModalLabel">How to use this page</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div id="page-info-modal-body" class="modal-body text-secondary pt-2">
+      <div class="container-fluid album_list_instruction">
+        <ul class="album_list" style="list-style-type: none;">
 
-            <small style="line-height:1em;"><strong>To add an album to your favorites:</strong></small><br/>
-            <ol class="mb-2 pl-4"><small>
-              <li>Click the <span class="text-primary add-album-instruction-link">Add Album</span> button on the top toolbar of the my favorites page</li>
-              <li>Search for an album by album title or artist name
-              <li>Scroll through the results and click an album card to add it to your favorites</li>
-            </small></ol>
-
-            <small style="line-height:1em;"><strong>To remove an album from your favorites:</strong></small><br/>
-            <ol class="mb-2 pl-4"><small>
-              <li>Exit the instruction modal you are currently in</li>
-              <li>On the my favorites page, click the 'X' in the upper-right corner of the album you would like to remove</li>
-              <li>Confirm you would like to remove the album from your favorites in the prompt</li>
-            </small></ol>
-          </div>
-        </div>
+        </ul>
       </div>
+      <!-- END ALBUM CARDS -->   
+      
+      <!-- Start Share Favorites Modal -->
+      <% include partials/content/modal/share_favorites_modal.ejs %>
+
+      <!-- ====== start page info modal ====== -->
+      <% include partials/content/modal/myfavorites_info_modal.ejs %>
+      <!-- ====== end page info modal ====== -->    
+      
+      <!-- ====== START SEARCH MODAL ====== -->
+      <% include partials/content/search_modal.ejs %>
+      <!-- ====== END SEARCH MODAL ====== -->      
+      
+      <!-- ====== start add album modal ====== -->
+      <% include partials/content/modal/myfavorites_add_album_modal.ejs %>
+      <!-- ====== end add album modal ====== -->     
+
     </div>
-    <!-- ====== end page info modal ====== -->    
-    
-    <!-- ====== START SEARCH MODAL ====== -->
-    <% include partials/content/search_modal.ejs %>
-    <!-- ====== END SEARCH MODAL ====== -->      
-    
-    <!-- ====== start add album modal ====== -->
-    <div class="modal fade" id="addFavoritesAlbumModal" tabindex="-1" role="dialog" aria-labelledby="addFavoritesAlbumModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="addFavoritesAlbumModalLabel">Add an album to your favorites</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="input-group mb-3">
-              <input id="add-favorites-album-input" type="search" class="form-control" placeholder="Search for an album...">
-              <div class="input-group-append">
-                <button id="add-favorites-album-button" class="btn btn-primary" type="button">Search</button>
-              </div>
-            </div>
-            <div class="new-loader text-center" style="display:none;"><span class="text-secondary">Loading...</span></div>
-            <div id="favorites-search-results" class="mt-3 mb-0"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- ====== end add album modal ====== -->     
+    <!-- END PAGE CONTENT -->
 
     <% include partials/templates/footer.ejs %>
     <script src="/javascripts/myfavorites.script.min.js"></script>

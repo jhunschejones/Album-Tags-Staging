@@ -3,17 +3,11 @@
   margin-bottom: 140px;
 }
 
-/* ====== START LIST FILTER STYLING ====== */
+/* ====== START LIST FILTER STYLES ====== */
 @media screen and (max-width: 500px) {
   .large-button-text {
     display: none;
   }
-}
-
-#list-filters {
-  /* make icons stay visible at top of screen when scrolling */
-  padding-top: 16px;
-  margin-top: -16px;
 }
 
 #clear-filters-button,
@@ -36,12 +30,18 @@
   margin-left: 1px;
 }
 
-/* ====== END LIST FILTER STYLING ====== */
+/* ====== END LIST FILTER STYLES ====== */
+
+
+#list-top-line {
+  display: block;
+  line-height: 1em;
+  margin: -6px 5px 0px 6px;
+}
 
 #list-title {
-  display: inline-block;
-  line-height: 1em;
-  margin: -2px 5px 0px 15px;
+  display: inline;
+  margin-right: 5px;
 }
 
 #page-info-button {
@@ -51,7 +51,7 @@
 }
 
 #list-creator {
-  margin: 1.5px 5px 10px 15px;
+  margin: 1.5px 0px 10px 6px;
   line-height: 1em;
 }
 
@@ -62,10 +62,80 @@
   margin-bottom: 50px;
 }
 
+/* ====== START CARD STYLES ====== */
+#albums .card {
+  width: 16rem;
+  word-wrap: break-word;
+  margin: 2px 8px 5px 7px;
+  border: none;
+}
+
+#albums .card img {
+  border-radius: .25rem;
+  width: 16rem;
+  height: 16rem;
+  box-shadow: 2px 2px 5px grey;
+}
+
+#albums .card-title {
+  margin-bottom: 3px;
+  font-size: 1.1rem;
+  line-height: 1.1;
+}
+
+#albums .card-body {
+  padding: 5px 9px 6px 4px;
+  line-height: 1.2;
+}
+
+#albums .large_artist,
+#albums .small_artist {
+  margin-top: 3px;
+}
+
+#albums .small_album,
+#albums .large_album {
+  font-size: .9rem;
+  color: #6c757d;
+  font-weight: 100;
+  margin-top: -2px;
+}
+
+@media screen and (max-width: 800px) {
+  #albums .card {
+    width: 10.8rem;
+    margin: 3px 5px;
+  }
+  #albums .card img {
+    width: 10.8rem;
+    height: 10.8rem;
+  }
+  #albums .large_artist,
+  #albums .large_album {
+    display: none;
+  }
+  #albums .small_artist,
+  #albums .small_album {
+    display: block;
+  }
+}
+
+@media screen and (min-width: 800px) {
+  #albums .small_artist,
+  #albums .small_album {
+    display: none;
+  }
+  #albums .large_artist,
+  #albums .large_album {
+    display: block;
+  }
+}
+/* ====== END CARD STYLES ====== */
+
 .album-delete-button {
   cursor: pointer;
-  margin-left: 232px;
-  margin-top: -3px;
+  margin-left: 241px;
+  margin-top: -8px;
   background-color: rgba(245, 245, 245, 0.7);
   display: block;
   border-radius: 12px;
@@ -78,34 +148,20 @@
   color: darkslategrey;
 }
   .album-delete-button:hover {
-    background-color: rgba(245, 245, 245, 0.9);
+    background-color: rgb(245, 245, 245);
   }
 
   @media screen and (max-width: 800px) {
     .album-delete-button {
-      margin-left: 150px;
+      margin-left: 157px;
     }
   }
 
-#back-button {
-  margin-left: 12px;
-}
-#back_arrow {
-  height: 22px;
-  padding: 0px 6px 2px 3px;
-}
 #edit-button,
 #add-album-button {
   padding: 5px 10px;
   display: none;
 }
-.inactive-list-edit-tab {
-  color: #6c757d;
-}
-
-  .inactive-list-edit-tab:hover {
-    color: #007bff;
-  }
 
 #add-album-search-results {
   display: inline-flex;

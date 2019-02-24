@@ -481,9 +481,9 @@ function buildYearFilters() {
   for (let index = 0; index < yearsList.length; index++) {
     let year = yearsList[index]
     if(filterYear == `year-${year}`){
-      $('#year_filter_menu').append(`<a id="year-${year}" class="badge badge-primary year_to_filter_by" href="#" onclick="filterByYear(${year})">${year}</a>`)
+      $('#year_filter_menu').append(`<a id="year-${year}" class="badge badge-primary year_to_filter_by" href="" onclick="filterByYear(${year}, event)">${year}</a>`)
     } else {
-      $('#year_filter_menu').append(`<a id="year-${year}" class="badge badge-light year_to_filter_by" href="#" onclick="filterByYear(${year})">${year}</a>`)
+      $('#year_filter_menu').append(`<a id="year-${year}" class="badge badge-light year_to_filter_by" href="" onclick="filterByYear(${year}, event)">${year}</a>`)
     }
   }
 
@@ -491,7 +491,8 @@ function buildYearFilters() {
   whatsOnThePage_years()  
 }
 
-function filterByYear(year) {
+function filterByYear(year, event) {
+  if (event) { event.preventDefault(); }
   if(document.getElementById(`year-${year}`).classList.contains("badge-primary")){
     filterYear = 'none'
   } else {
@@ -566,9 +567,9 @@ function buildGenreFilters() {
   for (let index = 0; index < genresList.length; index++) {
     let genre = genresList[index]
     if(filterGenre == `genre-${replaceSpaceWithUnderscore(replaceSepecialCharacters(genre))}`) {
-      $('#genre_filter_menu').append(`<a id="genre-${replaceSpaceWithUnderscore(replaceSepecialCharacters(genre))}" class="badge badge-primary genre_to_filter_by" href="#" onclick="filterByGenre('${genre}')">${genre}</a>`)
+      $('#genre_filter_menu').append(`<a id="genre-${replaceSpaceWithUnderscore(replaceSepecialCharacters(genre))}" class="badge badge-primary genre_to_filter_by" href="" onclick="filterByGenre('${genre}', event)">${genre}</a>`)
     } else {
-      $('#genre_filter_menu').append(`<a id="genre-${replaceSpaceWithUnderscore(replaceSepecialCharacters(genre))}" class="badge badge-light genre_to_filter_by" href="#" onclick="filterByGenre('${genre}')">${genre}</a>`)
+      $('#genre_filter_menu').append(`<a id="genre-${replaceSpaceWithUnderscore(replaceSepecialCharacters(genre))}" class="badge badge-light genre_to_filter_by" href="" onclick="filterByGenre('${genre}', event)">${genre}</a>`)
     }       
   }
 
@@ -576,7 +577,8 @@ function buildGenreFilters() {
   whatsOnThePage_genres()
 }
 
-function filterByGenre(genre){
+function filterByGenre(genre, event){
+  if (event) { event.preventDefault(); }
   if(document.getElementById(`genre-${replaceSpaceWithUnderscore(replaceSepecialCharacters(genre))}`).classList.contains("badge-primary")){
       filterGenre = 'none'
   } else {
@@ -623,9 +625,9 @@ function buildArtistFilters() {
     let cleanArtist = replaceSpaceWithUnderscore(removeDoubleSpace(replaceSepecialCharacters(longArtist)))
     
     if(filterArtist == `artist-${cleanArtist}`){
-      $('#artist_filter_menu').append(`<a id="artist-${cleanArtist}" class="badge badge-primary artist_to_filter_by" href="#" onclick="filterByArtist('${cleanArtist}')">${artist}</a>`)
+      $('#artist_filter_menu').append(`<a id="artist-${cleanArtist}" class="badge badge-primary artist_to_filter_by" href="" onclick="filterByArtist('${cleanArtist}', event)">${artist}</a>`)
     } else {
-      $('#artist_filter_menu').append(`<a id="artist-${cleanArtist}" class="badge badge-light artist_to_filter_by" href="#" onclick="filterByArtist('${cleanArtist}')">${artist}</a>`)
+      $('#artist_filter_menu').append(`<a id="artist-${cleanArtist}" class="badge badge-light artist_to_filter_by" href="" onclick="filterByArtist('${cleanArtist}', event)">${artist}</a>`)
     }
   } 
 
@@ -633,7 +635,8 @@ function buildArtistFilters() {
   whatsOnThePage_artists() 
 }
 
-function filterByArtist(artist) {
+function filterByArtist(artist, event) {
+  if (event) { event.preventDefault(); }
   let cleanArtist = 
     replaceSpaceWithUnderscore(removeDoubleSpace(replaceSepecialCharacters(artist)))
 
