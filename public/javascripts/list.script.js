@@ -514,7 +514,8 @@ function toggleFilter(type, filter) {
   } else {
     url.searchParams.set(type, filter); // add if not set
   }
-  history.pushState({}, '', url); // url update works with page `back` navigation
+  history.replaceState({}, '', url); // replace history entry
+  // history.pushState({}, '', url); // add new history entry
   populateList();
 }
 
@@ -523,7 +524,8 @@ function clearFilters() {
   url.searchParams.delete("year");
   url.searchParams.delete("artist");
   url.searchParams.delete("genre");
-  history.pushState({}, '', url); // url update works with page `back` navigation
+  history.replaceState({}, '', url); // replace history entry
+  // history.pushState({}, '', url); // add new history entry
   populateList();
 }
 
