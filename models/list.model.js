@@ -15,6 +15,7 @@ let ListSchema = new Schema({
     artist: {type: String, required: true},
     releaseDate: {type: String, required: true},
     cover: {type: String, required: true},
+    genres: {type: Array, required: true},
   }],
   attributes: {type: Array, required: false}
 }, { collection : 'album-lists' } )

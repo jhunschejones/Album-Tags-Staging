@@ -118,7 +118,8 @@ exports.update_list = function (req, res, next) {
           title: req.body.title,
           artist: req.body.artist,
           releaseDate: req.body.releaseDate,
-          cover: req.body.cover
+          cover: req.body.cover,
+          genres: req.body.genres
         }
         // $push just adds it, $addToSet adds if there are no duplicates
         // {new: true} required in order to return the updated object
@@ -144,7 +145,8 @@ exports.update_list = function (req, res, next) {
         title: req.body.title,
         artist: req.body.artist,
         releaseDate: req.body.releaseDate,
-        cover: req.body.cover
+        cover: req.body.cover,
+        genres: req.body.genres
       }
       // {new: true} required in order to return the updated object
       List.findByIdAndUpdate(listID, { $pull: { albums: removeAlbum }}, {new: true}).populate('albums.album').exec(function (err, list) {
@@ -200,21 +202,17 @@ exports.update_list = function (req, res, next) {
 }
 
 exports.get_user_virtual_favorites_list = function (req, res, next) {
-  const message = {
-    user: req.params.id,
-    displayName: req.body.displayName || ""
-  }
-  const urlToken = cryptr.encrypt(JSON.stringify(message))
-  res.send(urlToken)
+  res.send(cryptr.encrypt(`${req.params.id.trim()}\s\s\s${req.body.displayName.trim()}`));
 }
 
 exports.get_user_favorites = function (req, res, next) {
-  const favoritesListID = req.params.id
-  const message = JSON.parse(cryptr.decrypt(favoritesListID))
+  const requestArray = cryptr.decrypt(req.params.id).split("\s\s\s");
+  const userID = requestArray[0];
+  const displayName = requestArray[1];
 
   request.get(  
     {  
-      url: 'https://www.albumtags.com/api/v1/album/favorites/' + message.user,  
+      url: 'https://www.albumtags.com/api/v1/album/favorites/' + userID,  
       json: true  
     },  
     (err, favoritesResponse, albumResult) => {  
@@ -222,15 +220,15 @@ exports.get_user_favorites = function (req, res, next) {
       if (albumResult) {
         let resultList = {
           title: "My Favorites",
-          displayName: message.displayName || "",
-          user: message.user,
+          displayName: displayName || "",
+          user: userID,
           albums: albumResult
         }
         res.send(resultList)
         return
 
       } else {
-        res.send({ "message" : `unable to find favorites for user "${message.displayName || "Unknown"}"` })
+        res.send({ "message" : `unable to find favorites for user "${displayName || "Unknown"}"` })
         return
       }
     })

@@ -328,7 +328,8 @@ function addToList(chosenList) {
       title: albumResult.title,
       artist: albumResult.artist,
       releaseDate: albumResult.releaseDate,
-      cover: albumResult.cover
+      cover: albumResult.cover,
+      genres: albumResult.genres
     };
     $.ajax({
       method: "PUT",
