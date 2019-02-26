@@ -140,12 +140,21 @@ function populateList() {
   $('#list-creator').text("by: " + listCreator);
 
   if (listData.albums && listData.albums.length > 0) {
-    const albumArray = filterAlbums();
+    let albumArray = filterAlbums();
 
     if (albumArray.length > 0) {
       $('#no-albums-message').hide();
     } else {
-      $('#no-albums-message').show();
+      // if removing an album results in no albums on the page
+      // clear all filters and try one more time
+      clearFilters(); 
+      albumArray = filterAlbums();
+      if (albumArray.length > 0) {
+        $('#no-albums-message').hide(); 
+        $('#albums').html('');
+      } else {
+        $('#no-albums-message').show();
+      }
     }
 
     let card = 0;
@@ -187,7 +196,8 @@ function removeAlbum(albumID) {
       title: thisAlbum.title,
       artist: thisAlbum.artist,
       releaseDate: thisAlbum.releaseDate,
-      cover: thisAlbum.cover
+      cover: thisAlbum.cover,
+      genres: thisAlbum.genres
     };
     
     $.ajax({
