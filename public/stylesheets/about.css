@@ -136,7 +136,7 @@ a:hover {
         top: 100px;
         left: 0%;
         right: 0%;
-        max-height: 78.7vh;
+        max-height: 78vh;
     }
     #background_image_container {
         background-image: url("../images/woman_headphones_md.jpg");
@@ -147,7 +147,7 @@ a:hover {
 /* iphone 7/8 plus */
 @media screen and (min-width: 376px) and (max-width: 414px) {
     #absolute_content {
-        max-height: 81vh;
+        max-height: 80vh;
         /* top: 13.8%; */
         top: 100px;
         left: 0%;
@@ -165,7 +165,7 @@ a:hover {
         top: 99px;
         left: 0%;
         right: 0%;
-        max-height: 83.2vh;
+        max-height: 83vh;
     }
     #background_image_container {
         background-image: url("../images/woman_headphones_md.jpg");
