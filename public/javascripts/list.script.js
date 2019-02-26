@@ -480,6 +480,8 @@ function populateFilters(albumArray) {
     });
   }});
 
+  genreFilters.length < 1 ? $('#filter-by-genre-button').hide() : $('#filter-by-genre-button').show();
+  
   genreFilters.sort();
   genreFilters.forEach(genre => {
     if (!!filterObject.genre && genre === filterObject.genre) {
