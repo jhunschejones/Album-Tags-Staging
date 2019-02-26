@@ -56,6 +56,16 @@ function addToArray(arr, ele){
     arr.push(ele);
   }
 }
+
+function removeDuplicates(inputArray){
+  let outputArray = []
+  for(let i = 0;i < inputArray.length; i++){
+    if(outputArray.indexOf(inputArray[i]) == -1){
+      outputArray.push(inputArray[i])
+    }
+  }
+  return outputArray
+}
 // ------- END UTILITIES SECTION ----------
 
 let listData;
@@ -157,11 +167,12 @@ function populateList() {
         return;
       }
     });
+    populateFilters(albumArray);
   } else {
     $("#no-albums-message").show();
+    populateFilters([]);
   }
-  // show user control buttons for this list type
-  displayButtons();
+  displayButtons(); // show user control buttons for this list type
 }
 
 function removeAlbum(albumID) {
@@ -362,10 +373,6 @@ function toggleActiveInfoTab(element) {
 
 
 // ====== START FILTER FUNCTIONALITY ======
-// need to write url update for page to work on `back` navigation
-// let newUrl = "/list?type=" + year
-// history.pushState({}, '', newUrl)
-
 function getCleanAlbumArray(arr) {
   let cleanArray = [];
   arr.forEach(ele => {
@@ -386,7 +393,7 @@ function getCleanAlbumArray(arr) {
       });
     }
     album.year = album.releaseDate.slice(0,4);
-    if (album.genres) { album.genres = album.genres.join('||').toLowerCase().split('||'); }
+    // if (album.genres) { album.genres = album.genres.join('||').toLowerCase().split('||'); }
   });
   return cleanArray;
 }
@@ -409,7 +416,7 @@ function filterAlbums() {
     });
   }
   if (!!filterObject.artist) {
-    albumArray = albumArray.filter(album => !!album.artist && album.artist.toLowerCase() === filterObject.artist);
+    albumArray = albumArray.filter(album => !!album.artist && album.artist === filterObject.artist);
   }
   if (!!filterObject.year) {
     albumArray = albumArray.filter(album => !!album.year && album.year === filterObject.year);
@@ -418,6 +425,96 @@ function filterAlbums() {
   albumArray = albumArray.reverse(); // reverse shows newer albums first (generally)
   return albumArray;
 }
+
+function populateFilters(albumArray) {
+  const filterObject = getFilterObject();
+  $('#year-filter-dropdown').html('');
+  $('#artist-filter-dropdown').html('');
+  $('#genre-filter-dropdown').html('');
+
+  if (albumArray.length < 1) {
+    $('.remove-if-no-albums').hide();
+    return;
+  } else {
+    $('.remove-if-no-albums').show();
+  }
+
+  // YEAR FILTERS
+  let yearFilters = [];
+  albumArray.forEach(album => { addToArray(yearFilters, album.releaseDate.slice(0,4)); });
+  yearFilters.sort();
+  yearFilters.forEach(year => {
+    if (!!filterObject.year && year === filterObject.year) {
+      $('#year-filter-dropdown').append(`<span class="badge badge-primary year-filter" data-year="${year}">${year}</span>`);
+    } else {
+      $('#year-filter-dropdown').append(`<span class="badge badge-light year-filter" data-year="${year}">${year}</span>`);
+    }
+  });
+  $('.year-filter').click(function(event) {
+    event.preventDefault();
+    toggleFilter("year", $(this).data("year"));
+  })
+
+  // ARTIST FILTERS
+  let artistFilters = [];
+  albumArray.forEach(album => { addToArray(artistFilters, album.artist); });
+  artistFilters.sort();
+  artistFilters.forEach(artist => {
+    if (!!filterObject.artist && artist === filterObject.artist) {
+      $('#artist-filter-dropdown').append(`<span class="badge badge-primary artist-filter" data-artist="${artist}">${artist.length > 32 ? truncate(artist, 32) : artist}</span>`);
+    } else {
+      $('#artist-filter-dropdown').append(`<span class="badge badge-light artist-filter" data-artist="${artist}">${artist.length > 32 ? truncate(artist, 32) : artist}</span>`);
+    }
+  });
+  $('.artist-filter').click(function(event) {
+    event.preventDefault();
+    toggleFilter("artist", $(this).data("artist"));
+  })
+
+  // GENRE FILTERS
+  let genreFilters = [];
+  albumArray.forEach(album => { if (album.genres) { 
+    album.genres.forEach(genre => {
+      if (isGenre(genre)) { addToArray(genreFilters, genre); }
+      else { console.log(`Ignored genre: '${genre}'`); }
+    });
+  }});
+
+  genreFilters.sort();
+  genreFilters.forEach(genre => {
+    if (!!filterObject.genre && genre === filterObject.genre) {
+      $('#genre-filter-dropdown').append(`<span class="badge badge-primary genre-filter" data-genre="${genre}">${genre}</span>`);
+    } else {
+      $('#genre-filter-dropdown').append(`<span class="badge badge-light genre-filter" data-genre="${genre}">${genre}</span>`);
+    }
+  });
+  $('.genre-filter').click(function(event) {
+    event.preventDefault();
+    toggleFilter("genre", $(this).data("genre"));
+  })
+}
+
+function toggleFilter(type, filter) {
+  let url = new URL(document.location);
+  if (url.searchParams.get(type) == filter) {
+    url.searchParams.delete(type); // toggle off if already set
+  } else {
+    url.searchParams.set(type, filter); // add if not set
+  }
+  history.pushState({}, '', url); // url update works with page `back` navigation
+  populateList();
+}
+
+function clearFilters() {
+  let url = new URL(document.location);
+  url.searchParams.delete("year");
+  url.searchParams.delete("artist");
+  url.searchParams.delete("genre");
+  history.pushState({}, '', url); // url update works with page `back` navigation
+  populateList();
+}
+
+$('#clear-filters-button').click(clearFilters);
 // ====== END FILTER FUNCTIONALITY ======
 
 
@@ -484,9 +581,12 @@ $('#editListModal .nav-link').click(function(event) {
   event.preventDefault();
   toggleActiveInfoTab($(this));
 });
-$('#to-top-button').click(function(event) {
-  event.preventDefault();
-  scrollToTop();
+$('#to-top-button').click(scrollToTop);
+// closes filter dropdowns when page is scrolling
+$(document).on( 'scroll', function(){
+  $('#year-filter-dropdown').removeClass('show');
+  $('#genre-filter-dropdown').removeClass('show');
+  $('#artist-filter-dropdown').removeClass('show');
 });
 // ====== END EVENT LISTENERS ======
 

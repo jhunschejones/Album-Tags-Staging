@@ -4,10 +4,9 @@
 }
 
 /* ====== START LIST FILTER STYLES ====== */
-@media screen and (max-width: 500px) {
-  .large-button-text {
-    display: none;
-  }
+#list-filters {
+  margin-top: -1px;
+  padding: 1px;
 }
 
 #clear-filters-button,
@@ -30,6 +29,38 @@
   margin-left: 1px;
 }
 
+#year-filter-dropdown, 
+#genre-filter-dropdown,
+#artist-filter-dropdown {
+  padding: 1px 0px 4px 4px;
+  margin: 2px 0px 0px 0px;
+}
+
+.year-filter, 
+.genre-filter,
+.artist-filter {
+  margin: 0px 2px 0px 2px;
+  padding: 3px 5px 3px 5px !important;
+  cursor: pointer;
+}
+
+#artist-filter-dropdown {
+  overflow: auto;
+  max-height: 55vh;
+}
+
+@media screen and (max-width: 350px) {
+  #list-filters {
+    margin-top: 0px;
+    padding: 0px;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .large-button-text {
+    display: none;
+  }
+}
 /* ====== END LIST FILTER STYLES ====== */
 
 
