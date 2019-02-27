@@ -396,15 +396,15 @@ function getCleanAlbumArray(arr) {
 
   cleanArray.forEach(album => {
     if (album.tagObjects) {
+      album.tagGenres = [];
       album.tagObjects.forEach(tagObject => {
         // check if the tag is created by the same person who created the list
-        if (tagObject.creator === listData.user && isGenre(tagObject.tag) && album.genres.indexOf(tagObject.tag) === -1) {
-          album.genres.push(tagObject.tag);
+        if (tagObject.creator === listData.user && isGenre(tagObject.tag) && album.tagGenres.indexOf(tagObject.tag) === -1) {
+          album.tagGenres.push(tagObject.tag);
         }
       });
     }
     album.year = album.releaseDate.slice(0,4);
-    // if (album.genres) { album.genres = album.genres.join('||').toLowerCase().split('||'); }
   });
   return cleanArray;
 }
@@ -423,7 +423,7 @@ function filterAlbums() {
   
   if (!!filterObject.genre) { // `!!` forces a boolean value
     albumArray = albumArray.filter(album => {
-      return !album.genres ? false : album.genres.indexOf(filterObject.genre) !== -1;
+      return !album.tagGenres ? false : album.tagGenres.indexOf(filterObject.genre) !== -1;
     });
   }
   if (!!filterObject.artist) {
@@ -453,7 +453,7 @@ function populateFilters(albumArray) {
   // YEAR FILTERS
   let yearFilters = [];
   albumArray.forEach(album => { addToArray(yearFilters, album.releaseDate.slice(0,4)); });
-  yearFilters.sort();
+  yearFilters.sort().reverse();
   yearFilters.forEach(year => {
     if (!!filterObject.year && year === filterObject.year) {
       $('#year-filter-dropdown').append(`<span class="badge badge-primary year-filter" data-year="${year}">${year}</span>`);
@@ -484,8 +484,8 @@ function populateFilters(albumArray) {
 
   // GENRE FILTERS
   let genreFilters = [];
-  albumArray.forEach(album => { if (album.genres) { 
-    album.genres.forEach(genre => {
+  albumArray.forEach(album => { if (album.tagGenres) { 
+    album.tagGenres.forEach(genre => {
       if (isGenre(genre)) { addToArray(genreFilters, genre); }
       else { console.log(`Ignored genre: '${genre}'`); }
     });
@@ -497,7 +497,7 @@ function populateFilters(albumArray) {
   genreFilters.forEach(genre => {
     if (!!filterObject.genre && genre === filterObject.genre) {
       $('#genre-filter-dropdown').append(`<span class="badge badge-primary genre-filter" data-genre="${genre}">${genre}</span>`);
-    } else {
+    } else if (!filterObject.genre) { // don't show any other genre filters if there is a selected genre
       $('#genre-filter-dropdown').append(`<span class="badge badge-light genre-filter" data-genre="${genre}">${genre}</span>`);
     }
   });

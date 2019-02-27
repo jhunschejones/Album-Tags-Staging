@@ -49,6 +49,10 @@
   max-height: 55vh;
 }
 
+#filter-by-genre-button {
+  display: none;
+}
+
 @media screen and (max-width: 350px) {
   #list-filters {
     margin-top: 0px;
