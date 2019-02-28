@@ -25,7 +25,8 @@
 
 #to-top-button,
 #add-album-button,
-#edit-button {
+#edit-button,
+#share-favorites-button {
   margin-left: 1px;
 }
 
@@ -192,12 +193,23 @@
     }
   }
 
+#to-top-button {
+  padding: 5px 8px;
+}
+
+/* move dropdown arrow down */
+#list-filters .dropdown-toggle::after {
+  margin-bottom: -2px;
+}
+
 #edit-button,
-#add-album-button {
+#add-album-button,
+#share-favorites-button {
   padding: 5px 10px;
   display: none;
 }
 
+#favorites-search-results,
 #add-album-search-results {
   display: inline-flex;
   max-width: 100%;
@@ -206,6 +218,7 @@
   padding-bottom: 11px; /* accomidates size of scroll bar */
 }
 
+#favorites-search-results:hover,
 #add-album-search-results:hover {
   overflow-x: scroll;
   padding-bottom: 0px; /* accomidates size of scroll bar */
@@ -217,31 +230,44 @@
   -webkit-appearance: searchfield-cancel-button;
 }
 
+#copied-message {
+  margin-left: 17px;
+  margin-bottom: 8px;
+  margin-top: -25px;
+  display: none;
+}
+
 /* ====== show scrollbar ====== */
+#favorites-search-results::-webkit-scrollbar,
 #add-album-search-results::-webkit-scrollbar {
   -webkit-appearance: none;
 }
 
+#favorites-search-results::-webkit-scrollbar:vertical,
 #add-album-search-results::-webkit-scrollbar:vertical {
   width: 11px;
 }
 
+#favorites-search-results::-webkit-scrollbar:horizontal,
 #add-album-search-results::-webkit-scrollbar:horizontal {
   height: 11px;
 }
 
+#favorites-search-results::-webkit-scrollbar-thumb,
 #add-album-search-results::-webkit-scrollbar-thumb {
   border-radius: 8px;
   border: 2px solid white; /* should match background, can't be transparent */
   background-color: rgba(0, 0, 0, .5);
 }
 
-#add-album-search-resultss::-webkit-scrollbar-track { 
+#favorites-search-results::-webkit-scrollbar-track,
+#add-album-search-results::-webkit-scrollbar-track { 
   background-color: #fff; 
   border-radius: 8px; 
 } 
 
 /* adds the arrow to the end of the scroll bar */
+#favorites-search-results::-webkit-scrollbar-button:horizontal:end:increment,
 #add-album-search-results::-webkit-scrollbar-button:horizontal:end:increment {
   display: block;
   background:
@@ -252,6 +278,7 @@
 }
 
 /* adds the arrow to the start of the scroll bar */
+#favorites-search-results::-webkit-scrollbar-button:horizontal:start:decrement,
 #add-album-search-results::-webkit-scrollbar-button:horizontal:start:decrement {
   display: block;
   background:

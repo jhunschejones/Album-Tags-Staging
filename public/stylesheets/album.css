@@ -46,6 +46,17 @@
   display: none;
 }
 
+#custom-genre-checkbox-text {
+  cursor: pointer;
+}
+
+#custom-genre-checkbox {
+  cursor: pointer;
+  margin-top: 1px;
+  margin-right: 6px;
+  margin-left: 2px;
+}
+
 #track-titles {
   counter-reset: foo;
   display: table;
@@ -97,7 +108,7 @@ input[type=search]::-webkit-search-cancel-button {
   }
 
 #tag-success {
-  line-height: 1em;
+  margin-top: -19px;
 }
 
 .connection {

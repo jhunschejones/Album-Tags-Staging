@@ -706,10 +706,10 @@ function populateTags() {
     
       if (creator === userID) {
         // tags are stored escaped and displayed raw
-        $('#current-tags').append(`<a href="" id="${tagName}-${creator}" class="badge badge-light album-tag my-tag" data-creator="${creator}" data-rawtag="${escapeHtml(albumResult.tagObjects[index].tag)}"><span>${tag}</span><span class="delete-tag-button ml-1" data-tag-id="${tagName}-${creator}">&#10005;</span></a>`);
+        $('#current-tags').append(`<a href="" id="${tagName}-${creator}" class="badge badge-light album-tag my-tag" data-creator="${creator}" data-rawtag="${escapeHtml(albumResult.tagObjects[index].tag)}" data-custom-genre="${albumResult.tagObjects[index].customGenre || false}"><span>${tag}</span><span class="delete-tag-button ml-1" data-tag-id="${tagName}-${creator}">&#10005;</span></a>`);
       } else {
         // tags are stored escaped and displayed raw
-        $('#current-tags').append(`<a href="" id="${tagName}-${creator}" class="badge badge-light album-tag other-tag" data-creator="${creator}" data-rawtag="${escapeHtml(albumResult.tagObjects[index].tag)}"><span>${tag}</span></a>`);
+        $('#current-tags').append(`<a href="" id="${tagName}-${creator}" class="badge badge-light album-tag other-tag" data-creator="${creator}" data-rawtag="${escapeHtml(albumResult.tagObjects[index].tag)}" data-custom-genre="${albumResult.tagObjects[index].customGenre || false}"><span>${tag}</span></a>`);
       }
     }
     // ------ tag delete button event listener -----
@@ -783,6 +783,7 @@ function fixShortTagsArray() {
 function deleteTag(tagID) {
   const creator = $(`#${tagID}`).data('creator');
   const tag = $(`#${tagID}`).data('rawtag');
+  const customGenre = $(`#${tagID}`).data('custom-genre');
 
   let confirmation = confirm(`Are you sure you want to delete the "${tag}" tag? You cannot undo this operation.`);
 
@@ -794,7 +795,8 @@ function deleteTag(tagID) {
         // tags are stored escaped and displayed raw, converting to string
         // in case the raw tag is just a number (like a year)
         "tag": escapeHtml(tag.toString()),
-        "creator": creator
+        "creator": creator,
+        "customGenre": customGenre
       }),
       success: function(album) {
         if (!album.message) {
@@ -817,12 +819,14 @@ function addTag() {
     if ((newTag.includes("<") && newTag.includes(">")) || newTag.includes(".") || newTag.includes("{") || newTag.includes("}")) {
       alert("Some characters are not allowed in tags, sorry!");
       $('#add-tag-input').val("");
+      $("#custom-genre-checkbox").prop("checked", false);
       return;
     }
 
     if (newTag.length > 30) {
       alert("Tags cannot be longer than 30 characters. Check out the \"All tags\" page for some examples!");
       $('#add-tag-input').val("");
+      $("#custom-genre-checkbox").prop("checked", false);
       return;
     }
     // tags are stored escaped and displayed raw
@@ -840,6 +844,7 @@ function addTag() {
       if (duplicates > 0) {
         alert(`You already added the "${newTag}" tag to this album!`);
         $('#add-tag-input').val("");
+        $("#custom-genre-checkbox").prop("checked", false);
         return;
       }   
 
@@ -847,9 +852,13 @@ function addTag() {
       if (albumResult.tags.indexOf(newTag) != -1) { 
         let confirmed = confirm(`Someone else already added the "${newTag}" tag to this album. Choose "ok" to add your tag, or "cancel" to avoid duplicates.`); 
         $('#add-tag-input').val("");
+        $("#custom-genre-checkbox").prop("checked", false);
         if (!confirmed) { return; }
       }
     }  
+
+    let customGenre = false;
+    if ($('#custom-genre-checkbox').is(":checked")) { customGenre = true; }
 
     // ADD NEW TAG OR NEW ALBUM TO THE DATABASE
     $.ajax(`/api/v1/album/tags/${albumResult._id || "new"}`, {
@@ -858,13 +867,14 @@ function addTag() {
       data: JSON.stringify({
         "album": albumResult,
         "creator": userID,
-        "tag": newTag
+        "tag": newTag,
+        "customGenre": customGenre
       }),
       success: function (album) {
         if (!album.message) {
           albumResult = album;
           populateTags();
-          $('#tag-success').text("You successfully added a tag!");
+          $('#tag-success').html("Added! &#10003;");
           setTimeout(function(){ $('#tag-success').html('&nbsp;'); }, 3000);
         } else {
           alert(album.message);
@@ -877,6 +887,7 @@ function addTag() {
   } 
 
   $('#add-tag-input').val("");
+  $("#custom-genre-checkbox").prop("checked", false);
 }
 
 function toggleActiveInfoTab(element) {
@@ -1070,6 +1081,10 @@ $('#add-to-new-list-button').click(function(event) {
     document.getElementById("new-list-title").value = "";
   }
 });
+$('#custom-genre-checkbox-text').click(function(event) {
+  event.preventDefault();
+  $('#custom-genre-checkbox').click()
+})
 
 // make hover scrollbar always visible on touchscreens
 $(document).ready(function() {

@@ -179,7 +179,8 @@ exports.add_tag = function (req, res, next) {
     if (req.body.creator) {
       let updateObject = {
         "tag": req.body.tag,
-        "creator": req.body.creator
+        "creator": req.body.creator,
+        "customGenre": req.body.customGenre
       }
       // $push just adds it, $addToSet adds if there are no duplicates
       // {new: true} required in order to return the updated object
@@ -209,7 +210,8 @@ exports.add_tag = function (req, res, next) {
         // create new database album
         let updateObject = {
           "tag": req.body.tag,
-          "creator": req.body.creator
+          "creator": req.body.creator,
+          "customGenre": req.body.customGenre
         }
         const titleKeyWords = _this.utility_getKeyWords(req.body.album.title) || []
         const artistKeyWords = _this.utility_getKeyWords(req.body.album.artist) || []
@@ -247,7 +249,8 @@ exports.add_tag = function (req, res, next) {
         // back end database album found!
         let updateObject = {
           "tag": req.body.tag,
-          "creator": req.body.creator
+          "creator": req.body.creator,
+          "customGenre": req.body.customGenre
         }
         // $push just adds it, $addToSet adds if there are no duplicates
         // {new: true} required in order to return the updated object
@@ -264,7 +267,8 @@ exports.add_tag = function (req, res, next) {
 exports.delete_tag = function (req, res, next) {
   let deleteObject = {
     "tag": req.body.tag,
-    "creator": req.body.creator
+    "creator": req.body.creator,
+    // "customGenre": req.body.customGenre
   }
   // {new: true} required in order to return the updated object
   Album.findByIdAndUpdate(req.params.id, { $pull: { tagObjects: deleteObject, tags: req.body.tag }}, {new: true}, function (err, album) {
@@ -451,11 +455,19 @@ exports.add_favorite = function (req, res, next) {
 exports.delete_favorite = function (req, res, next) {
   const userID = req.body.user
   // {new: true} required in order to return the updated object
-  Album.findByIdAndUpdate(req.params.id, { $pull: { favoritedBy: userID }}, {new:true}, function (err, album) {
-    if (err) return next(err)
-    res.send(album)
-    return
-  })
+  if (req.params.id.length === 24) {
+    Album.findByIdAndUpdate(req.params.id, { $pull: { favoritedBy: userID }}, {new:true}, function (err, album) {
+      if (err) return next(err)
+      res.send(album)
+      return
+    })
+  } else {
+    Album.findOneAndUpdate({ "appleAlbumID": req.params.id }, { $pull: { favoritedBy: userID }}, {new:true}, function (err, album) {
+      if (err) return next(err)
+      res.send(album)
+      return
+    })
+  }
 }
 
 exports.find_blank_albums = function (req, res, next) {
