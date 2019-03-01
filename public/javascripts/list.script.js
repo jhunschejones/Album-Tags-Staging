@@ -4,16 +4,12 @@
 // instructions: https://developers.google.com/closure/compiler/docs/gettingstarted_app
 // terminal command: `java -jar compiler.jar --js list.script.js --js_output_file list.script.min.js`
 // ======
+
 function truncate(str, len){
   // set up the substring
   const subString = str.substr(0, len-1);
-  
-  return (
-    // add elipse after last complete word
-    subString.substr(0, subString.lastIndexOf(' '))
-    // trim trailing comma
-    .replace(/(^[,\s]+)|([,\s]+$)/g, '') + '...'
-  );
+  // add elipse after last complete word & trim trailing comma
+  return (subString.substr(0, subString.lastIndexOf(' ')).replace(/(^[,\s]+)|([,\s]+$)/g, '') + '...');
 }
 
 function removeDash(str) { return str.replace(/-/g, ''); }
@@ -46,32 +42,28 @@ function isGenre(str) {
 }
 
 function removeFromArray(arr, ele){
-  if (arr.indexOf(ele) !== -1) {
-    arr.splice(arr.indexOf(ele), 1);
-  }
+  if (arr.indexOf(ele) !== -1) { arr.splice(arr.indexOf(ele), 1); }
 }
 
 function addToArray(arr, ele){
-  if (arr.indexOf(ele) === -1) {
-    arr.push(ele);
-  }
+  if (arr.indexOf(ele) === -1) { arr.push(ele); }
 }
 
 function removeDuplicates(inputArray){
-  let outputArray = []
+  let outputArray = [];
   for(let i = 0;i < inputArray.length; i++){
     if(outputArray.indexOf(inputArray[i]) == -1){
-      outputArray.push(inputArray[i])
+      outputArray.push(inputArray[i]);
     }
   }
-  return outputArray
+  return outputArray;
 }
 // ------- END UTILITIES SECTION ----------
 
 let listData;
 let listType;
 let listID;
-let startingURL = (new URL(document.location))
+let startingURL = (new URL(document.location));
 
 if (startingURL.pathname === "/list") {
   listType = startingURL.searchParams.get("type");
@@ -134,7 +126,7 @@ function getList() {
           populateList();
         }
       }
-    })
+    });
   }
 }
 
@@ -241,7 +233,6 @@ function removeListAlbum(albumID) {
       cover: thisAlbum.cover,
       genres: thisAlbum.genres
     };
-    
     $.ajax({
       method: "PUT",
       url: "/api/v1/list/" + listID,
@@ -337,48 +328,50 @@ function populateAddToListModalResults(data) {
   $('#add-album-search-results').html('');
   $('#add-album-card-body .new-loader').hide();
   if (data.albums && data.albums.length > 0) {
+    // store search results globally
+    addAlbumResults = data.albums;
+
     for (let index = 0; index < data.albums.length; index++) {
       const album = data.albums[index];
       const cardNumber = index;
-      createAddAlbumModalCard(cardNumber);
-      populateAddAlbumModalCard(album, cardNumber);
+      addPageModalCard('add-album-search-results', 'addAlbum', cardNumber);
+      populatePageModalCard('addAlbum', addToList, addAlbumResults, album, cardNumber);
     }
     // this adds an empty space at the end so the user can scroll 
     // all the way to the right to see the last album
     $('#add-album-search-results').append('<div id="add-search-modal-placeholder">&nbsp;</div>');
-
-    // store search results globally
-    addAlbumResults = data.albums;
   } else {
     $('#add-album-search-results').after('<div id="no-results-message" class="text-primary" style="text-align:center;">It looks like no albums matched your search terms. Try a different search!</div>');
   }
 }
 
-function createAddAlbumModalCard(cardNumber) {
-  $('#add-album-search-results').append(`<div id="addAlbumModalCard${cardNumber}" class="search-modal-card" data-result-index="${cardNumber}"><img class="search-modal-card-image" src="" alt=""><div class="search-modal-card-body"><h4 class="search-modal-card-title"></h4><span class="search-modal-card-album"></span></div></div>`);
+// ====== START CREATE AND POPULATE ALBUM CARDS FOR MODALS ======
+function addPageModalCard(divName, modalType, cardNumber) {
+  $(`#${divName}`).append(`<div id="${modalType}ModalCard${cardNumber}" class="search-modal-card" data-result-index="${cardNumber}"><img class="search-modal-card-image" src="" alt=""><div class="search-modal-card-body"><h4 class="search-modal-card-title"></h4><span class="search-modal-card-album"></span></div></div>`);
 }
 
-function populateAddAlbumModalCard(album, cardNumber) {
+function populatePageModalCard(modalType, clickMethod, resultsArray, album, cardNumber) {
   let smallArtist = album.artist.length > 32 ? truncate(album.artist, 32) : album.artist;
   let largeArtist = album.artist.length > 49 ? truncate(album.artist, 49) : album.artist;
   let smallAlbum = album.title.length > 44 ? truncate(album.title, 44) : album.title;
   let largeAlbum = album.title.length > 66 ? truncate(album.title, 66): album.title;
   
   // artist name
-  $(`#addAlbumModalCard${cardNumber} .search-modal-card-title`).html(`<span class="search-modal-card-large-artist">${largeArtist}</span><span class="search-modal-card-small-artist">${smallArtist}</span>`);
+  $(`#${modalType}ModalCard${cardNumber} .search-modal-card-title`).html(`<span class="search-modal-card-large-artist">${largeArtist}</span><span class="search-modal-card-small-artist">${smallArtist}</span>`);
   // album name
-  $(`#addAlbumModalCard${cardNumber} .search-modal-card-album`).html(`<span class="search-modal-card-large-album">${largeAlbum}</span><span class="search-modal-card-small-album">${smallAlbum}</span>`);
+  $(`#${modalType}ModalCard${cardNumber} .search-modal-card-album`).html(`<span class="search-modal-card-large-album">${largeAlbum}</span><span class="search-modal-card-small-album">${smallAlbum}</span>`);
   // album cover
-  $(`#addAlbumModalCard${cardNumber} .search-modal-card-image`).attr('src', album.cover.replace('{w}', 260).replace('{h}', 260));
+  $(`#${modalType}ModalCard${cardNumber} .search-modal-card-image`).attr('src', album.cover.replace('{w}', 260).replace('{h}', 260));
 
-  $(`#addAlbumModalCard${cardNumber}`).click(function(event) {
+  $(`#${modalType}ModalCard${cardNumber}`).click(function(event) {
     event.preventDefault();
     // connect to this album
     const selectedAlbumIndex = $(this).data("result-index");
-    const selectedAlbum = addAlbumResults[selectedAlbumIndex];
-    addToList(selectedAlbum);
+    const selectedAlbum = resultsArray[selectedAlbumIndex];
+    clickMethod(selectedAlbum);
   });
 }
+// ====== END CREATE AND POPULATE ALBUM CARDS FOR MODALS ======
 
 function addToList(selectedAlbum) {
   if (selectedAlbum) {
@@ -506,7 +499,7 @@ function populateFilters(albumArray) {
   $('.year-filter').click(function(event) {
     event.preventDefault();
     toggleFilter("year", $(this).data("year"));
-  })
+  });
 
   // ARTIST FILTERS
   let artistFilters = [];
@@ -522,7 +515,7 @@ function populateFilters(albumArray) {
   $('.artist-filter').click(function(event) {
     event.preventDefault();
     toggleFilter("artist", $(this).data("artist"));
-  })
+  });
 
   // GENRE FILTERS
   let genreFilters = [];
@@ -532,20 +525,21 @@ function populateFilters(albumArray) {
     });
   }});
 
-  genreFilters.length < 1 ? $('#filter-by-genre-button').hide() : $('#filter-by-genre-button').show();
+  if (genreFilters.length < 1) { $('#filter-by-genre-button').hide(); }
+  else { $('#filter-by-genre-button').show(); }
   
   genreFilters.sort();
   genreFilters.forEach(genre => {
     if (!!filterObject.genre && genre === filterObject.genre) {
-      $('#genre-filter-dropdown').append(`<span class="badge badge-primary genre-filter" data-genre="${genre}">${genre}</span>`);
+      $('#genre-filter-dropdown').append(`<span class="badge badge-primary genre-filter" data-genre="${genre}">${genre.length > 32 ? truncate(genre, 32) : genre}</span>`);
     } else if (!filterObject.genre) { // don't show any other genre filters if there is a selected genre
-      $('#genre-filter-dropdown').append(`<span class="badge badge-light genre-filter" data-genre="${genre}">${genre}</span>`);
+      $('#genre-filter-dropdown').append(`<span class="badge badge-light genre-filter" data-genre="${genre}">${genre.length > 32 ? truncate(genre, 32) : genre}</span>`);
     }
   });
   $('.genre-filter').click(function(event) {
     event.preventDefault();
     toggleFilter("genre", $(this).data("genre"));
-  })
+  });
 }
 
 function toggleFilter(type, filter) {
@@ -579,51 +573,22 @@ function populateAddToFavoritesModalResults(data) {
   $('#favorites-search-results').html('');
   $('#addFavoritesAlbumModal .new-loader').hide();
   if (data.albums && data.albums.length > 0) {
+    // store search results globally
+    addFavoritesAlbumResults = data.albums;
+
     for (let index = 0; index < data.albums.length; index++) {
       const album = data.albums[index];
       const cardNumber = index;
-      createFavoritesModalCard(cardNumber);
-      populateFavoritesModalCard(album, cardNumber);
+      addPageModalCard('favorites-search-results', 'addFavorites', cardNumber);
+      populatePageModalCard('addFavorites', addToFavorites, addFavoritesAlbumResults, album, cardNumber);
     }
+    
     // this adds an empty space at the end so the user can scroll 
     // all the way to the right to see the last album
     $('#favorites-search-results').append('<div id="add-search-modal-placeholder">&nbsp;</div>');
-    addFavoritesAlbumResults = data.albums;
   } else {
     $('#favorites-search-results').after('<div id="no-results-message" class="text-primary mb-3" style="text-align:center;">It looks like no albums matched your search terms. Try a different search!</div>');
   }
-}
-
-function createFavoritesModalCard(cardNumber) {
-  $('#favorites-search-results').append(`<div id="addFavoritesModalCard${cardNumber}" class="search-modal-card" data-result-index="${cardNumber}"><img class="search-modal-card-image" src="" alt=""><div class="search-modal-card-body"><h4 class="search-modal-card-title"></h4><span class="search-modal-card-album"></span></div></div>`)
-}
-
-function populateFavoritesModalCard(album, cardNumber) {
-  let smallArtist = album.artist.length > 32 ? truncate(album.artist, 32) : album.artist;
-  let largeArtist = album.artist.length > 49 ? truncate(album.artist, 49) : album.artist;
-  let smallAlbum = album.title.length > 44 ? truncate(album.title, 44) : album.title;
-  let largeAlbum = album.title.length > 66 ? truncate(album.title, 66): album.title;
-  
-  // artist name
-  $(`#addFavoritesModalCard${cardNumber} .search-modal-card-title`).html(`<span class="search-modal-card-large-artist">${largeArtist}</span><span class="search-modal-card-small-artist">${smallArtist}</span>`)
-  // album name
-  $(`#addFavoritesModalCard${cardNumber} .search-modal-card-album`).html(`<span class="search-modal-card-large-album">${largeAlbum}</span><span class="search-modal-card-small-album">${smallAlbum}</span>`) 
-  // album cover
-  $(`#addFavoritesModalCard${cardNumber} .search-modal-card-image`).attr('src', album.cover.replace('{w}', 260).replace('{h}', 260))
-
-  $(`#addFavoritesModalCard${cardNumber}`).click(function(event) {
-    event.preventDefault();
-    // add this album to favorites
-    const selectedAlbumIndex = $(this).data("result-index");
-    const selectedAlbum = addFavoritesAlbumResults[selectedAlbumIndex];
-
-    let alreadyInFavorites = listData.albums.find(x => x.appleAlbumID === selectedAlbum.appleAlbumID);
-    if (!alreadyInFavorites) {
-      addToFavorites(selectedAlbum);
-    } else {
-      alert(`"${selectedAlbum.title}" is already in your favorites.`);
-    }
-  })
 }
 
 $('#add-favorites-album-button').click(function(event) {
@@ -641,6 +606,12 @@ $("#add-favorites-album-input").keyup(function(event) {
 });
 
 function addToFavorites(selectedAlbum) {
+  let alreadyInFavorites = listData.albums.find(x => x.appleAlbumID === selectedAlbum.appleAlbumID);
+  if (alreadyInFavorites) {
+    alert(`"${selectedAlbum.title}" is already in your favorites.`);
+    return;
+  }
+
   if (selectedAlbum && userID) {
     $.ajax('/api/v1/album/favorites/new', {
       method: 'POST',
@@ -669,7 +640,7 @@ function removeFavoritesAlbum(selectedAlbum) {
   let albumToRemove = listData.albums.find(x => x.appleAlbumID === selectedAlbum);
   let confirmed = confirm(`Are you sure you want to remove "${albumToRemove.title}" from your favorites? You cannot undo this operation.`);
 
-  if (confirmed) {
+  if (confirmed && albumToRemove) {
     $.ajax(`/api/v1/album/favorites/${selectedAlbum}`, {
       method: 'DELETE',
       contentType: 'application/json',
@@ -710,10 +681,10 @@ document.getElementById("get-shareable-link").addEventListener("click", function
         setTimeout(function(){ $('#copied-message').hide(); }, 3000);
       }, function() {
         // clipboard write failed
-      })
+      });
     }
-  })
-})
+  });
+});
 $('#add-album-modal-button').click(function(event) {
   event.preventDefault();
   const search = $('#add-album-modal-input').val().trim().replace(/[^\w\s]/gi, '');
@@ -724,8 +695,7 @@ $('#add-album-modal-button').click(function(event) {
 });
 document.getElementById("share-favorites-button").addEventListener("click", function() {
   $('#shareFavoritesModal').modal('show');
-})
-// execute search when enter key is pressed
+});
 $("#add-album-modal-input").keyup(function(event) {
   if (event.keyCode === 13) {
     $("#add-album-modal-button").click();
@@ -777,8 +747,8 @@ $("#list-display-name-input").keyup(function(event) {
     $("#update-list-display-name").click();
   }
 });
-document.getElementById("update-list-display-name").addEventListener("click", editDisplayName);
-document.getElementById("update-list-title").addEventListener("click", editListTitle);
+$('#update-list-display-name').click(editDisplayName);
+$('#update-list-title').click(editListTitle);
 $('#editListModal .nav-link').click(function(event) {
   event.preventDefault();
   toggleActiveInfoTab($(this));
@@ -893,15 +863,11 @@ function displayButtons() {
 }
 
 // add event listener to log in and out buttons
-const loginButton = document.getElementById("login_button");
-const loginButton2 = document.getElementById("full_menu_login_button");
-const logoutButton = document.getElementById("logout_button");
-const logoutButton2 = document.getElementById("full_menu_logout_button");
-loginButton.addEventListener("click", logIn);
-loginButton2.addEventListener("click", logIn);
-logoutButton.addEventListener("click", logOut);
-logoutButton2.addEventListener("click", logOut);
-$('.login_button').on('click', logIn);
+$('#login_button').click(logIn);
+$('#full_menu_login_button').click(logIn);
+$('#logout_button').click(logOut);
+$('#full_menu_logout_button').click(logOut);
+$('.login_button').click(logIn);
 // ----- END FIREBASE AUTH SECTION ------
 
 
