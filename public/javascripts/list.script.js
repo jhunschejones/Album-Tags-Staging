@@ -189,25 +189,23 @@ function populateList() {
       }
     }
 
-    let card = 0;
-    albumArray.forEach(albumObject => {
-      card = card + 1;
+    for (let index = 0; index < albumArray.length; index++) {
+      const albumObject = albumArray[index];
+      const card = index + 1;
       createCard(card);
       populateCard(albumObject, card);
-    });
+    }
   
     // ====== add event listener to delete buttons =====
     $(".album-delete-button").on("click", function() { 
-      if (listData.user !== userID) {
-        alert("Sorry! Only the list creator can delete albums.");
-        return;
-      } else if (listType === "userlist") {
+      if (listData.user !== userID) return alert("Sorry! Only the list creator can delete albums."); 
+      
+      if (listType === "userlist") {
         removeListAlbum($(this).attr("data-album-id")); 
       } else if (listType === "myfavorites") {
         removeFavoritesAlbum($(this).attr("data-album-id")); 
       } else {
-        alert("Sorry! This type of list won't let you delete albums.");
-        return;
+        return alert("Sorry! This type of list won't let you delete albums.");
       }
     });
     populateFilters(albumArray);
@@ -250,14 +248,8 @@ function editDisplayName() {
   let newDisplayName = $("#list-display-name-input").val().trim();
 
   // pass basic data validation
-  if (newDisplayName === listData.displayName) {
-    alert(`The display name for this list is already set as "${listData.displayName}"`);
-    return;
-  }
-  if (newDisplayName.length > 30) {
-    alert("Display names must be shorter than 30 characters in length.");
-    return;
-  } 
+  if (newDisplayName === listData.displayName) return alert(`The display name for this list is already set as "${listData.displayName}"`);
+  if (newDisplayName.length > 30) return alert("Display names must be shorter than 30 characters in length.");
 
   // start updating list
   let updateObject = {
@@ -273,7 +265,7 @@ function editDisplayName() {
       if (!data.message) {
         listData = data;
         populateList();
-        $('#list-update-success').text("List info updated!");
+        $('#list-update-success').html("List info updated! &#10003;");
         setTimeout(function(){ $('#list-update-success').html('&nbsp;'); }, 3000);
       } else {
         alert(data.message);
@@ -286,14 +278,8 @@ function editListTitle() {
   let newListTitle = $("#list-title-input").val().trim();
 
   // pass basic data validation
-  if (newListTitle === listData.title) {
-    alert(`The title for this list is already "${listData.title}"`);
-    return;
-  }
-  if (newListTitle.length > 60) {
-    alert("List titles must be shorter than 60 characters in length.");
-    return;
-  } 
+  if (newListTitle === listData.title) return alert(`The title for this list is already "${listData.title}"`);
+  if (newListTitle.length > 60) return alert("List titles must be shorter than 60 characters in length.");
 
   // start updating list
   if (newListTitle && newListTitle.length > 0) {
@@ -310,7 +296,7 @@ function editListTitle() {
         if (!data.message) {
           listData = data;
           populateList();
-          $('#list-update-success').text("List info updated!");
+          $('#list-update-success').html("List info updated! &#10003;");
           setTimeout(function(){ $('#list-update-success').html('&nbsp;'); }, 3000);
         } else {
           alert(data.message);
@@ -333,7 +319,7 @@ function populateAddToListModalResults(data) {
 
     for (let index = 0; index < data.albums.length; index++) {
       const album = data.albums[index];
-      const cardNumber = index;
+      const cardNumber = index + 1;
       addPageModalCard('add-album-search-results', 'addAlbum', cardNumber);
       populatePageModalCard('addAlbum', addToList, addAlbumResults, album, cardNumber);
     }
@@ -347,7 +333,7 @@ function populateAddToListModalResults(data) {
 
 // ====== START CREATE AND POPULATE ALBUM CARDS FOR MODALS ======
 function addPageModalCard(divName, modalType, cardNumber) {
-  $(`#${divName}`).append(`<div id="${modalType}ModalCard${cardNumber}" class="search-modal-card" data-result-index="${cardNumber}"><img class="search-modal-card-image" src="" alt=""><div class="search-modal-card-body"><h4 class="search-modal-card-title"></h4><span class="search-modal-card-album"></span></div></div>`);
+  $(`#${divName}`).append(`<div id="${modalType}ModalCard${cardNumber}" class="search-modal-card" data-result-index="${cardNumber - 1}"><img class="search-modal-card-image" src="" alt=""><div class="search-modal-card-body"><h4 class="search-modal-card-title"></h4><span class="search-modal-card-album"></span></div></div>`);
 }
 
 function populatePageModalCard(modalType, clickMethod, resultsArray, album, cardNumber) {
@@ -363,9 +349,7 @@ function populatePageModalCard(modalType, clickMethod, resultsArray, album, card
   // album cover
   $(`#${modalType}ModalCard${cardNumber} .search-modal-card-image`).attr('src', album.cover.replace('{w}', 260).replace('{h}', 260));
 
-  $(`#${modalType}ModalCard${cardNumber}`).click(function(event) {
-    event.preventDefault();
-    // connect to this album
+  $(`#${modalType}ModalCard${cardNumber}`).click(function() {
     const selectedAlbumIndex = $(this).data("result-index");
     const selectedAlbum = resultsArray[selectedAlbumIndex];
     clickMethod(selectedAlbum);
@@ -376,11 +360,7 @@ function populatePageModalCard(modalType, clickMethod, resultsArray, album, card
 function addToList(selectedAlbum) {
   if (selectedAlbum) {
     let alreadyInList = listData.albums.find(x => x.appleAlbumID === selectedAlbum.appleAlbumID);
-
-    if (alreadyInList) {
-      alert(`"${selectedAlbum.title}" is already in this list.`);
-      return;
-    }
+    if (alreadyInList) return alert(`"${selectedAlbum.title}" is already in this list.`);
 
     let addAlbumToListBody = {
       method: "add album",
@@ -479,8 +459,7 @@ function populateFilters(albumArray) {
   $('#genre-filter-dropdown').html('');
 
   if (albumArray.length < 1) {
-    $('.remove-if-no-albums').hide();
-    return;
+    return $('.remove-if-no-albums').hide();
   } else {
     $('.remove-if-no-albums').show();
   }
@@ -496,8 +475,7 @@ function populateFilters(albumArray) {
       $('#year-filter-dropdown').append(`<span class="badge badge-light year-filter" data-year="${year}">${year}</span>`);
     }
   });
-  $('.year-filter').click(function(event) {
-    event.preventDefault();
+  $('.year-filter').click(function() {
     toggleFilter("year", $(this).data("year"));
   });
 
@@ -512,8 +490,7 @@ function populateFilters(albumArray) {
       $('#artist-filter-dropdown').append(`<span class="badge badge-light artist-filter" data-artist="${artist}">${artist.length > 32 ? truncate(artist, 32) : artist}</span>`);
     }
   });
-  $('.artist-filter').click(function(event) {
-    event.preventDefault();
+  $('.artist-filter').click(function() {
     toggleFilter("artist", $(this).data("artist"));
   });
 
@@ -536,8 +513,7 @@ function populateFilters(albumArray) {
       $('#genre-filter-dropdown').append(`<span class="badge badge-light genre-filter" data-genre="${genre}">${genre.length > 32 ? truncate(genre, 32) : genre}</span>`);
     }
   });
-  $('.genre-filter').click(function(event) {
-    event.preventDefault();
+  $('.genre-filter').click(function() {
     toggleFilter("genre", $(this).data("genre"));
   });
 }
@@ -578,7 +554,7 @@ function populateAddToFavoritesModalResults(data) {
 
     for (let index = 0; index < data.albums.length; index++) {
       const album = data.albums[index];
-      const cardNumber = index;
+      const cardNumber = index + 1;
       addPageModalCard('favorites-search-results', 'addFavorites', cardNumber);
       populatePageModalCard('addFavorites', addToFavorites, addFavoritesAlbumResults, album, cardNumber);
     }
@@ -591,8 +567,7 @@ function populateAddToFavoritesModalResults(data) {
   }
 }
 
-$('#add-favorites-album-button').click(function(event) {
-  event.preventDefault();
+$('#add-favorites-album-button').click(function() {
   const search = $('#add-favorites-album-input').val().trim().replace(/[^\w\s]/gi, '');
   $('#no-results-message').remove();
   $('#favorites-search-results').html('');
@@ -607,10 +582,7 @@ $("#add-favorites-album-input").keyup(function(event) {
 
 function addToFavorites(selectedAlbum) {
   let alreadyInFavorites = listData.albums.find(x => x.appleAlbumID === selectedAlbum.appleAlbumID);
-  if (alreadyInFavorites) {
-    alert(`"${selectedAlbum.title}" is already in your favorites.`);
-    return;
-  }
+  if (alreadyInFavorites) return alert(`"${selectedAlbum.title}" is already in your favorites.`);
 
   if (selectedAlbum && userID) {
     $.ajax('/api/v1/album/favorites/new', {
@@ -636,7 +608,7 @@ function addToFavorites(selectedAlbum) {
 }
 
 function removeFavoritesAlbum(selectedAlbum) {
-  if (listData.user !== userID) { alert("Sorry, only the list creator can delete albums from a list."); return; }
+  if (listData.user !== userID) return alert("Sorry, only the list creator can delete albums from a list."); 
   let albumToRemove = listData.albums.find(x => x.appleAlbumID === selectedAlbum);
   let confirmed = confirm(`Are you sure you want to remove "${albumToRemove.title}" from your favorites? You cannot undo this operation.`);
 
@@ -659,8 +631,13 @@ function removeFavoritesAlbum(selectedAlbum) {
 // ====== END MY FAVORITES FUNCTIONALITY ======
 
 // ====== START EVENT LISTENERS ======
-document.getElementById("get-shareable-link").addEventListener("click", function() {
-  let displayName = $('#display-name-input').val();
+$("#favorites-display-name-input").keyup(function(event) {
+  if (event.keyCode === 13) {
+    $("#get-shareable-link").click();
+  }
+});
+$('#get-shareable-link').click(function() {
+  let displayName = $('#favorites-display-name-input').val();
 
   $.ajax(`/api/v1/list/favorites/${userID}`, {
     method: 'POST',
@@ -670,7 +647,6 @@ document.getElementById("get-shareable-link").addEventListener("click", function
     }),
     success: function (data) {
       const myFavoritesURL = window.location.protocol + "//" + window.location.host + "/list?type=favorites&id=" + data;
-
       const urlBox = document.getElementById("shareable-url");
       urlBox.value = myFavoritesURL;
       urlBox.select();
@@ -685,15 +661,14 @@ document.getElementById("get-shareable-link").addEventListener("click", function
     }
   });
 });
-$('#add-album-modal-button').click(function(event) {
-  event.preventDefault();
+$('#add-album-modal-button').click(function() {
   const search = $('#add-album-modal-input').val().trim().replace(/[^\w\s]/gi, '');
   $('#add-album-search-results').html('');
   $('#no-results-message').remove();
   $('#add-album-card-body .new-loader').show();
   executeSearch(search, "add to list");
 });
-document.getElementById("share-favorites-button").addEventListener("click", function() {
+$('#share-favorites-button').click(function() {
   $('#shareFavoritesModal').modal('show');
 });
 $("#add-album-modal-input").keyup(function(event) {
@@ -701,23 +676,17 @@ $("#add-album-modal-input").keyup(function(event) {
     $("#add-album-modal-button").click();
   }
 });
-$('#edit-button').click(function(event) {
-  event.preventDefault();
-  if (listData.user !== userID) {
-    alert("Sorry! Only the list creator can edit the information for this list.");
-    return;
-  }
+$('#edit-button').click(function() {
+  if (listData.user !== userID) return alert("Sorry! Only the list creator can edit the information for this list.");
+
   toggleActiveInfoTab($('#edit-list-modal-nav-tab'));
   $('#editListModal').modal('show');
   $('#list-title-input').val(listData.title);
   $('#list-display-name-input').val(listData.displayName || "Unknown");
 });
-$('#add-album-button').click(function(event) {
-  event.preventDefault();
-  if (listData.user !== userID) {
-    alert("Sorry! Only the list creator can add albums to this list.");
-    return;
-  }
+$('#add-album-button').click(function() {
+  if (listData.user !== userID) return alert("Sorry! Only the list creator can add albums to this list.");
+
   if (listType === "userlist") {
     toggleActiveInfoTab($('#add-album-modal-nav-tab'));
     $('#editListModal').modal('show');
@@ -727,13 +696,11 @@ $('#add-album-button').click(function(event) {
     $('#addFavoritesAlbumModal').modal('show');
   }
 });
-$('.add-album-refrence').click(function(event) {
-  event.preventDefault();
+$('.add-album-refrence').click(function() {
   $('#pageInfoModal').modal('hide');
   $("#add-album-button").click();
 });
-$('.edit-list-refrence').click(function(event) {
-  event.preventDefault();
+$('.edit-list-refrence').click(function() {
   $('#pageInfoModal').modal('hide');
   $('#edit-button').click();
 });
