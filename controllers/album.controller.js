@@ -1,6 +1,7 @@
 const Album = require('../models/album.model')
+const request = require('request')
 
-// ====== UTILITY FUNCTIONS =======
+// ====== START HELPER FUNCTIONS =======
 const _this = this
 
 exports.utility_getKeyWords = function (string) {
@@ -41,7 +42,26 @@ function makeConnectionObject(albumObject, creator, databaseID) {
   }
   return connectionObject
 }
-// ====== UTILITY FUNCTIONS =======
+
+async function findAppleAlbumData(album) {
+  const options = {
+    url: `https://www.albumtags.com/api/v1/apple/details/${album}`,  
+    json: true  
+  };
+
+  return new Promise(function(resolve, reject) {
+    request.get(options, function(err, resp, body) {
+      if (err) {
+        reject(err);
+      } else if (body) {
+        resolve(body);
+      } else {
+        resolve({ "message" : `unable to find an album with ID ${album}` });
+      }
+    })
+  })
+}
+// ====== END HELPER FUNCTIONS =======
 
 exports.return_all_albums = function (req, res) {
   Album.find({}, function (err, data) {
@@ -51,13 +71,14 @@ exports.return_all_albums = function (req, res) {
 }
 
 // ====== Deprecated 02.20.19 ======
-// exports.get_album_details = function (req, res, next) {
-//   Album.findById(req.params.id, function (err, album) {
-//     if (err) return next(err)
-//     if (album) res.status(200).send(album)
-//     else res.send({ "message" : `Album ID '${req.params.id}' does not exist in the database. NOTE: the required ID value is for the database '_id' field, not the Apple 'albumID' field.` })
-//   })
-// }
+// ====== Turned back on 03.02.19 for tests ======
+exports.get_album_details = function (req, res, next) {
+  Album.findById(req.params.id, function (err, album) {
+    if (err) return next(err)
+    if (album) res.status(200).send(album)
+    else res.send({ "message" : `Album ID '${req.params.id}' does not exist in the database. NOTE: the required ID value is for the database '_id' field, not the Apple 'albumID' field.` })
+  })
+}
 
 exports.add_new_album = function (req, res) {
   const titleKeyWords = _this.utility_getKeyWords(req.body.title) || []
@@ -94,13 +115,22 @@ exports.add_new_album = function (req, res) {
 } 
 
 // ====== Deprecated 02.20.19 ======
-// exports.update_entire_album = function (req, res, next) {
-//   Album.findByIdAndUpdate(req.params.id, {$set: req.body}, function (err, album) {
-//     if (err) return next(err)
-//     res.send('Album updated successfully!')
-//     return
-//   })
-// }
+// ====== Turned back on 03.02.19 for database error corrections ======
+exports.update_entire_album = function (req, res, next) {
+  Album.findByIdAndUpdate(req.params.id, {$set: req.body}, function (err, album) {
+    if (err) { 
+      if (err.message.slice(0,23) === "Cast to ObjectId failed") {
+        // handle most common error with more helpful response
+        res.send({"message" : `No album found for '${req.params.id}' database _id.`}); 
+        return;
+      } else {
+        return next(err); 
+      }
+    }
+    res.send('Album updated successfully!')
+    return
+  })
+}
 
 exports.delete_album = function (req, res) {
   Album.findByIdAndRemove(req.params.id, function (err, deletedAlbum) {
@@ -123,24 +153,6 @@ exports.find_by_apple_album_id = function (req, res, next) {
     }
     res.send(album)
     return
-  })
-}
-
-exports.find_duplicate_apple_album_id = function (req, res, next) {
-  const searchParams = req.params.id
-
-  Album.find({}, function (err, data) {
-    if (err) return next(err)
-
-    let allAlbumID = [];
-    let duplicateIDs = [];
-    data.forEach(element => {
-      if (duplicateIDs.indexOf(element.appleAlbumID) != -1) { duplicateIDs.push(element.appleAlbumID); }
-      allAlbumID.push(element.appleAlbumID);
-    });
-
-    res.send(duplicateIDs);
-    return;
   })
 }
 
@@ -301,22 +313,23 @@ async function existingAlbumConnection(albumObject, creator) {
 }
 
 async function newAlbumConnection(albumObject, creator) {
-  const titleKeyWords = _this.utility_getKeyWords(albumObject.title) || []
-  const artistKeyWords = _this.utility_getKeyWords(albumObject.artist) || []
+  let fullAlbum = await findAppleAlbumData(albumObject.appleAlbumID);
+  const titleKeyWords = _this.utility_getKeyWords(fullAlbum.title) || [];
+  const artistKeyWords = _this.utility_getKeyWords(fullAlbum.artist) || [];
 
   let newAlbum = new Album(
     {
-      appleAlbumID: albumObject.appleAlbumID,
-      appleURL: albumObject.appleURL,
-      title: albumObject.title,
+      appleAlbumID: fullAlbum.appleAlbumID,
+      appleURL: fullAlbum.appleURL,
+      title: fullAlbum.title,
       titleKeyWords: titleKeyWords,
-      artist: albumObject.artist,
+      artist: fullAlbum.artist,
       artistKeyWords: artistKeyWords,
-      releaseDate: albumObject.releaseDate,
-      recordCompany: albumObject.recordCompany,
-      songNames: albumObject.songNames,
-      cover: albumObject.cover,
-      genres: albumObject.genres,
+      releaseDate: fullAlbum.releaseDate,
+      recordCompany: fullAlbum.recordCompany,
+      songNames: fullAlbum.songNames,
+      cover: fullAlbum.cover,
+      genres: fullAlbum.genres,
       tagObjects: [],
       tags: [],
       connectionObjects: [],
@@ -393,7 +406,7 @@ exports.get_favorites = function (req, res) {
   })
 }
 
-exports.add_favorite = function (req, res, next) {
+exports.add_favorite = async function (req, res, next) {
   const userID = req.body.user
   if (req.params.id && req.params.id != "new") {
     // $push just adds it, $addToSet adds if there are no duplicates
@@ -404,26 +417,27 @@ exports.add_favorite = function (req, res, next) {
     })
   } else {
     // client reports album not in database, doublecheck
-    Album.findOne({ "appleAlbumID": req.body.albumData.appleAlbumID }, function (err, existingAlbum) {
+    Album.findOne({ "appleAlbumID": req.body.albumData.appleAlbumID }, async function (err, existingAlbum) {
       if (err) { return next(err) }
       if (!existingAlbum || existingAlbum.length === 0) { 
         // ADD NEW ALBUM TO THE DATABASE
-        const titleKeyWords = _this.utility_getKeyWords(req.body.albumData.title) || []
-        const artistKeyWords = _this.utility_getKeyWords(req.body.albumData.artist) || []
+        let fullAlbum = await findAppleAlbumData(req.body.albumData.appleAlbumID);
+        const titleKeyWords = _this.utility_getKeyWords(fullAlbum.title) || []
+        const artistKeyWords = _this.utility_getKeyWords(fullAlbum.artist) || []
 
         let newAlbum = new Album(
           {
-            appleAlbumID: req.body.albumData.appleAlbumID,
-            appleURL: req.body.albumData.appleURL,
-            title: req.body.albumData.title,
+            appleAlbumID: fullAlbum.appleAlbumID,
+            appleURL: fullAlbum.appleURL,
+            title: fullAlbum.title,
             titleKeyWords: titleKeyWords,
-            artist: req.body.albumData.artist,
+            artist: fullAlbum.artist,
             artistKeyWords: artistKeyWords,
-            releaseDate: req.body.albumData.releaseDate,
-            recordCompany: req.body.albumData.recordCompany,
-            songNames: req.body.albumData.songNames,
-            cover: req.body.albumData.cover,
-            genres: req.body.albumData.genres,
+            releaseDate: fullAlbum.releaseDate,
+            recordCompany: fullAlbum.recordCompany,
+            songNames: fullAlbum.songNames,
+            cover: fullAlbum.cover,
+            genres: fullAlbum.genres,
             tagObjects: [],
             tags: [],
             connectionObjects: [],
@@ -468,29 +482,4 @@ exports.delete_favorite = function (req, res, next) {
       return
     })
   }
-}
-
-exports.find_blank_albums = function (req, res, next) {
-  Album.find({ "tags" : [], "connectionObjects" : [], "favoritedBy" : [] }, function (err, albums) {
-    if (err) { return next(err) }
-    if (albums.length === 0) { 
-      res.send({"message" : 'No blank albums in the database.'}) 
-      return
-    }
-    res.send(albums)
-    return
-  })
-}
-
-exports.find_albums_missing_tags = function (req, res) {
-  let albumsMissingTags = []
-  Album.find({}, function (err, albums) {
-    for (let index = 0; index < albums.length; index++) {
-      const album = albums[index];
-      if (album.tags.length < album.tagObjects.length) {
-        albumsMissingTags.push(album)
-      }
-    }
-    res.send(albumsMissingTags)
-  })
 }
