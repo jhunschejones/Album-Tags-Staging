@@ -9,6 +9,64 @@
           margin-left: 20px;
           margin-bottom: 90px;
         }
+        .loader,
+        .loader:before,
+        .loader:after {
+          border-radius: 50%;
+          width: 2.5em;
+          height: 2.5em;
+          -webkit-animation-fill-mode: both;
+          animation-fill-mode: both;
+          -webkit-animation: load7 1.8s infinite ease-in-out;
+          animation: load7 1.8s infinite ease-in-out;
+        }
+        .loader {
+          display: none;
+          color: #d6d6d6;
+          font-size: 10px;
+          margin: 80px auto;
+          position: relative;
+          text-indent: -9999em;
+          -webkit-transform: translateZ(0);
+          -ms-transform: translateZ(0);
+          transform: translateZ(0);
+          -webkit-animation-delay: -0.16s;
+          animation-delay: -0.16s;
+        }
+        .loader:before,
+        .loader:after {
+          content: '';
+          position: absolute;
+          top: 0;
+        }
+        .loader:before {
+          left: -3.5em;
+          -webkit-animation-delay: -0.32s;
+          animation-delay: -0.32s;
+        }
+        .loader:after {
+          left: 3.5em;
+        }
+        @-webkit-keyframes load7 {
+          0%,
+          80%,
+          100% {
+            box-shadow: 0 2.5em 0 -1.3em;
+          }
+          40% {
+            box-shadow: 0 2.5em 0 0;
+          }
+        }
+        @keyframes load7 {
+          0%,
+          80%,
+          100% {
+            box-shadow: 0 2.5em 0 -1.3em;
+          }
+          40% {
+            box-shadow: 0 2.5em 0 0;
+          }
+        }
       </style>
   </head>
   <body>
@@ -37,18 +95,33 @@
         <div class="row">
           <p id="missing-albums-count">&nbsp;</p>
         </div>
+        <!--
         <div class="row">
           <input id="update-albums-missing-tags" class="btn btn-secondary" type="button" value="Update Albums Missing Tags">
         </div>
         <div class="row">
           <p id="missing-albums-modified">&nbsp;</p>
         </div>
+        -->
         <div class="row">
           <input id="find-duplicate-albums" class="btn btn-secondary" type="button" value="Find Duplicate Albums">
         </div>
         <div class="row">
           <p id="duplicate-album-count">&nbsp;</p>
         </div>
+        <div class="row">
+          <input id="find-albums-missing-songs" class="btn btn-secondary" type="button" value="Find Albums Missing Songs">
+        </div>
+        <div class="row">
+          <p id="albums-missing-songs-count">&nbsp;</p>
+        </div>         
+        <div class="row">
+          <input id="find-expired-albums" class="btn btn-secondary" type="button" value="Find Expired Albums">
+        </div>
+        <div class="row">
+          <p id="expired-album-count">&nbsp;</p>
+          <div><div class="loader float-left" style="margin-left:68px;margin-top:-8px;margin-bottom:0px;">Loading...</div></div>
+        </div>        
       </div>
     </div>
     <!-- PAGE CONTENT -->
@@ -57,20 +130,22 @@
     <% include partials/templates/footer.ejs %>
 
     <script>
-      var blankAlbums
-      var missingTagAlbums
-      var duplicateAlbums
+      let blankAlbums;
+      let missingTagAlbums;
+      let duplicateAlbums;
+      let expiredAlbums;
+      let missingSongs;
 
       function findBlankAlbums() {
         $.ajax({
           method: "GET",
-          url: "/api/v1/album/utility/blankalbums",
+          url: "/api/utility/blankalbums",
           success: function(data) {
             blankAlbums = data
           }
         }).then(function() {
-          $('#blank-albums-count').text(`Blank albums: ${blankAlbums.length || 0}`)
-        })
+          $('#blank-albums-count').text(`Blank albums: ${blankAlbums.length || 0}`);
+        });
       }
 
       function deleteAlbums() {
@@ -79,73 +154,105 @@
             $.ajax({
               method: "DELETE",
               url: "/api/v1/album/" + album._id,
-            })          
-          })
-          $('#blank-albums-deleted').text('Blank albums deleted.')
-          findBlankAlbums()
+            });         
+          });
+          $('#blank-albums-deleted').text('Blank albums deleted.');
+          findBlankAlbums();
         } else {
-          $('#blank-albums-deleted').text('No blank albums to delete!')
+          $('#blank-albums-deleted').text('No blank albums to delete!');
         }
       }
 
       function findMissingTagAlbums() {
         $.ajax({
           method: "GET",
-          url: "/api/v1/album/utility/missingtags",
+          url: "/api/utility/missingtags",
           success: function(data) {
             missingTagAlbums = data
           }
         }).then(function() {
           $('#missing-albums-count').text(`Albums missing tags: ${missingTagAlbums.length || 0}`)
-        })
+        });
       }
 
       function updateMissingTagAlbums() {
         if (missingTagAlbums.length > 0) {
           missingTagAlbums.forEach(album => {
-            let newTags = []
+            let newTags = [];
             album.tagObjects.forEach(tagObject => {
-              newTags.push(tagObject.tag)
+              newTags.push(tagObject.tag);
             })
             newTags.forEach(tag => {
               let updateObject = 
               {
                 "tag": tag,
                 "method": "fix short tags array"
-              }
+              };
               $.ajax({
                 method: "POST",
                 url: '/api/v1/album/tags/' + album._id,
                 data: JSON.stringify(updateObject),
                 contentType: "application/json"
-              })
-            })
-          })
-          $('#missing-albums-modified').text('Albums missing tags have been updated.')
-          findMissingTagAlbums()
+              });
+            });
+          });
+          $('#missing-albums-modified').text('Albums missing tags have been updated.');
+          findMissingTagAlbums();
         } else {
-          $('#missing-albums-modified').text('There are no albums missing tags!')
+          $('#missing-albums-modified').text('There are no albums missing tags!');
         }
       }
 
       function findDuplicateAlbums() {
         $.ajax({
           method: "GET",
-          url: "/api/v1/album/utility/duplicates",
+          url: "/api/utility/duplicates",
           success: function(data) {
-            duplicateAlbums = data
+            duplicateAlbums = data;
           }
         }).then(function() {
-          $('#duplicate-album-count').text(`Duplicate albums: ${duplicateAlbums.length || 0}`)
+          $('#duplicate-album-count').text(`Duplicate albums: ${duplicateAlbums.length || 0}`);
+        });
+      }
+
+      function findExpiredAlbums() {
+        $('.loader').show();
+        $.ajax({
+          method: "GET",
+          url: "/api/utility/expired",
+          success: function(data) {
+            expiredAlbums = data
+          }
+        }).then(function() {
+          $('.loader').hide();
+          $('#expired-album-count').text(`Expired albums: ${expiredAlbums.expiredAlbums.length || 0}`);
+        })
+      }
+
+      function findAlbumsMissingSongs() {
+        $.ajax({
+          method: "GET",
+          url: "/api/utility/missingsongs",
+          success: function(data) {
+            if (data.message === "No albums in the database are missing songs.") {
+              missingSongs = [];
+            } else {
+              missingSongs = data.albums;
+            }
+          }
+        }).then(function() {
+          $('#albums-missing-songs-count').text(`Albums missing songs: ${missingSongs.length || 0}`);
         })
       }
 
       // ====== ADD EVENT LISTENERS ======
-      document.getElementById('find-blank-albums').addEventListener('click', findBlankAlbums)
-      document.getElementById('delete-blank-albums').addEventListener('click', deleteAlbums)
-      document.getElementById('find-albums-missing-tags').addEventListener('click', findMissingTagAlbums)
-      document.getElementById('update-albums-missing-tags').addEventListener('click', updateMissingTagAlbums)    
-      document.getElementById('find-duplicate-albums').addEventListener('click', findDuplicateAlbums)  
+      document.getElementById('find-blank-albums').addEventListener('click', findBlankAlbums);
+      document.getElementById('delete-blank-albums').addEventListener('click', deleteAlbums);
+      document.getElementById('find-albums-missing-tags').addEventListener('click', findMissingTagAlbums);
+      // document.getElementById('update-albums-missing-tags').addEventListener('click', updateMissingTagAlbums); 
+      document.getElementById('find-duplicate-albums').addEventListener('click', findDuplicateAlbums);
+      document.getElementById('find-expired-albums').addEventListener('click', findExpiredAlbums);
+      document.getElementById('find-albums-missing-songs').addEventListener('click', findAlbumsMissingSongs);
     </script>
   </body>
 </html>

@@ -1,4 +1,4 @@
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging') {
   require('dotenv').load();
 }
 const express = require('express')
@@ -21,10 +21,12 @@ app.use(compression())
 
 // security
 app.use(helmet())
-if (process.env.NODE_ENV === 'production') { app.use(redirectToHTTPS([/localhost:(\d{4})/])) }
+if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') { 
+  app.use(redirectToHTTPS([/localhost:(\d{4})/])) 
+}
 app.use(cors())
 
-// limit requests to 100 per 15mins in production
+// limit requests to 120 per 10mins in production and staging
 const rateLimit = require("express-rate-limit");
 app.enable("trust proxy"); 
 const apiLimiter = rateLimit({
@@ -33,7 +35,9 @@ const apiLimiter = rateLimit({
   message: "Too many requests from this IP, please try again in 15 minutes",
   statusCode: 429
 });
-if (process.env.NODE_ENV === 'production') { app.use("/api/", apiLimiter); }
+if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging') { 
+  app.use("/api/v1/", apiLimiter); 
+}
 
 // ====== Set up database connection ======
 const mongoose = require('mongoose')
@@ -47,6 +51,8 @@ const albumRoutes = require('./routes/album.routes')
 const listRoutes = require('./routes/list.routes')
 const appleAPIRoutes = require('./routes/appleAPI.routes')
 const staticRoutes = require('./routes/static.routes')
+const utilityRoutes = require('./routes/utility.routes')
+app.use('/api/utility', utilityRoutes)
 app.use('/api/v1/album', albumRoutes)
 app.use('/api/v1/list', listRoutes)
 app.use('/api/v1/apple', appleAPIRoutes)
@@ -57,11 +63,5 @@ app.use(function(err, res) {
 	res.status(err.status || 500);
 	res.render('error', { error: err.message || "Page not found." });
 });
-
-// This functionality is in `lib/www.js` now
-// const PORT = process.env.PORT || 3000
-// app.listen(PORT, () => {
-//   // console.log(`Albumtags worker ${cluster.worker.id} is running on port ${PORT}.`)
-// })
 
 module.exports = app
