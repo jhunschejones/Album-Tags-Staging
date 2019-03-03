@@ -23,11 +23,6 @@ router.get('/about', function(req, res, next) {
 // GET legacy album details page
 // Deprecated winter 2018, redirecting to new `album` page
 router.get('/albumdetails/:albumId', function(req, res, next) {
-  // res.render('albumdetails', {
-  //   pageTitle: ': Details',
-  //   subTitle: 'Album Details',
-  //   albumId: req.params.albumId
-  // })
   newrelic.recordCustomEvent('DeprecatedPageCalled', {'call': 'GET', 'page': req.url});
   res.redirect('/album/' + req.params.albumId)
 })
@@ -51,11 +46,6 @@ router.get('/alltags', function(req, res, next) {
 // GET legacy our-favorites page
 // Deprecated 02.25.19, redirecting to `myfavorites` page
 router.get('/favorites', function(req, res, next) {
-  // res.setHeader("Cache-Control", "private, max-age=600")
-  // res.render('favorites', { 
-  //   pageTitle: `: ${(new Date()).getFullYear()}`,
-  //   subTitle: `Our Favorite Albums of ${(new Date()).getFullYear()}`
-  // })
   newrelic.recordCustomEvent('DeprecatedPageCalled', {'call': 'GET', 'page': req.url});
   res.redirect('/myfavorites'); 
 })
@@ -68,11 +58,6 @@ router.get('/josh', function(req, res, next) {
 
 // GET "my favorites" page
 router.get('/myfavorites', function(req, res, next) {
-  // res.setHeader("Cache-Control", "private, max-age=600")
-  // res.render('myfavorites', { 
-  //   pageTitle: ': My Favorites',
-  //   subTitle: 'Your Favorite Albums'
-  // })
   res.render('list', {
     pageTitle: ': My Favorites',
     subTitle: 'Your Favorite Albums'
@@ -82,11 +67,6 @@ router.get('/myfavorites', function(req, res, next) {
 // GET legacy search page
 // Deprecated 02.25.19, redirecting to `home` page
 router.get('/search', function(req, res, next) {
-  // res.setHeader("Cache-Control", "private, max-age=600")
-  // res.render('search', {
-  //   pageTitle: ': Search',
-  //   subTitle: 'Search By Album or Artist'
-  // })
   newrelic.recordCustomEvent('DeprecatedPageCalled', {'call': 'GET', 'page': req.url});
   res.redirect('/'); 
 })
@@ -103,11 +83,6 @@ router.get('/search/tags/:selectedtags', function(req, res, next) {
 // GET legacy album update page
 // Deprecated winter 2018, redirecting to new `album` page
 router.get('/update/:albumId', function(req, res) {
-  // res.render('update', {
-  //   pageTitle: ': Update',
-  //   subTitle: 'Update Album Tags',
-  //   albumId: req.params.albumId
-  // })
   newrelic.recordCustomEvent('DeprecatedPageCalled', {'call': 'GET', 'page': req.url});
   res.redirect('/album/' + req.params.albumId)
 })
