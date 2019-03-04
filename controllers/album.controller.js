@@ -1,7 +1,7 @@
 const Album = require('../models/album.model')
 const request = require('request')
 
-// ====== START HELPER FUNCTIONS =======
+// ====== START UTILITY FUNCTIONS =======
 const _this = this
 
 exports.utility_getKeyWords = function (string) {
@@ -61,7 +61,7 @@ async function findAppleAlbumData(album) {
     })
   })
 }
-// ====== END HELPER FUNCTIONS =======
+// ====== END UTILITY FUNCTIONS =======
 
 exports.return_all_albums = function (req, res) {
   Album.find({}, function (err, data) {
@@ -153,6 +153,24 @@ exports.find_by_apple_album_id = function (req, res, next) {
     }
     res.send(album)
     return
+  })
+}
+
+exports.get_all_tags = function (req, res) {
+  Album.find({ "tags": { $exists: true, $not: {$size: 0} }}, function (err, albums) {
+    if (err) { return next(err); }
+
+    let allTags = [];
+    for (let i = 0; i < albums.length; i++) {
+      const album = albums[i];
+      for (let j = 0; j < album.tags.length; j++) {
+        const tag = album.tags[j];
+        if (allTags.indexOf(tag) === -1) {
+          allTags.push(tag);
+        }
+      }
+    }
+    res.send(allTags.sort());
   })
 }
 

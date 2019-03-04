@@ -24,6 +24,7 @@ router.put('/:id', album_controller.update_entire_album)
 router.delete('/:id', album_controller.delete_album)
 router.get('/albumid/:id', album_controller.find_by_apple_album_id) // by appleAlbumID
 // connections and tags
+router.get('/tags/all', album_controller.get_all_tags)
 router.post('/tags/:id', album_controller.add_tag)
 router.delete('/tags/:id', album_controller.delete_tag)
 router.get('/matchingtags/:tags', album_controller.find_by_tags)
