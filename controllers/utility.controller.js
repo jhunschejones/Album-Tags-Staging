@@ -1,5 +1,6 @@
 const Album = require('../models/album.model');
 const List = require('../models/list.model');
+const Audit = require('../models/audit.model');
 const request = require('request');
 
 exports.find_blank_albums = function (req, res, next) {
@@ -79,25 +80,31 @@ async function checkAlbumID(album) {
 }
 
 exports.find_expired_albums = async function (req, res) {
+  res.send({ "message": "Audit job started." })
   let expiredAlbums = [];
   let allAlbums;
   Album.find({}, async function (err, albums) {
     allAlbums = albums;
     for (const album of allAlbums) {
       let result = await checkAlbumID(album.appleAlbumID);
-      // console.log(`Remaining alubms to check: ${allAlbums.length - (allAlbums.indexOf(album) + 1)}`);
-      if (result.message) { expiredAlbums.push(result.message.slice(32, result.message.length)); }
+      if (result.message) { expiredAlbums.push({ 
+        "appleAlbumID" : result.message.slice(32, result.message.length), 
+        "_id" : album._id,
+        "artist" : album.artist,
+        "title" : album.title
+      }); }
     }
-    // console.log(`There are ${expiredAlbums.length} expired albums out of ${allAlbums.length}:`)
-    // expiredAlbums.forEach(album => {
-    //   console.log(album)
-    // });
-    res.send(
+
+    let audit = new Audit(
       {
-        "message" : `There are ${expiredAlbums.length} expired albums out of ${allAlbums.length}.`,
-        "expiredAlbums" : expiredAlbums
+        message: `There are ${expiredAlbums.length} expired albums out of ${allAlbums.length}.`,
+        payload: expiredAlbums
       }
     )
+  
+    audit.save(function(err, res) {
+      if (err) { return next(err) }
+    })
   })
 }
 
@@ -137,5 +144,22 @@ exports.find_duplicate_albums = function (req, res, next) {
 
     res.send(duplicateAlbums);
     return;
+  })
+}
+
+exports.get_most_recent_audit = function (req, res) {
+  Audit.findOne().sort({createdAt: -1}).exec(function (err, audit) {
+    if (err) { return next(err) }
+    else if (!audit || audit.length === 0) { 
+      res.send({"message" : 'There are no stored album audits.'}) 
+    }
+    else { res.send(audit); }
+  })
+}
+
+exports.purge_all_audits = function (req, res) {
+  Audit.deleteMany({}, function (err, data) {
+    if (err) return next(err)
+    else { res.send({ "message": "All existing audits purged." }); }
   })
 }

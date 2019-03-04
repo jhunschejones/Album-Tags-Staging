@@ -9,64 +9,6 @@
           margin-left: 20px;
           margin-bottom: 90px;
         }
-        .loader,
-        .loader:before,
-        .loader:after {
-          border-radius: 50%;
-          width: 2.5em;
-          height: 2.5em;
-          -webkit-animation-fill-mode: both;
-          animation-fill-mode: both;
-          -webkit-animation: load7 1.8s infinite ease-in-out;
-          animation: load7 1.8s infinite ease-in-out;
-        }
-        .loader {
-          display: none;
-          color: #d6d6d6;
-          font-size: 10px;
-          margin: 80px auto;
-          position: relative;
-          text-indent: -9999em;
-          -webkit-transform: translateZ(0);
-          -ms-transform: translateZ(0);
-          transform: translateZ(0);
-          -webkit-animation-delay: -0.16s;
-          animation-delay: -0.16s;
-        }
-        .loader:before,
-        .loader:after {
-          content: '';
-          position: absolute;
-          top: 0;
-        }
-        .loader:before {
-          left: -3.5em;
-          -webkit-animation-delay: -0.32s;
-          animation-delay: -0.32s;
-        }
-        .loader:after {
-          left: 3.5em;
-        }
-        @-webkit-keyframes load7 {
-          0%,
-          80%,
-          100% {
-            box-shadow: 0 2.5em 0 -1.3em;
-          }
-          40% {
-            box-shadow: 0 2.5em 0 0;
-          }
-        }
-        @keyframes load7 {
-          0%,
-          80%,
-          100% {
-            box-shadow: 0 2.5em 0 -1.3em;
-          }
-          40% {
-            box-shadow: 0 2.5em 0 0;
-          }
-        }
       </style>
   </head>
   <body>
@@ -120,7 +62,6 @@
         </div>
         <div class="row">
           <p id="expired-album-count">&nbsp;</p>
-          <div><div class="loader float-left" style="margin-left:68px;margin-top:-8px;margin-bottom:0px;">Loading...</div></div>
         </div>        
       </div>
     </div>
@@ -216,17 +157,57 @@
       }
 
       function findExpiredAlbums() {
-        $('.loader').show();
         $.ajax({
           method: "GET",
           url: "/api/utility/expired",
-          success: function(data) {
-            expiredAlbums = data
+          success: function() {
+            $('.latest-audit').remove();
+            $('.purge-audits').remove();
+            $('#expired-album-count').text("Expired album audit started.")
+            $('#expired-album-count').after("<span class='text-primary latest-audit' style='cursor:pointer;'>&nbsp;[View latest audit]</span>")
+            $('.latest-audit').click(getLatestAudit);
           }
-        }).then(function() {
-          $('.loader').hide();
-          $('#expired-album-count').text(`Expired albums: ${expiredAlbums.expiredAlbums.length || 0}`);
         })
+      }
+      
+      function getLatestAudit() {
+        $.ajax({
+          method: "GET",
+          url: "/api/utility/audit/last",
+          success: function(data) {
+            $('.latest-audit').remove();
+            $('.purge-audits').remove();
+            if (data.message === "There are no stored album audits.") {
+              $('#expired-album-count').text(`There are no previous album audits on file.`);
+              $('#expired-album-count').after("<span class='text-primary latest-audit' style='cursor:pointer;'>&nbsp;[View latest audit]</span>")
+              $('.latest-audit').click(getLatestAudit);
+              return;
+            }
+            expiredAlbums = data.payload;
+            $('#expired-album-count').text(`There are ${data.payload.length} expired albums.`);
+            $('#expired-album-count').after("<span class='text-danger purge-audits' style='cursor:pointer;'>&nbsp;[Purge audits]</span>")
+            $('#expired-album-count').after("<span class='text-primary latest-audit' style='cursor:pointer;'>&nbsp;[View latest audit]</span>")
+            $('.latest-audit').click(getLatestAudit);
+            $('.purge-audits').click(purgeAllAudits);
+          }
+        })
+      }
+
+      function purgeAllAudits() {
+        const confirmed = confirm(`Are you sure you want to purge all existing expired-album audits? You cannot undo this operation.`);
+        if (confirmed) {
+          $.ajax({
+            method: "DELETE",
+            url: "/api/utility/audit/purge",
+            success: function() {
+              $('.latest-audits').remove();
+              $('.purge-audit').remove();
+              $('#expired-album-count').text("Expired album audits purged.")
+              $('.latest-audit').remove();
+              $('.purge-audits').remove();
+            }
+          })
+        }
       }
 
       function findAlbumsMissingSongs() {
