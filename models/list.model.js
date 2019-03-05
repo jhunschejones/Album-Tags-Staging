@@ -2,19 +2,19 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 let ListSchema = new Schema({
-  user: {type: String, required: true},
-  displayName: {type: String, required: false},
-  title: {type: String, required: true},
-  notes: {type: String, required: false},
+  user: {type: String, required: true, maxlength: 40},
+  displayName: {type: String, required: false, maxlength: 30},
+  title: {type: String, required: true, maxlength: 60},
+  notes: {type: String, required: false, maxlength: 180},
   isPrivate: {type: Boolean, required: false}, 
   albums: [{
     _id:false,
     id:false,
-    appleAlbumID: {type: String, required: true},
-    title: {type: String, required: true},
-    artist: {type: String, required: true},
-    releaseDate: {type: String, required: true},
-    cover: {type: String, required: true},
+    appleAlbumID: {type: String, required: true, maxlength: 20},
+    title: {type: String, required: true, maxlength: 180},
+    artist: {type: String, required: true, maxlength: 180},
+    releaseDate: {type: String, required: true, maxlength: 20},
+    cover: {type: String, required: true, maxlength: 180},
     genres: {type: Array, required: true},
   }],
   attributes: {type: Array, required: false}
