@@ -20,25 +20,26 @@ function replaceBackSlashWithHtml(str) {
 var allTags = [];
 
 function populateTags() {
-  $.getJSON ( '/api/v1/album', function(albums) {
-    if (albums) {
+  // $.getJSON ( '/api/v1/album', function(albums) {
+  //   if (albums) {
+  //     $(".all_tags").text('');
+
+  //     // removing duplicates before populating
+  //     albums.forEach(albumObject => {
+  //       let tags = albumObject.tags;
+
+  //       tags.forEach(tag => {
+  //         if (allTags.indexOf(tag) == -1) {
+  //           allTags.push(tag);
+  //         } 
+  //         else {
+  //           // duplicate tag
+  //         }; 
+  //       });            
+  //     });
+  //     allTags.sort();
+    $.getJSON ( '/api/v1/album/tags/all', function(allTags) {      
       $(".all_tags").text('');
-
-      // removing duplicates before populating
-      albums.forEach(albumObject => {
-        let tags = albumObject.tags;
-
-        tags.forEach(tag => {
-          if (allTags.indexOf(tag) == -1) {
-            allTags.push(tag);
-          } 
-          else {
-            // duplicate tag
-          }; 
-        });            
-      });
-      allTags.sort();
-      
       allTags.forEach(tag => {
         // tag = tag.replace(/_/g, "/");
         // creating a unique tag for each element, solving the problem of number tags not allowed
@@ -55,7 +56,7 @@ function populateTags() {
         // tag to toggle a badge-success class name and change the color
         $('.all_tags').append(`<a href="" onclick="changeClass(${tagName}, event)" id="${tagName}" class="badge badge-light tag">${safeParse(tag)}</a>`);    
       });
-    };
+    // };
   });
 };
 
@@ -71,8 +72,8 @@ function changeClass(tagName, event) {
   thisTag.classList.toggle("badge-primary");
   thisTag.classList.toggle("selected_tag");
   thisTag.classList.toggle("badge-light");
-  // see below
-  addToTagArray(replaceBackSlashWithHtml(thisTag.innerHTML));
+  // addToTagArray(replaceBackSlashWithHtml(thisTag.innerHTML));
+  addToTagArray(thisTag.innerHTML);
 };
 
 // this function creates an array and adds or removes tags as the
@@ -111,7 +112,12 @@ function tagSearch(event) {
   if (event) { event.preventDefault(); }
 
   if (selectedTags.length > 0) {
-    var win = window.location = (`/search/tags/${selectedTags}`);
+    // var win = window.location = (`/search/tags/${selectedTags}`);
+    let listURL = new URL(document.location);
+    listURL.pathname = "/list";
+    listURL.searchParams.set("type", "tagsearch");
+    listURL.searchParams.set("search", selectedTags);
+    window.location = (listURL.href);
   }  else {
     $('.warning_label').text('');
     $('.warning_label').text('Select one or more tags to preform a tag-search.');

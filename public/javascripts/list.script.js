@@ -58,16 +58,32 @@ function removeDuplicates(inputArray){
   }
   return outputArray;
 }
+
+function escapeHtml(text) {
+  var map = {
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+    '/': '&sol;',
+    '\\': '&#92;',
+    '{': '&#123;',
+    '}': '&#125;',
+  };
+  return text.replace(/[<>"'/\\{}]/g, function(m) { return map[m]; });
+}
 // ------- END UTILITIES SECTION ----------
 
 let listData;
 let listType;
 let listID;
+let tagSearch;
 let startingURL = (new URL(document.location));
 
 if (startingURL.pathname === "/list") {
   listType = startingURL.searchParams.get("type");
   listID = startingURL.searchParams.get("id");
+  tagSearch = startingURL.searchParams.get("search");
 } else if (startingURL.pathname === "/myfavorites") {
   listType = "myfavorites";
 }
@@ -127,6 +143,35 @@ function getList() {
         }
       }
     });
+  } else if (listType === "tagsearch") {
+    // GET TAG SEARCH RESULTS
+    let databaseTags = [];
+    let sellectedTagsHTML = "";
+    decodeURIComponent(tagSearch).split(',').forEach(tag => {
+      databaseTags.push(escapeHtml(tag)); // the tags we're searching in the database are already stored with escaped-HTML
+      sellectedTagsHTML += `<span class="badge badge-primary mr-1">${escapeHtml(tag)}</span>`;
+    });
+    $("#no-albums-message").html("There are no albums that match this tag combination! Go <a href='/alltags'>back</a> and try another search.");
+  
+    $.ajax({
+      method: "GET",
+      url: "/api/v1/album/matchingtags/" + databaseTags,
+      success: function(data) {
+        if (data.message) {
+          alert(data.message);
+        } else {
+          listData = {
+            user: userID || null,
+            displayName: "All Users",
+            // title: `Tags: ${decodeURIComponent(tagSearch).split(',').join(', ')}`, // TAGS AS TEXT
+            title: `Tags: ${sellectedTagsHTML}`, // TAGS AS BADGES
+            albums: data
+          };
+          $('#main-page-loader').hide();
+          populateList();
+        }
+      }
+    });
   }
 }
 
@@ -166,7 +211,7 @@ function populateList() {
 
   let listCreator = listData.displayName;
   if (!listCreator || listCreator.trim === "") { listCreator = "Unknown"; }
-  $('#list-title').text(`${listData.title}`);
+  $('#list-title').html(`${listData.title}`);
   $('#list-title').after('<h5 id="page-info-button" class="text-secondary" data-toggle="modal" data-target="#pageInfoModal">&#9432;</h5>');
   if (listType !== "userlist") { $('#page-info-button').hide(); }
   $('#list-creator').text("by: " + listCreator);

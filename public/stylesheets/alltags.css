@@ -50,7 +50,13 @@
   border-radius: 5px;
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 450px) {
+  #absolute_content {
+    top: 95px;
+  }
+}
+
+@media screen and (max-width: 800px) and (min-width: 451px) {
   #absolute_content {
     top: 110px;
   }
@@ -172,7 +178,7 @@ hr {
 /* iphone 5s */
 @media screen and (max-width: 320px) {
   #absolute_content {
-      top: 98px;
+      top: 92px;
       left: 0%;
       right: 0%;
       /* max-height: 80vh; */
