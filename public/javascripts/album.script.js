@@ -1004,7 +1004,12 @@ $('#info-card .nav-link').click(function(event) {
 $('#tag-search-button').click(function(event) {
   event.preventDefault();
   if (selectedTags.length > 0) {
-    var win = window.location = (`/search/tags/${selectedTags}`);
+    // var win = window.location = (`/search/tags/${selectedTags}`);
+    let listURL = new URL(document.location);
+    listURL.pathname = "/list";
+    listURL.searchParams.set("type", "tagsearch");
+    listURL.searchParams.set("search", selectedTags);
+    window.location = (listURL.href);
   } else {
     alert("Select one or more tags to preform a tag search");
   }
@@ -1064,6 +1069,13 @@ $('#add-to-new-list-button').click(function(event) {
   } else if ((displayName.includes("<") && displayName.includes(">")) || displayName.includes(".") || displayName.includes("{") || displayName.includes("}")) {
     alert("Some characters are not allowed in tags, sorry!");
     $('#new-display-name').val("");
+    return;
+  }
+
+  // enforce reserved list name 
+  if (listTitle.toUpperCase() === "MY FAVORITES") {
+    alert("'My Favorites' is a reserved list name. Give the existing 'My Favorites' functionality a shot or choose a different title.");
+    $('#new-list-title').val("");
     return;
   }
 

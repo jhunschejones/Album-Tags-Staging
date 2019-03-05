@@ -42,6 +42,12 @@ exports.new_list = function (req, res, next) {
   if ((!req.body.displayName || req.body.displayName.length < 31) && 
     (req.body.title.length < 61) && 
     (!req.body.notes || req.body.notes.length < 181)) {
+
+    if (req.body.title.toUpperCase() === "MY FAVORITES") {
+      res.send({ "message" : "'My Favorites' is a reserved title." });
+      return;
+    }
+
     let list = new List(
       {
         user: req.body.user,
@@ -156,6 +162,10 @@ exports.update_list = function (req, res, next) {
       });
     } else if (method && method === "change title") {
       newTitle = req.body.title;
+      if (newTitle.toUpperCase() === "MY FAVORITES") {
+        res.send({ "message" : "'My Favorites' is a reserved title." });
+        return;
+      }
       List.findByIdAndUpdate(listID, { $set: { title: newTitle } }, {new: true}).populate('albums.album').exec(function (err, list) {
         if (err) { 
           if (err.message.slice(0,23) === "Cast to ObjectId failed") {
