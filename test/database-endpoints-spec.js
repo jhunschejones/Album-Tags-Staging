@@ -130,7 +130,7 @@ describe('add, view, and remove a connection', function() {
     request
       .post('/api/v1/album')
       .send({
-        appleAlbumID: "Test Apple Album ID 1",
+        appleAlbumID: "0001",
         appleURL: "Test Apple URL",
         title: "Test Title 1",
         artist: "Test Artist",
@@ -143,7 +143,7 @@ describe('add, view, and remove a connection', function() {
         res.status.should.equal(200)
         newAlbumOne = {
           _id: res.body,
-          appleAlbumID: "Test Apple Album ID 1",
+          appleAlbumID: "0001",
           appleURL: "Test Apple URL",
           title: "Test Title 1",
           artist: "Test Artist",
@@ -157,7 +157,7 @@ describe('add, view, and remove a connection', function() {
     request
       .post('/api/v1/album')
       .send({
-        appleAlbumID: "Test Apple Album ID 2",
+        appleAlbumID: "00002",
         appleURL: "Test Apple URL",
         title: "Test Title 2",
         artist: "Test Artist",
@@ -170,7 +170,7 @@ describe('add, view, and remove a connection', function() {
         res.status.should.equal(200)
         newAlbumTwo = {
           _id: res.body,
-          appleAlbumID: "Test Apple Album ID 2",
+          appleAlbumID: "00002",
           appleURL: "Test Apple URL",
           title: "Test Title 2",
           artist: "Test Artist",
