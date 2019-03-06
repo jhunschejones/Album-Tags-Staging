@@ -60,7 +60,7 @@ app.use('/', staticRoutes)
 
 // ====== Error Handler ======
 app.use(function(err, res) {
-	res.status(err.status || 500);
+	res.status(err.status || 404);
 	res.render('error', { error: err.message || "Page not found." });
 });
 
