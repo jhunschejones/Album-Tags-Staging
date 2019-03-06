@@ -111,4 +111,10 @@ router.get('/utility', function(req, res) {
   })
 })
 
+// GET /robots.txt
+router.get('/robots.txt', function (req, res) {
+  res.type('text/plain');
+  res.send("User-agent: *\nDisallow:");
+});
+
 module.exports = router
