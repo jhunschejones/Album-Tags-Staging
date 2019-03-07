@@ -20,45 +20,27 @@ function replaceBackSlashWithHtml(str) {
 var allTags = [];
 
 function populateTags() {
-  // $.getJSON ( '/api/v1/album', function(albums) {
-  //   if (albums) {
-  //     $(".all_tags").text('');
-
-  //     // removing duplicates before populating
-  //     albums.forEach(albumObject => {
-  //       let tags = albumObject.tags;
-
-  //       tags.forEach(tag => {
-  //         if (allTags.indexOf(tag) == -1) {
-  //           allTags.push(tag);
-  //         } 
-  //         else {
-  //           // duplicate tag
-  //         }; 
-  //       });            
-  //     });
-  //     allTags.sort();
     $.getJSON ( '/api/v1/album/tags/all', function(allTags) {      
       $(".all_tags").text('');
       allTags.forEach(tag => {
-        // tag = tag.replace(/_/g, "/");
+
         // creating a unique tag for each element, solving the problem of number tags not allowed
         // by adding some letters to the start of any tag that can be converted to a number
         // then using a regular expression to remove all spaces in each tag
+        let tagName;
         if (parseInt(tag)) {
           var addLetters = "tag_";
-          var tagName = addLetters.concat(tag).replace(/[^A-Z0-9]+/ig,'');
+          tagName = addLetters.concat(tag).replace(/[^A-Z0-9]+/ig,'');
         } else {                  
-          var tagName = tag.replace(/[^A-Z0-9]+/ig,'');
+          tagName = tag.replace(/[^A-Z0-9]+/ig,'');
         }
 
         // Here we add the tags as elements on the DOM, with an onclick function that uses a unique
         // tag to toggle a badge-success class name and change the color
         $('.all_tags').append(`<a href="" onclick="changeClass(${tagName}, event)" id="${tagName}" class="badge badge-light tag">${safeParse(tag)}</a>`);    
       });
-    // };
   });
-};
+}
 
 // this function is avaiable onclick for all the tags it will toggle
 // between two boostrap classes to change the color of selected tags
@@ -72,15 +54,15 @@ function changeClass(tagName, event) {
   thisTag.classList.toggle("badge-primary");
   thisTag.classList.toggle("selected_tag");
   thisTag.classList.toggle("badge-light");
-  // addToTagArray(replaceBackSlashWithHtml(thisTag.innerHTML));
+
   addToTagArray(thisTag.innerHTML);
-};
+}
 
 // this function creates an array and adds or removes tags as the
 // applicable tag badges are clicked
 var selectedTags = [];
 function addToTagArray(tag) {
-  // tag = tag.replace(/\//g, '_');
+
   // this conditional returns -1 value if tag is not in array
   if ($.inArray(tag, selectedTags) === -1) {
     selectedTags.push(tag);
@@ -88,10 +70,10 @@ function addToTagArray(tag) {
     // cant use pop because it removes last item only
     // this finds the item being clicked and uses that
     // index with splice() to remove 1 item only
-    let index = selectedTags.indexOf(tag)
+    let index = selectedTags.indexOf(tag);
     selectedTags.splice(index, 1);
-  };
-};
+  }
+}
 
 function clearTagArray(event) {
   if (event) { event.preventDefault(); }
@@ -112,7 +94,6 @@ function tagSearch(event) {
   if (event) { event.preventDefault(); }
 
   if (selectedTags.length > 0) {
-    // var win = window.location = (`/search/tags/${selectedTags}`);
     let listURL = new URL(document.location);
     listURL.pathname = "/list";
     listURL.searchParams.set("type", "tagsearch");
@@ -122,6 +103,6 @@ function tagSearch(event) {
     $('.warning_label').text('');
     $('.warning_label').text('Select one or more tags to preform a tag-search.');
   }
-};
+}
 
 populateTags();
