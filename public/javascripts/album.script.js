@@ -117,7 +117,6 @@ function populateAlbumPage(userLoggedIn) {
   populateConnections();
   getListsWithAlbum(userLoggedIn);
   getUserLists();
-  checkFavorites();
   if (userLoggedIn) { 
     updateTagDisplay(userLoggedIn); 
     updateConnectionDisplay(userLoggedIn);
@@ -127,34 +126,11 @@ function populateAlbumPage(userLoggedIn) {
   }
 }
 
-function checkFavorites () {
-  if (userID) {
-    $('#favorite-title').show();
-    // checks if album has a database result and if it has been favorited by this user
-    if (!albumResult._id || albumResult.favoritedBy.indexOf(userID) === -1) {
-      $('#favorited-icon').html(`<img src="../images/heart-unliked.png" height="30" id="add-to-favorites"><img src="../images/heart-liked.png" height="30" id="remove-from-favorites" style="display:none;">`);
-    } else {
-      $('#favorited-icon').html(`<img src="../images/heart-liked.png" height="30" id="remove-from-favorites"><img src="../images/heart-unliked.png" height="30" id="add-to-favorites" style="display:none;">`);
-    }
-
-    // ------ start event listeners for favorite buttons ------
-    $('#remove-from-favorites').click(function() {
-      removeFromFavorites();
-      $('#remove-from-favorites').hide();
-      $('#add-to-favorites').show();
-    });
-    $('#add-to-favorites').click(function() {
-      addToFavorites();
-      $('#add-to-favorites').hide();
-      $('#remove-from-favorites').show();
-    });
-    // ------ end event listeners for favorite buttons ------
-  } else {
-    $('#favorite-title').hide();
-  }
-}
-
 function addToFavorites() {
+  if (albumResult._id && albumResult.favoritedBy.indexOf(userID) !== -1) {
+    populateUserLists();
+    return alert("This album is already in your \"My Favorites\" list.");
+  }
   $.ajax(`/api/v1/album/favorites/${albumResult._id || "new"}`, {
     method: 'POST',
     contentType: 'application/json',
@@ -165,6 +141,9 @@ function addToFavorites() {
     success: function(album) {
       if (!album.message) {
         albumResult = album;
+        populateListsWithAlbum();
+        $('#updateListModal').modal('hide');
+        $('#list-options').get(0).selectedIndex = 0;
       } else {
         alert(album.message);
       }
@@ -173,18 +152,22 @@ function addToFavorites() {
 }
 
 function removeFromFavorites() {
-  $.ajax(`/api/v1/album/favorites/${albumResult._id}`, {
-    method: 'DELETE',
-    contentType: 'application/json',
-    data: JSON.stringify({ "user" : userID }),
-    success: function(album) {
-      if (!album.message) {
-        albumResult = album;
-      } else {
-        alert(album.message);
+  let confirmed = confirm(`Are you sure you want to remove this album from the 'My Favorites' list? You cannot undo this operation.`);
+  if (confirmed) {
+    $.ajax(`/api/v1/album/favorites/${albumResult._id}`, {
+      method: 'DELETE',
+      contentType: 'application/json',
+      data: JSON.stringify({ "user" : userID }),
+      success: function(album) {
+        if (!album.message) {
+          albumResult = album;
+          populateListsWithAlbum();
+        } else {
+          alert(album.message);
+        }
       }
-    }
-  });
+    });
+  }
 }
 
 function getUserLists() {
@@ -216,19 +199,24 @@ function getListsWithAlbum(userLoggedIn) {
 function populateListsWithAlbum(userLoggedIn) {
   $('#all-lists').html('');
   $('.list-message').remove();
+  // check if album is favorited
+  if (albumResult._id && userID && albumResult.favoritedBy.indexOf(userID) !== -1) {
+    $('#all-lists').append(`<li class="list my-list" data-creator="${userID}"><a href="/list?type=myfavorites">My Favorites</a><span class="text-secondary"> by: You!</span><span class="remove-from-list-button" data-list-type="myfavorites">&#10005;</span></li>`);
+  }
   listsWithAlbum.forEach(list => {
     if(!list.isPrivate) {
       let listCreator = list.displayName;
       if (listCreator.trim === "") { listCreator = "Unknown"; }
 
       if (list.user === userID) {
-        $('#all-lists').append(`<li class="list my-list" data-creator="${list.user}"><a href="/list?type=userlist&id=${list._id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span><span class="remove-from-list-button" data-list-id="${list._id}">&#10005;</span></li>`);
+        $('#all-lists').append(`<li class="list my-list" data-creator="${list.user}"><a href="/list?type=userlist&id=${list._id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span><span class="remove-from-list-button" data-list-id="${list._id}" data-list-type="userlist">&#10005;</span></li>`);
       } else {
-        $('#all-lists').append(`<li class="list other-list" data-creator="${list.user}"><a href="/list?type=userlist&id=${list._id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span></li>`);
+        $('#all-lists').append(`<li class="list other-list" data-creator="${list.user}"><a href="/list?type=userlist&id=${list._id}">${list.title}</a><span class="text-secondary" data-list-type="userlist"> by: ${listCreator}</span></li>`);
       }
     }
   });
   $('.remove-from-list-button').click(function() {
+    if ($(this).data('list-type') === "myfavorites") return removeFromFavorites();
     removeFromList($(this).data('list-id'));
   });
   if (userLoggedIn) return updateListDisplay();
@@ -242,6 +230,7 @@ function populateListsWithAlbum(userLoggedIn) {
 function populateUserLists() {
   $('#list-options').html('');
   $("<option selected>Add to a list...</option>").appendTo("#list-options");
+  $("<option value='myfavorites'>My Favorites</option>").appendTo("#list-options");
   userLists.forEach(list => {
     $(`<option value="${list._id}">${list.title}</option>`).appendTo("#list-options");
   });
@@ -249,8 +238,9 @@ function populateUserLists() {
 
 function addToList(chosenList) {
   if (chosenList) {
-    let alreadyInList = listsWithAlbum.find(x => x._id === chosenList);
+    if (chosenList === "myfavorites") return addToFavorites();
 
+    let alreadyInList = listsWithAlbum.find(x => x._id === chosenList);
     if (alreadyInList) {
       $('#list-options').get(0).selectedIndex = 0;
       return alert(`This album is already in your "${alreadyInList.title}" list.`);
@@ -925,6 +915,7 @@ $("#add-connection-input").keyup(function(event) {
 $('#add-to-list-button').click(function() {
   let listOptions = document.getElementById("list-options");
   let chosenList = listOptions[listOptions.selectedIndex].value;
+  if (chosenList === "My Favorites") return addToFavorites();
   if (chosenList !== "Add to a list...") { addToList(chosenList); } 
 });
 $('#add-to-new-list-button').click(function() {
@@ -991,7 +982,7 @@ function userIsLoggedIn() {
   $('#tag-update-button').show();
   $('#connection-update-button').show();
   $('#list-update-button').show();
-  $('#favorite-title').show();
+  // $('#favorite-title').show();
 
   getAlbumDetails(true);
 }
@@ -1009,7 +1000,7 @@ function userIsLoggedOut() {
   $('#tag-update-button').hide();
   $('#connection-update-button').hide();
   $('#list-update-button').hide();
-  $('#favorite-title').hide();
+  // $('#favorite-title').hide();
 
   getAlbumDetails(false);
 }

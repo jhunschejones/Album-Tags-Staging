@@ -67,7 +67,6 @@
               <button type="button" id="connection-update-button" class="btn btn-sm  btn-outline-primary float-right" data-toggle="modal" data-target="#updateConnectionModal">Add Connections</button>
             </div>
             <div id="lists-info-card-body" class="card-body info-card-body">
-              <h5 id="favorite-title" class="card-title text-secondary text-center"><span id="favorited-icon"></span> + <span id="favorites-link" class="font-italic">your favorites</span><hr/></h5>
               <h5 class="card-title"><span id="list-title-modifier">All <span class="large-button-text">user </span></span>lists with this album<span class="text-secondary ml-2 page-info-button" data-toggle="modal" data-target="#pageInfoModal">&#9432;</span><span id="lists-toggle" class="float-right"></span></h5>
               <ul id="all-lists" class="card-text"></ul>
               <button type="button" class="btn btn-sm btn-outline-primary ml-1 float-right info-card-login-button">Log in to Update</button>
@@ -148,7 +147,8 @@
                         <button id="add-to-list-button" class="btn btn-primary" type="button">Add</button>
                       </div>
                     </div>
-                    <p class="text-secondary mb-1 mt-4"><small>Add to a new list:</small></p>
+                    <hr class="mt-4 mb-3"/>
+                    <p class="text-secondary mb-1"><small>Add to a new list:</small></p>
                     <div class="input-group mb-2">
                       <input id="new-list-title" type="search" class="form-control" placeholder="New list name...">
                     </div>
