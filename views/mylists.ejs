@@ -18,6 +18,7 @@
     <div id="page-control-buttons" class="sticky-top">
       <button id="back-button" class="btn btn-sm btn-light" onclick="window.history.back()"><img id="back_arrow" src="/images/back_arrow.png"><span class="button_text">Back</span></button>    
       <button id="launch-new-list-modal-button" class="btn btn-sm btn-light" data-toggle="modal" data-target="#updateListModal" style="display:none;">New List</button>
+      <button id="info-modal-button" class="btn btn-sm btn-light" data-toggle="modal" data-target="#pageInfoModal" style="display:none;">&#9432;</button>
     </div>
   
     <!-- BEGIN LISTS -->
@@ -63,7 +64,44 @@
         </div>
       </div>
     </div>
-    <!-- ====== end update list modal ====== -->          
+    <!-- ====== end update list modal ====== -->     
+    
+    <!-- ====== start page info modal ====== -->
+    <div class="modal fade" id="pageInfoModal" tabindex="-1" role="dialog" aria-labelledby="pageInfoModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="pageInfoModalLabel">How to use this page</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div id="page-info-modal-body" class="modal-body text-secondary pt-2">
+
+            <small style="line-height:1em;"><strong>To create a new list:</strong></small><br/>
+            <ol class="mb-2 pl-4"><small>
+              <li>Click the <span class="font-italic">New List</span> button at the top of this page</li>
+              <li>Choose a name for the new list</li>
+              <li>Choose how you would like your name to be displayed as the list's creator</li>
+              <li>Click <span class="font-italic">Create New List</span></li>
+            </small></ol>
+
+            <small style="line-height:1em;"><strong>To add albums or edit a list:</strong></small><br/>
+            <ol class="mb-2 pl-4"><small>
+              <li>Click on the card for the list you would like to modify</li>
+              <li>You will be taken to the <span class="font-italic">List</span> page for that album where you can make changes</li>
+            </small></ol>
+
+            <small style="line-height:1em;"><strong>To view your "My Favorites" list:</strong></small><br/>
+            <ol class="mb-2 pl-4"><small>
+              <li>Click the <span class="font-italic">My Favorites</span> link on the main page menu above</li>
+              <li>You will be taken to the <span class="font-italic">My Favorites</span> page where you can view and make changes to your "My Favorites" list</li>
+            </small></ol>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ====== end page info modal ====== -->     
 
     <!-- ====== START SEARCH MODAL ====== -->
     <% include partials/content/modal/search_modal.ejs %>
