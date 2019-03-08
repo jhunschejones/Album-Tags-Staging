@@ -10,22 +10,20 @@ const compression = require('compression')
 const helmet = require('helmet') 
 const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS
 const cors = require('cors')
-
-// module.exports allows me to use app in tests
+// module.exports allows me to access `app` later in tests
 const app = express()
-// view engine setup
+
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
-// app.use(express.static(path.join(__dirname, 'public')))
-app.use(serveStatic(path.join(__dirname, 'public'), {
+app.set('etag', 'strong')
+app.use(express.static(path.join(__dirname, 'public'), {
   lastModified: true,
   etag: true,
   setHeaders: function (res, filePath) {
-    res.set('x-timestamp', Date.now());
     if (path.extname(filePath) === '.png' || path.parse(filePath).name === 'favicon') {
-      res.setHeader('Cache-Control', 'public, max-age=1d')
+      res.setHeader('Cache-Control', 'public, max-age=864000000')
     } else {
-      res.header('Cache-Control', 'public');
+      res.setHeader('Cache-Control', 'public, max-age=120000');
     }
   }
 }))
