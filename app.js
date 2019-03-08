@@ -2,6 +2,7 @@ if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging')
   require('dotenv').load();
 }
 const express = require('express')
+const serveStatic = require('serve-static')
 const path = require('path')
 const bodyParser = require('body-parser')
 const compression = require('compression')
@@ -15,7 +16,8 @@ const app = express()
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
-app.use(express.static(path.join(__dirname, 'public')))
+// app.use(express.static(path.join(__dirname, 'public')))
+app.use(serveStatic(path.join(__dirname, 'public')))
 app.use(bodyParser.json())
 app.use(compression())
 
