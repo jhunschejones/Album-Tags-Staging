@@ -17,7 +17,14 @@ const app = express()
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 // app.use(express.static(path.join(__dirname, 'public')))
-app.use(serveStatic(path.join(__dirname, 'public')))
+app.use(serveStatic(path.join(__dirname, 'public'), {
+  lastModified: true,
+  etag: true,
+  setHeaders: function (res, path, stat) {
+    res.set('x-timestamp', Date.now());
+    res.header('Cache-Control', 'public');
+  }
+}))
 app.use(bodyParser.json())
 app.use(compression())
 
