@@ -243,6 +243,12 @@
   display: none;
 }
 
+#artist-tag-filter-input {
+  margin-top: 4px;
+  padding: 3px 8px 3px 8px;
+  width: 98%;
+}
+
 /* ====== show scrollbar ====== */
 #favorites-search-results::-webkit-scrollbar,
 #add-album-search-results::-webkit-scrollbar {

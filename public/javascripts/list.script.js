@@ -497,6 +497,7 @@ function filterAlbums() {
   return albumArray;
 }
 
+let artistFilterElements;
 function populateFilters(albumArray) {
   const filterObject = getFilterObject();
   $('#year-filter-dropdown').html('');
@@ -538,6 +539,12 @@ function populateFilters(albumArray) {
   $('.artist-filter').click(function() {
     toggleFilter("artist", $(this).data("artist"));
   });
+  // Add artist-filter input if more than 12 artists
+  if (artistFilters.length > 12) {
+    $('#artist-filter-dropdown').prepend('<input id="artist-tag-filter-input" type=search placeholder="Filter artist tags..." class="form-control"></input>');
+    artistFilterElements = document.getElementsByClassName('artist-filter');
+    $("#artist-tag-filter-input").on("input", searchFilter);
+  }
 
   // GENRE FILTERS
   let genreFilters = [];
@@ -561,6 +568,27 @@ function populateFilters(albumArray) {
   $('.genre-filter').click(function() {
     toggleFilter("genre", $(this).data("genre"));
   });
+}
+
+function searchFilter() {
+  userInput = document.getElementById("artist-tag-filter-input").value.toUpperCase();
+  // if you remove all spaces and there is nothing in the input field then set all 
+  // buttons to visible. This addresses empty searches and is used later to display 
+  // all buttons when the box is blank
+  if (userInput.trim().length == 0){
+    for (let i = 0; i < artistFilterElements.length; i++){
+      artistFilterElements[i].style.display = "";
+    }
+  } else {
+    for (let i = 0; i < artistFilterElements.length; i++) {
+      // if (tagElements[i].value.toUpperCase().indexOf(userInput)!= -1) {
+      if (artistFilterElements[i].dataset.artist.toUpperCase().indexOf(userInput)!= -1) {
+        artistFilterElements[i].style.display = "";
+      } else {
+        artistFilterElements[i].style.display = "none";
+      }
+    }
+  }
 }
 
 function toggleFilter(type, filter) {
@@ -852,7 +880,7 @@ function logOut() {
 
 function displayButtons() {
   if (!listData && listType === "myfavorites") {
-    $("#page-info-button").hide();
+    $('#page-info-button').hide();
     $('#edit-button').hide();
     $('#add-album-button').hide();
     $('.remove-if-no-albums').hide();
@@ -862,12 +890,13 @@ function displayButtons() {
     $('#add-album-button').show();
     $('#page-info-button').show();
   } else if (listData.user === userID && listType === "myfavorites") {
-    $("#page-info-button").hide();
+    $('#page-info-button').show();
+    $('.list-only').hide();
     $('#edit-button').hide();
     $('#add-album-button').show();
     $('#share-favorites-button').show();
   } else {
-    $("#page-info-button").hide();
+    $('#page-info-button').hide();
     $('#edit-button').hide();
     $('#add-album-button').hide();
     $('.album-delete-button').hide();
