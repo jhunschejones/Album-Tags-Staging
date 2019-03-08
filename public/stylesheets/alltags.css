@@ -67,6 +67,10 @@
   max-height: 60vh;
 }
 
+.shrink_height {
+  max-height: 49vh!important;
+}
+
 /* ====== scroll bar ====== */
 .all_tags::-webkit-scrollbar {
   -webkit-appearance: none;

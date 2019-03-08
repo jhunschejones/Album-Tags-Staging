@@ -1,38 +1,40 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <% include partials/templates/head_tags.ejs %>
-        <link rel="stylesheet" href="/stylesheets/alltags.min.css">
-        <link rel="stylesheet" href="/stylesheets/search_modal_cards.min.css">
-    </head>
-    <body>
+  <head>
+    <% include partials/templates/head_tags.ejs %>
+    <link rel="stylesheet" href="/stylesheets/alltags.min.css">
+    <link rel="stylesheet" href="/stylesheets/search_modal_cards.min.css">
+  </head>
+  <body>
 
-        <!-- BASIC NAVBAR TEMPLATE -->
-        <% include partials/templates/navbar_basic.ejs %>
+    <!-- BASIC NAVBAR TEMPLATE -->
+    <% include partials/templates/navbar_basic.ejs %>
 
-        <div id="background_image_container">
-        <!--CSS PUTS BACKGROUND HERE-->
-        </div>
+    <div id="background_image_container">
+    <!--CSS PUTS BACKGROUND HERE-->
+    </div>
 
-        <div id="absolute_content" class="container-fluid">
-            <h4>All Tags:</h4>
-            <div class="all_tags">
-                <div id="my-favorites-loader" class="new-loader text-center" style="margin-top:120px;margin-bottom:120px;"><span class="text-secondary">Loading...</span></div>
-            </div>
+    <div id="absolute_content" class="container-fluid">
+      <h4 id="all-tags-title">All Tags:</h4>
+      <input id="tag-search-input" type=search placeholder="Filter tags on page..." class="form-control mb-2 hide_me">
+      <div class="all_tags">
+        <div id="my-favorites-loader" class="new-loader text-center" style="margin-top:120px;margin-bottom:120px;"><span class="text-secondary">Loading...</span></div>
+      </div>
 
-            <button class="btn btn-sm btn-outline-light back_button" onclick="window.history.back()">Go Back</button>
-            <a href="" onclick="tagSearch(event)" class="btn btn-sm btn-outline-light all_tags_button">Search<span class="extra_text"> by Selected Tags</span></a>
-            <a href="" onclick="clearTagArray(event)" class="btn btn-sm btn-outline-light all_tags_button">Clear Selected<span class="extra_text"> Tags</span></a>
-            <p class="warning_label text-danger"></p>
-        </div>  
-        
-        <!-- ====== START SEARCH MODAL ====== -->
-        <% include partials/content/modal/search_modal.ejs %>
-        <!-- ====== END SEARCH MODAL ====== -->    
+      <button class="btn btn-sm btn-outline-light back_button" onclick="window.history.back()"><span class="extra_text">Go </span>Back</button>
+      <a href="" onclick="tagSearch(event)" class="btn btn-sm btn-outline-light all_tags_button">Search<span class="extra_text"> by Selected Tags</span></a>
+      <a href="" onclick="clearTagArray(event)" class="btn btn-sm btn-outline-light all_tags_button">Clear<span class="extra_text"> Selected Tags</span></a>
+      <a href="" onclick="showFilter(event)" class="btn btn-sm btn-outline-light all_tags_button">Filter<span class="extra_text"> Tags</span></a>
+      <p class="warning_label text-danger"></p>
+    </div>  
+    
+    <!-- ====== START SEARCH MODAL ====== -->
+    <% include partials/content/modal/search_modal.ejs %>
+    <!-- ====== END SEARCH MODAL ====== -->    
 
-        <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
-        <% include partials/templates/footer.ejs %>
-        <script src="/javascripts/alltags.script.min.js"></script>
-        <script src="/javascripts/search_modal.script.min.js"></script>
-    </body>
+    <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
+    <% include partials/templates/footer.ejs %>
+    <script src="/javascripts/alltags.script.min.js"></script>
+    <script src="/javascripts/search_modal.script.min.js"></script>
+  </body>
 </html>

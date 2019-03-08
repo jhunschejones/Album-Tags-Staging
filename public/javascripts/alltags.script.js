@@ -7,17 +7,18 @@
 function safeParse(content) {
   // replace characters with html equivalents
   // prevents some basic cross site scripting attacks
-  content = content.replace(/\</g, "&lt;").replace(/\>/g, "&gt;").replace(/\//g, "&#47;").replace(/\\/g, "&#92;").replace(/\(/g, "&#40;").replace(/\)/, "&#41;").replace(/\./g, "&#46;").replace(/\[/g, "&#91;").replace(/\]/g, "&#93;").replace(/\{/g, "&#123;").replace(/\}/g, "&#125;").replace(/\=/g, "&#61;")
-  return content
+  content = content.replace(/\</g, "&lt;").replace(/\>/g, "&gt;").replace(/\//g, "&#47;").replace(/\\/g, "&#92;").replace(/\(/g, "&#40;").replace(/\)/, "&#41;").replace(/\./g, "&#46;").replace(/\[/g, "&#91;").replace(/\]/g, "&#93;").replace(/\{/g, "&#123;").replace(/\}/g, "&#125;").replace(/\=/g, "&#61;");
+  return content;
 }
 
 // replaces back slash with html character
 function replaceBackSlashWithHtml(str) {
-  return str.replace(/\//g, '&sol;')
+  return str.replace(/\//g, '&sol;');
 }
 // ---------------- END UTILITIES ---------------
 
-var allTags = [];
+let allTags = [];
+let tagElements;
 
 function populateTags() {
     $.getJSON ( '/api/v1/album/tags/all', function(allTags) {      
@@ -39,6 +40,7 @@ function populateTags() {
         // tag to toggle a badge-success class name and change the color
         $('.all_tags').append(`<a href="" onclick="changeClass(${tagName}, event)" id="${tagName}" class="badge badge-light tag">${safeParse(tag)}</a>`);    
       });
+      tagElements = document.getElementsByClassName("tag");
   });
 }
 
@@ -87,7 +89,7 @@ function clearTagArray(event) {
     $('.warning_label').text('');
     // $('.warning_label').text('No tags have been selected.');
   }
-};
+}
 
 // called by the search by selected tags button
 function tagSearch(event) {
@@ -103,6 +105,35 @@ function tagSearch(event) {
     $('.warning_label').text('');
     $('.warning_label').text('Select one or more tags to preform a tag-search.');
   }
+}
+
+function searchFilter() {
+  userInput = document.getElementById("tag-search-input").value.toUpperCase();
+  // if you remove all spaces and there is nothing in the input field then set all 
+  // buttons to visible. This addresses empty searches and is used later to display 
+  // all buttons when the box is blank
+  if (userInput.trim().length == 0){
+    for (let i = 0; i < tagElements.length; i++){
+      tagElements[i].style.display = "";
+    }
+  } else {
+    for (let i = 0; i < tagElements.length; i++) {
+      // if (tagElements[i].value.toUpperCase().indexOf(userInput)!= -1) {
+      if (tagElements[i].innerHTML.toUpperCase().indexOf(userInput)!= -1) {
+        tagElements[i].style.display = "";
+      } else {
+        tagElements[i].style.display = "none";
+      }
+    }
+  }
+}
+
+$("#tag-search-input").on("input", searchFilter);
+
+function showFilter(event) {
+  event.preventDefault();
+  $("#tag-search-input").toggleClass('hide_me');
+  $(".all_tags").toggleClass('shrink_height');
 }
 
 populateTags();
