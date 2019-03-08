@@ -10,17 +10,9 @@ router.post('/', album_controller.add_new_album)
 // Deprecated 02.20.19, redirecting to find by apple album ID endpoint
 // Turned back on 03.02.19 for tests 
 router.get('/:id', album_controller.get_album_details) // by database _id
-// router.get('/:id', function(req, res) { 
-//   newrelic.recordCustomEvent('DeprecatedEndpointCalled', {'call': 'GET', 'endpoint': `/api/v1/album${req.url}`})
-//   res.redirect('/api/v1/album/albumid/' + req.params.id); 
-// })
 // Deprecated 02.20.19, replacing with warning message
 // Turned back on 03.02.19 for database error corrections 
 router.put('/:id', album_controller.update_entire_album)
-// router.put('/:id', function(req, res) {
-//   newrelic.recordCustomEvent('DeprecatedEndpointCalled', {'call': 'PUT', 'endpoint': `/api/v1/album${req.url}`})
-//   res.send({ "message": "the full album update endpoint was deprecated on 02.20.19" })
-// })
 router.delete('/:id', album_controller.delete_album)
 router.get('/albumid/:id', album_controller.find_by_apple_album_id) // by appleAlbumID
 // connections and tags

@@ -203,11 +203,11 @@ exports.update_list = function (req, res, next) {
   }
 };
 
-exports.get_user_virtual_favorites_list = function (req, res, next) {
+exports.create_virtual_favorites_list = function (req, res, next) {
   res.send(cryptr.encrypt(`${req.params.id.trim()}\s\s\s${req.body.displayName.trim()}`));
 };
 
-exports.get_user_favorites = function (req, res, next) {
+exports.get_virtual_favorites_list = function (req, res, next) {
   const requestArray = cryptr.decrypt(req.params.id).split("\s\s\s");
   const userID = requestArray[0];
   const displayName = requestArray[1];

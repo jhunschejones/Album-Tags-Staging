@@ -71,13 +71,11 @@ router.get('/search', function(req, res, next) {
   res.redirect('/'); 
 })
 
-// GET tags-search page
+// GET legacy tags-search page
+// Deprecated 03.07.19, tag search results are now a list
 router.get('/search/tags/:selectedtags', function(req, res, next) {
-  res.render('tagsearch', {
-    pageTitle: ': Tag Search',
-    subTitle: 'Tag Search Results',
-    selectedTags: req.params.selectedtags
-  })
+  newrelic.recordCustomEvent('DeprecatedPageCalled', {'call': 'GET', 'page': req.url});
+  res.redirect('/alltags');
 })
 
 // GET legacy album update page
