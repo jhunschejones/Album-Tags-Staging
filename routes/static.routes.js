@@ -4,7 +4,7 @@ const newrelic = require('newrelic')
 
 // GET home page
 router.get('/', function(req, res, next) {
-  res.setHeader("Cache-Control", "private, max-age=600")
+  // res.setHeader("Cache-Control", "private, max-age=600")
   res.render('index', { 
     pageTitle: "",
     subTitle: "Find Something New",
@@ -30,7 +30,7 @@ router.get('/albumdetails/:albumId', function(req, res, next) {
 // GET album page
 router.get('/album/:albumId', function(req, res, next) {
   res.set({
-    'Cache-Control' : 'public',
+    'Cache-Control' : 'public, no-cache',
     'If-Modified-Since' : new Date().toUTCString()
   })
   res.render('album', {
@@ -42,7 +42,7 @@ router.get('/album/:albumId', function(req, res, next) {
 // GET alltags page 
 router.get('/alltags', function(req, res, next) {
   res.set({
-    'Cache-Control' : 'public',
+    'Cache-Control' : 'public, no-cache',
     'If-Modified-Since' : new Date().toUTCString()
   })
   res.render('alltags', {
@@ -67,7 +67,7 @@ router.get('/josh', function(req, res, next) {
 // GET "my favorites" page
 router.get('/myfavorites', function(req, res, next) {
   res.set({
-    'Cache-Control' : 'public',
+    'Cache-Control' : 'public, no-cache',
     'If-Modified-Since' : new Date().toUTCString()
   })
   res.render('list', {
@@ -100,7 +100,7 @@ router.get('/update/:albumId', function(req, res) {
 // GET my-lists page
 router.get('/mylists', function(req, res) {
   res.set({
-    'Cache-Control' : 'public',
+    'Cache-Control' : 'public, no-cache',
     'If-Modified-Since' : new Date().toUTCString()
   })
   res.render('mylists', {
@@ -112,7 +112,7 @@ router.get('/mylists', function(req, res) {
 // GET specific lists page
 router.get('/list', function(req, res) {
   res.set({
-    'Cache-Control' : 'public',
+    'Cache-Control' : 'public, no-cache',
     'If-Modified-Since' : new Date().toUTCString()
   })
   res.render('list', {

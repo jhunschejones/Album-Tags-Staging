@@ -20,9 +20,13 @@ app.set('view engine', 'ejs')
 app.use(serveStatic(path.join(__dirname, 'public'), {
   lastModified: true,
   etag: true,
-  setHeaders: function (res, path, stat) {
+  setHeaders: function (res, filePath) {
     res.set('x-timestamp', Date.now());
-    res.header('Cache-Control', 'public');
+    if (path.extname(filePath) === '.png') {
+      res.setHeader('Cache-Control', 'public, max-age=1y')
+    } else {
+      res.header('Cache-Control', 'public, no-cache');
+    }
   }
 }))
 app.use(bodyParser.json())
