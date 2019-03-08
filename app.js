@@ -22,10 +22,10 @@ app.use(serveStatic(path.join(__dirname, 'public'), {
   etag: true,
   setHeaders: function (res, filePath) {
     res.set('x-timestamp', Date.now());
-    if (path.extname(filePath) === '.png') {
-      res.setHeader('Cache-Control', 'public, max-age=1y')
+    if (path.extname(filePath) === '.png' || path.parse(filePath).name === 'favicon') {
+      res.setHeader('Cache-Control', 'public, max-age=1d')
     } else {
-      res.header('Cache-Control', 'public, no-cache');
+      res.header('Cache-Control', 'public');
     }
   }
 }))
