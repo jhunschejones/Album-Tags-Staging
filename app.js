@@ -2,7 +2,6 @@ if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging')
   require('dotenv').load();
 }
 const express = require('express')
-const serveStatic = require('serve-static')
 const path = require('path')
 const bodyParser = require('body-parser')
 const compression = require('compression')
