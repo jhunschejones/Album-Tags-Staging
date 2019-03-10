@@ -91,6 +91,20 @@
   line-height: 1em;
 }
 
+#applied-filters {
+  margin: -8.5px 0px 5px 6px;
+}
+
+.applied-filter {
+  cursor: pointer;
+}
+
+.tagsearch-tag {
+  border: 1px solid #dddddd;
+  font-weight: 300;
+  font-size: 64%;
+}
+
 #no-albums-message {
   display: none;
   text-align: center;

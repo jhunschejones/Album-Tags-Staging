@@ -149,9 +149,9 @@ function getList() {
     let sellectedTagsHTML = "";
     decodeURIComponent(tagSearch).split(',').forEach(tag => {
       databaseTags.push(escapeHtml(tag)); // the tags we're searching in the database are already stored with escaped-HTML
-      sellectedTagsHTML += `<span class="badge badge-primary mr-1">${escapeHtml(tag)}</span>`;
+      sellectedTagsHTML += `<a href="/list?type=tagsearch&search=${encodeURIComponent(tag)}" class="badge badge-light text-secondary mr-1 tagsearch-tag" data-toggle="tooltip" data-placement="top" title="Search for albums with just this tag" data-trigger="hover">${escapeHtml(tag)}</a>`;
     });
-    $("#no-albums-message").html("There are no albums that match this tag combination! Go <a href='/alltags'>back</a> and try another search.");
+    $("#no-albums-message").html("No albums match this combination of tags. Go <a href='/alltags'>back</a> to try another search, or click one of the tags above to search just that tag.");
   
     $.ajax({
       method: "GET",
@@ -173,6 +173,17 @@ function getList() {
       }
     });
   }
+}
+
+function showAppliedFilter(filter, filterType) {
+  $('#applied-filters').show();
+  const cleanFilter = escapeHtml(filter);
+  const pageFilter = cleanFilter.length > 24 ? truncate(cleanFilter, 24) : cleanFilter;
+  $('#applied-filters').append(`<span class="badge badge-primary mr-1 applied-filter applied-filter-${filterType}" data-${filterType}="${filter}">${pageFilter}</span>`);
+
+  $(`.applied-filter-${filterType}`).click(function() {
+    toggleFilter(filterType, $(this).data(filterType));
+  });
 }
 
 function createCard(cardNumber) {
@@ -478,6 +489,7 @@ function getFilterObject() {
 }
 
 function filterAlbums() {
+  $('.applied-filter').remove(); // clear out previous filters displayed after list creator
   const filterObject = getFilterObject();
   let albumArray = getCleanAlbumArray(listData.albums);
   
@@ -485,12 +497,15 @@ function filterAlbums() {
     albumArray = albumArray.filter(album => {
       return !album.tagGenres ? false : album.tagGenres.indexOf(filterObject.genre) !== -1;
     });
+    showAppliedFilter(filterObject.genre, "genre");
   }
   if (!!filterObject.artist) {
     albumArray = albumArray.filter(album => !!album.artist && album.artist === filterObject.artist);
+    showAppliedFilter(filterObject.artist, "artist");
   }
   if (!!filterObject.year) {
     albumArray = albumArray.filter(album => !!album.year && album.year === filterObject.year);
+    showAppliedFilter(filterObject.year, "year");
   }
   bubbleSort(albumArray, "releaseDate");
   albumArray = albumArray.reverse(); // reverse shows newer albums first (generally)
@@ -601,6 +616,7 @@ function toggleFilter(type, filter) {
   history.replaceState({}, '', url); // replace history entry
   // history.pushState({}, '', url); // add new history entry
   populateList();
+  if ($('.applied-filter').length == 0) { $('#applied-filters').hide(); }
 }
 
 function clearFilters() {
@@ -610,6 +626,7 @@ function clearFilters() {
   url.searchParams.delete("genre");
   history.replaceState({}, '', url); // replace history entry
   // history.pushState({}, '', url); // add new history entry
+  $('#applied-filters').hide();
   populateList();
 }
 
@@ -900,6 +917,13 @@ function displayButtons() {
     $('#edit-button').hide();
     $('#add-album-button').hide();
     $('.album-delete-button').hide();
+  }
+
+  if (listType === "tagsearch" && $('.tagsearch-tag').length > 1) {
+    // ------ enable tooltips ------
+    let isTouchDevice = false;
+    if ("ontouchstart" in document.documentElement) { isTouchDevice = true; }
+    if (!isTouchDevice) { $('[data-toggle="tooltip"]').tooltip(); }
   }
 }
 
