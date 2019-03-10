@@ -15,17 +15,21 @@ const app = express()
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 app.set('etag', 'strong')
-app.use(express.static(path.join(__dirname, 'public'), {
-  lastModified: true,
-  etag: true,
-  setHeaders: function (res, filePath) {
-    if (path.extname(filePath) === '.png' || path.parse(filePath).name === 'favicon') {
-      res.setHeader('Cache-Control', 'public, max-age=864000000')
-    } else {
-      res.setHeader('Cache-Control', 'public, max-age=120000');
+if (process.env.NODE_ENV !== 'development') {
+  app.use(express.static(path.join(__dirname, 'public'), {
+    lastModified: true,
+    etag: true,
+    setHeaders: function (res, filePath) {
+      if (path.extname(filePath) === '.png' || path.parse(filePath).name === 'favicon') {
+        res.setHeader('Cache-Control', 'public, max-age=864000000')
+      } else {
+        res.setHeader('Cache-Control', 'public, max-age=120000');
+      }
     }
-  }
-}))
+  }))
+} else {
+  app.use(express.static(path.join(__dirname, 'public')));
+}
 app.use(bodyParser.json())
 app.use(compression())
 
