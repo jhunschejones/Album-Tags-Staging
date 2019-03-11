@@ -21,9 +21,9 @@ if (process.env.NODE_ENV !== 'development') {
     etag: true,
     setHeaders: function (res, filePath) {
       if (path.extname(filePath) === '.png' || path.parse(filePath).name === 'favicon') {
-        res.setHeader('Cache-Control', 'public, max-age=864000000')
+        res.setHeader('Cache-Control', 'public, max-age=86400')
       } else {
-        res.setHeader('Cache-Control', 'public, max-age=120000');
+        res.setHeader('Cache-Control', 'public, max-age=180');
       }
     }
   }))
