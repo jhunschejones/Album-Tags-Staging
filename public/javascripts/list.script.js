@@ -191,7 +191,7 @@ function showAlbumCount() {
   const hideCount = sessionStorage.getItem('hideCount');
   if (!hideCount) {
     $('#result-count').remove();
-    const countText = `&#8594; ${totalAlbumsOnPage} ${totalAlbumsOnPage > 1 || totalAlbumsOnPage === 0 ? "albums" : "album"}`;
+    const countText = `(${totalAlbumsOnPage} ${totalAlbumsOnPage > 1 || totalAlbumsOnPage === 0 ? "albums" : "album"})`;
     $('#applied-filters').append(`<small id="result-count">${countText}</small>`);
     $('#applied-filters').show();
   
