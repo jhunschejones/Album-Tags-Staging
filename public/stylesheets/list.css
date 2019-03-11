@@ -100,7 +100,7 @@
 }
 
 #result-count {
-  color: #cecdcd;
+  color: rgba(108, 117, 125, 0.7);
   font-weight: 100;
   font-size: 75%;
   /* cursor: pointer; */
