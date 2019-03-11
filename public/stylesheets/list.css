@@ -99,6 +99,13 @@
   cursor: pointer;
 }
 
+#result-count {
+  color: #dddddd;
+  font-weight: 100;
+  font-size: 75%;
+  /* cursor: pointer; */
+}
+
 .tagsearch-tag {
   border: 1px solid #dddddd;
   font-weight: 300;
@@ -108,8 +115,7 @@
 #no-albums-message {
   display: none;
   text-align: center;
-  margin-top: 60px;
-  margin-bottom: 50px;
+  margin: 140px 10px;
 }
 
 /* ====== START CARD STYLES ====== */

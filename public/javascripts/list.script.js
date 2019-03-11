@@ -79,6 +79,7 @@ let listType;
 let listID;
 let tagSearch;
 let startingURL = (new URL(document.location));
+let totalAlbumsOnPage = 0;
 
 if (startingURL.pathname === "/list") {
   listType = startingURL.searchParams.get("type");
@@ -186,6 +187,32 @@ function showAppliedFilter(filter, filterType) {
   });
 }
 
+function showAlbumCount() {
+  const hideCount = sessionStorage.getItem('hideCount');
+  if (!hideCount) {
+    $('#result-count').remove();
+    const countText = `${totalAlbumsOnPage} ${totalAlbumsOnPage > 1 || totalAlbumsOnPage === 0 ? "albums" : "album"}`;
+    $('#applied-filters').append(`<small id="result-count">${countText}</small>`);
+    $('#applied-filters').show();
+  
+    // HIDE ALBUM COUNT AFTER 3 SECONDS IF NO FILTERS APPLIED
+    // if ($('.applied-filter').length < 1) {
+    //   setTimeout(function(){ $('#applied-filters').hide(); }, 3000);
+    // }
+
+    // HIDE ALBUM COUNT ON USER CLICK
+    // $('#result-count').click(function(){
+    //   sessionStorage.setItem('hideCount', true);
+    //   if ($('.applied-filter').length < 1) {
+    //     $('#applied-filters').hide();
+    //   }
+    //   $('#result-count').hide();
+    // })
+  }
+
+  if (hideCount && $('.applied-filter').length < 1) { $('#applied-filters').hide(); }
+}
+
 function createCard(cardNumber) {
   $('#albums').append(`<div id="card${cardNumber}" class="card list-card"><a class="album-details-link" href=""><img class="card-img-top" src=""><a/><div class="card-body"><h4 class="card-title"></h4><span class="album-title"></span></div></div>`);
 }
@@ -219,6 +246,7 @@ function populateList() {
   $('#page-info-button').hide();
   $("#no-albums-message").hide();
   $('#albums').html('');
+  totalAlbumsOnPage = 0;
 
   let listCreator = listData.displayName;
   if (!listCreator || listCreator.trim === "") { listCreator = "Unknown"; }
@@ -251,6 +279,7 @@ function populateList() {
       createCard(card);
       populateCard(albumObject, card);
     }
+    totalAlbumsOnPage = albumArray.length;
   
     // ====== add event listener to delete buttons =====
     $(".album-delete-button").on("click", function() { 
@@ -270,6 +299,7 @@ function populateList() {
     populateFilters([]);
   }
   displayButtons(); // show user control buttons for this list type
+  showAlbumCount();
 }
 
 function removeListAlbum(albumID) {
@@ -616,7 +646,6 @@ function toggleFilter(type, filter) {
   history.replaceState({}, '', url); // replace history entry
   // history.pushState({}, '', url); // add new history entry
   populateList();
-  if ($('.applied-filter').length == 0) { $('#applied-filters').hide(); }
 }
 
 function clearFilters() {
@@ -626,7 +655,6 @@ function clearFilters() {
   url.searchParams.delete("genre");
   history.replaceState({}, '', url); // replace history entry
   // history.pushState({}, '', url); // add new history entry
-  $('#applied-filters').hide();
   populateList();
 }
 
@@ -898,17 +926,20 @@ function logOut() {
 function displayButtons() {
   if (!listData && listType === "myfavorites") {
     $('#page-info-button').hide();
+    $('.tag-search-only').hide();
     $('#edit-button').hide();
     $('#add-album-button').hide();
     $('.remove-if-no-albums').hide();
     $('#share-favorites-button').hide();
   } else if (listData.user === userID && listType === "userlist") {
     $('#edit-button').show(); 
+    $('.tag-search-only').hide();
     $('#add-album-button').show();
     $('#page-info-button').show();
   } else if (listData.user === userID && listType === "myfavorites") {
     $('#page-info-button').show();
     $('.list-only').hide();
+    $('.tag-search-only').hide();
     $('#edit-button').hide();
     $('#add-album-button').show();
     $('#share-favorites-button').show();
@@ -919,11 +950,24 @@ function displayButtons() {
     $('.album-delete-button').hide();
   }
 
-  if (listType === "tagsearch" && $('.tagsearch-tag').length > 1) {
-    // ------ enable tooltips ------
-    let isTouchDevice = false;
-    if ("ontouchstart" in document.documentElement) { isTouchDevice = true; }
-    if (!isTouchDevice) { $('[data-toggle="tooltip"]').tooltip(); }
+  if (listType === "favorites") {
+    $('#page-info-button').show();
+    $('.list-and-favorites-only').hide();
+    $('.tag-search-only').hide();
+    $('.list-only').hide();
+  }
+
+  if (listType === "tagsearch") {
+    $('#page-info-button').show();
+    $('.tag-search-only').show();
+    $('.list-only').hide();
+    $('.list-and-favorites-only').hide();
+    if ($('.tagsearch-tag').length > 1) {
+      // ------ enable tooltips ------
+      let isTouchDevice = false;
+      if ("ontouchstart" in document.documentElement) { isTouchDevice = true; }
+      if (!isTouchDevice) { $('[data-toggle="tooltip"]').tooltip(); }
+    }
   }
 }
 
