@@ -54,21 +54,11 @@ if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging')
 }
 
 // ====== Set up database connection ======
-const mongoose = require('mongoose')
-mongoose.set('useFindAndModify', false)
-mongoose.connect(process.env.MONGO_STRING, { useNewUrlParser: true })
-let db = mongoose.connection
-db.on('error', console.error.bind(console, 'MongoDB connection error:'))
+
 
 // ====== Set up routes ======
-const albumRoutes = require('./routes/album.routes')
-const listRoutes = require('./routes/list.routes')
 const appleAPIRoutes = require('./routes/appleAPI.routes')
 const staticRoutes = require('./routes/static.routes')
-const utilityRoutes = require('./routes/utility.routes')
-app.use('/api/utility', utilityRoutes)
-app.use('/api/v1/album', albumRoutes)
-app.use('/api/v1/list', listRoutes)
 app.use('/api/v1/apple', appleAPIRoutes)
 app.use('/', staticRoutes)
 
