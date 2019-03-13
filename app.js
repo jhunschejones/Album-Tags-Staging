@@ -59,9 +59,10 @@ if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging')
 // ====== Set up routes ======
 const appleAPIRoutes = require('./routes/appleAPI.routes')
 const staticRoutes = require('./routes/static.routes')
+const albumRoutes = require('./routes/album.routes')
+app.use('/api/v1/album', albumRoutes)
 app.use('/api/v1/apple', appleAPIRoutes)
 app.use('/', staticRoutes)
-
 // ====== Error Handler ======
 app.use(function(err, res) {
 	res.status(err.status || 404);
