@@ -59,7 +59,7 @@ let userLists = [];
 let listsWithAlbum = [];
 
 function getAlbumDetails(userLoggedIn) {
-  $.ajax('/api/v1/album/albumid/' + albumID, {
+  $.ajax('/api/v1/album/' + albumID, {
     method: 'GET',
     success: function(album) {
       // message returned here means no album in the database yet
