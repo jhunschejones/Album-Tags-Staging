@@ -6,6 +6,7 @@ const Song = require('../models/album_song.model.js');
 const Genre = require('../models/album_apple_genre.model.js');
 const Favorite = require('../models/album_favorite.model.js');
 const Tag = require('../models/album_tag.model.js');
+const Connection = require('../models/album_connection.model.js');
 
 // need to define `_this` so I can use it to re-use functions 
 // within this controller
@@ -45,7 +46,7 @@ exports.add_new_album = async function (req, res, next) {
     })
     .catch(async function(err) {
       if (res) {
-        if (err.errors[0].message === "appleAlbumID must be unique") return res.status(409).json({ "message" : `An album with Apple Album ID '${req.body.appleAlbumID}' already exists.` });
+        if (err.errors[0].message === "appleAlbumID must be unique") return res.status(409).send({ "message" : `An album with Apple Album ID '${req.body.appleAlbumID}' already exists.` });
         if (err.name === "SequelizeValidationError") return res.status(400).send(err);
         res.status(500).json(err);
       }
@@ -67,19 +68,12 @@ exports.get_album = function (req, res, next) {
       let appleGenres = [];
       album.songs.forEach(song => { songs[song.order - 1] = song.name; });
       album.appleGenres.forEach(appleGenre => { appleGenres.push(appleGenre.genre) });
+      album.dataValues.songNames = songs;
+      album.dataValues.genres = appleGenres;
+      delete album.dataValues.songs;
+      delete album.dataValues.appleGenres;
 
-      res.send({
-        appleAlbumID: album.appleAlbumID,
-        appleURL: album.appleURL,
-        title: album.title,
-        artist: album.artist,
-        releaseDate: album.releaseDate,
-        recordCompany: album.recordCompany,
-        cover: album.cover,
-        songNames: songs,
-        genres: appleGenres,
-        tags: album.tags
-      });
+      res.send(album);
     }).catch(function(err) {
       res.status(500).json(err);
     });
@@ -169,15 +163,34 @@ exports.add_tag = function (req, res, next) {
         recordCompany: req.body.recordCompany,
         cover: req.body.cover
       }
-    }).then(function(album){
+    }).then(async function(album){
+      if (album[0]._options.isNewRecord) {
+        for (let index = 0; index < req.body.songNames.length; index++) {
+          const song = req.body.songNames[index];
+          await Song.create({
+            name: song,
+            order: index + 1,
+            appleAlbumID: req.body.appleAlbumID
+          });
+        }
+        for (let index = 0; index < req.body.genres.length; index++) {
+          const genre = req.body.genres[index];
+          await Genre.create({
+            genre: genre,
+            appleAlbumID: req.body.appleAlbumID
+          });
+        }
+      }
+      // bluebird thinks I should be returning something from this promise
       album[0].addTag(tag[0])
       .then(function(albumTag) {
-        res.send(albumTag)
-      })
-    })
+        if (albumTag.length < 1) return res.send({ "message": "This tag already exists." });
+        res.send(albumTag);
+      });
+    });
   }).catch(function(err) {
-    res.status(500).json(err)
-  })
+    res.status(500).json(err);
+  });
 };
 
 exports.find_by_tags = function (req, res, next) {
@@ -190,16 +203,164 @@ exports.find_by_tags = function (req, res, next) {
         attributes: [],
       },
       where: { 
-        // currently just returns all albums with any of the
-        // user search tags
+        // currently returns all albums with ANY of the searched tags
         text: {
           [Op.in]: searchedTags
         }
       }
     }]
   }).then(function(albums) {
-    res.send(albums);
+    // filters albums down to results that only have ALL the searched tags
+    let results = [];
+    for (let i = 0; i < albums.length; i++) {
+      const album = albums[i];
+      let tags = [];
+      for (let j = 0; j < album.tags.length; j++) {
+        const tag = album.tags[j];
+        tags.push(tag.dataValues.text);
+      }
+      if (searchedTags.every(function(tag) { return tags.indexOf(tag) !== -1; })) {
+        results.push(album);
+      }
+    }
+    if (results.length < 1) return res.status(404).send({ "message": "No albums match this combination of tags." })
+    res.send(results);
   }).catch(function(err) {
+    res.status(500).json(err);
+  });
+};
+
+exports.delete_tag = function (req, res, next) {
+  Tag.findOne({
+    where: {
+      text: req.body.text,
+      creator: req.body.userID,
+      appleAlbumID: req.body.appleAlbumID
+    }
+  }).then(function(tag) {
+    Album.findOne({
+      where: {
+        appleAlbumID: req.body.appleAlbumID
+      }
+    }).then(function(album){
+      // bluebird thinks I should be returning something from this promise
+      album.removeTag(tag)
+      .then(function(albumTag) {
+        // this check is currently not being hit when a delete request is sent for a non-existent
+        if (albumTag.length < 1) return res.status(404).send({ "message": "This tag does not exist." });
+        res.send(albumTag);
+      }).catch(function(err) {
+        // this catch is hit if a delete request is sent for a non-existent tag (instead of the check above)
+        res.status(404).send({ "message": "This tag does not exist." });
+      });
+    });
+  }).catch(function(err) {
+    res.status(500).json(err);
+  });
+};
+
+exports.add_connection = function (req, res, next) {
+  const albumOne = req.body.albumOne;
+  const albumTwo = req.body.albumTwo;
+  Album.findOrCreate({
+    where: {
+      appleAlbumID: albumOne.appleAlbumID,
+      appleURL: albumOne.appleURL,
+      title: albumOne.title,
+      artist: albumOne.artist,
+      releaseDate: albumOne.releaseDate,
+      recordCompany: albumOne.recordCompany,
+      cover: albumOne.cover
+    }
+  }).then(async function(firstAlbum){
+    if (firstAlbum[0]._options.isNewRecord) {
+      for (let index = 0; index < albumOne.songNames.length; index++) {
+        const song = albumOne.songNames[index];
+        await Song.create({
+          name: song,
+          order: index + 1,
+          appleAlbumID: albumOne.appleAlbumID
+        });
+      }
+      for (let index = 0; index < albumOne.genres.length; index++) {
+        const genre = albumOne.genres[index];
+        await Genre.create({
+          genre: genre,
+          appleAlbumID: albumOne.appleAlbumID
+        });
+      }
+    }
+    Album.findOrCreate({
+      where: {
+        appleAlbumID: albumTwo.appleAlbumID,
+        appleURL: albumTwo.appleURL,
+        title: albumTwo.title,
+        artist: albumTwo.artist,
+        releaseDate: albumTwo.releaseDate,
+        recordCompany: albumTwo.recordCompany,
+        cover: albumTwo.cover
+      }
+    }).then(async function(seccondAlbum){
+      if (seccondAlbum[0]._options.isNewRecord) {
+        for (let index = 0; index < albumTwo.songNames.length; index++) {
+          const song = albumTwo.songNames[index];
+          await Song.create({
+            name: song,
+            order: index + 1,
+            appleAlbumID: albumTwo.appleAlbumID
+          });
+        }
+        for (let index = 0; index < albumTwo.genres.length; index++) {
+          const genre = albumTwo.genres[index];
+          await Genre.create({
+            genre: genre,
+            appleAlbumID: albumTwo.appleAlbumID
+          });
+        }
+      }
+      Connection.findOrCreate({
+        where: {
+          albumOne: albumOne.appleAlbumID,
+          albumTwo: albumTwo.appleAlbumID,
+          creator: req.body.userID
+        }
+      }).then(function(connectionOne) {
+        Connection.findOrCreate({
+          where: {
+            albumOne: albumTwo.appleAlbumID,
+            albumTwo: albumOne.appleAlbumID,
+            creator: req.body.userID
+          }
+        }).then(function(connectionTwo){
+          res.send({ "one": connectionOne[0], "two": connectionTwo[0] });
+        })
+      })
+    });
+  });
+};
+
+exports.get_connections = function (req, res, next) {
+  Album.findOne({
+    where: {
+      appleAlbumID: req.params.appleAlbumID
+    },
+    include: [{
+      model: Connection,
+      attributes: [ "creator", "albumTwo" ],
+      where: { 
+        albumOne: req.params.appleAlbumID
+      }
+    }]
+  }).then(async function(album) {
+    let connectedAlbums = [];
+    for (let i = 0; i < album.dataValues.connections.length; i++) {
+      const conection = album.dataValues.connections[i];
+      const connectedAlbum = await Album.findOne({ where: { appleAlbumID: conection.dataValues.albumTwo }, attributes: [ "appleAlbumID", "title", "artist", "cover" ] });
+      connectedAlbum.dataValues.creator = conection.dataValues.creator;
+      connectedAlbums.push(connectedAlbum);
+    }
+    res.send(connectedAlbums);
+  }).catch(function(err){
     res.status(500).json(err);
   })
 };
