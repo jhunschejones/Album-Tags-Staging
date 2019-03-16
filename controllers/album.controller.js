@@ -7,6 +7,7 @@ const Genre = require('../models/album_apple_genre.model.js');
 const Favorite = require('../models/album_favorite.model.js');
 const Tag = require('../models/album_tag.model.js');
 const Connection = require('../models/album_connection.model.js');
+const List = require('../models/list_info.model.js');
 
 // need to define `_this` so I can use it to re-use functions 
 // within this controller
@@ -108,7 +109,7 @@ exports.add_favorite = function (req, res, next) {
         appleAlbumID: req.body.appleAlbumID
       }
     }).then(function(result) {
-      res.send("Favorite added!")
+      res.send("Favorite added!");
     }).catch(function(err) {
       res.status(500).json(err);
     });
@@ -122,8 +123,8 @@ exports.get_user_favorites = function (req, res, next) {
     },
     include: [ Album ]
   }).then(function(albums) {
-    if (albums.length < 1) return res.status(404).send({ "message" : `User '${req.params.userID}' does not have any favorited records. `})
-    res.send(albums)
+    if (albums.length < 1) return res.status(404).send({ "message" : `User '${req.params.userID}' does not have any favorited records.`});
+    res.send(albums);
   }).catch(function(err) {
     res.status(500).json(err);
   });
@@ -223,7 +224,7 @@ exports.find_by_tags = function (req, res, next) {
         results.push(album);
       }
     }
-    if (results.length < 1) return res.status(404).send({ "message": "No albums match this combination of tags." })
+    if (results.length < 1) return res.status(404).send({ "message": "No albums match this combination of tags." });
     res.send(results);
   }).catch(function(err) {
     res.status(500).json(err);
@@ -352,6 +353,8 @@ exports.get_connections = function (req, res, next) {
       }
     }]
   }).then(async function(album) {
+    if (!album) return res.status(404).send({ "message" : "This user has not created a connection between these two albums." });
+
     let connectedAlbums = [];
     for (let i = 0; i < album.dataValues.connections.length; i++) {
       const conection = album.dataValues.connections[i];
@@ -363,6 +366,199 @@ exports.get_connections = function (req, res, next) {
   }).catch(function(err){
     res.status(500).json(err);
   })
+};
+
+exports.delete_connection = function (req, res, next) {
+  Connection.destroy({
+    where: {
+      albumOne: req.body.albumOne.appleAlbumID,
+      creator: req.body.userID
+    }
+  }).then(function(deletedConnectionOne) {
+    Connection.destroy({
+      where: {
+        albumTwo: req.body.albumOne.appleAlbumID,
+        creator: req.body.userID
+      }
+    }).then(function(deletedConnectionTwo) {
+      res.send(`${deletedConnectionOne + deletedConnectionTwo} connections deleted.`);
+    }).catch(function(err) {
+      res.status(500).json(err);
+    });
+  });
+};
+
+exports.create_new_list = function (req, res, next) {
+  List.findOrCreate({
+    where: {
+      user: req.body.userID,
+      displayName: req.body.displayName,
+      title: req.body.title,
+      isPrivate: req.body.isPrivate
+    }
+  }).then(function(list) {
+    res.send(list);
+  }).catch(function(err) {
+    res.status(500).json(err);
+  });
+};
+
+exports.update_list = function (req, res, next) {
+  if (req.body.method === "add album") {
+    List.findOne({
+      where: {
+        id: req.params.list
+      }
+    }).then(function(list) {
+      Album.findOrCreate({
+        where: {
+          appleAlbumID: req.body.appleAlbumID,
+          appleURL: req.body.appleURL,
+          title: req.body.title,
+          artist: req.body.artist,
+          releaseDate: req.body.releaseDate,
+          recordCompany: req.body.recordCompany,
+          cover: req.body.cover
+        }
+      }).then(async function(album){
+        if (album[0]._options.isNewRecord) {
+          for (let index = 0; index < req.body.songNames.length; index++) {
+            const song = req.body.songNames[index];
+            await Song.create({
+              name: song,
+              order: index + 1,
+              appleAlbumID: req.body.appleAlbumID
+            });
+          }
+          for (let index = 0; index < req.body.genres.length; index++) {
+            const genre = req.body.genres[index];
+            await Genre.create({
+              genre: genre,
+              appleAlbumID: req.body.appleAlbumID
+            });
+          }
+        }
+
+        list.addAlbum(album[0])
+        .then(function(listAlbum) {
+          if (listAlbum.length < 1) return res.send({ "message" : "This album is already in this list."});
+          res.send(listAlbum);
+        }).catch(function(err) {
+          res.status(500).json(err);
+        })
+      }).catch(function(err) {
+        res.status(500).json(err);
+      });
+    });
+  } else if (req.body.method === "remove album") {
+    if (!req.body.appleAlbumID) return res.status(400).send({ "message" : "Unable to remove album, `appleAlbumID` is a required field." });
+    List.findOne({
+      where: {
+        id: req.params.list
+      }
+    }).then(function(list) {
+      Album.findOne({
+        where: {
+          appleAlbumID: req.body.appleAlbumID
+        }
+      }).then(function(album){
+        // Bluebird wants me to be resolving this promise
+        list.removeAlbum(album)
+        .then(function(removedAlbums) {
+          res.send({ "message": `${removedAlbums} albums remove from the list.` });
+        }).catch(function(err) {
+          res.status(500).json(err);
+        })
+      }).catch(function(err) {
+        res.status(500).json(err);
+      });
+    });
+  } else if (req.body.method === "change title") {
+    if (!req.body.title) return res.status(400).send({ "message" : "Unable to update, `title` is a required field." });
+    List.findOne({
+      where: {
+        id: req.params.list
+      }
+    }).then(function(list) {
+      list.title = req.body.title;
+      list.save({ fields: ['title'] }).then(function (list) {
+        res.send(list);
+      }).catch(function(err) {
+        res.status(500).json(err);
+      })
+    })
+  } else if (req.body.method === "change display name") {
+    if (!req.body.displayName) return res.status(400).send({ "message" : "Unable to update, `displayName` is a required field." });
+    List.findOne({
+      where: {
+        id: req.params.list
+      }
+    }).then(function(list) {
+      list.displayName = req.body.displayName;
+      list.save({ fields: ['displayName'] }).then(function (list) {
+        res.send(list);
+      }).catch(function(err) {
+        res.status(500).json(err);
+      })
+    })
+  }
+};
+
+exports.get_list = function (req, res, next) {
+  List.findOne({
+    where: {
+      id: req.params.list
+    },
+    include: [ Album ]
+  }).then(function(list) {
+    res.send(list);
+  }).catch(function(err) {
+    res.status(500).json(err);
+  });
+};
+
+exports.delete_list = function (req, res, next) {
+  List.destroy({
+    where: {
+      id: req.params.list
+    }
+  }).then(function(listsDeleted) {
+    if (listsDeleted === 1) return res.send("List deleted!");
+    if (listsDeleted === 0) return res.status(404).send({ "message" : `Unable to find list with id '${req.params.list}'` });
+    res.send({ "message": `${listsDeleted} lists were deleted remove from the list.` });
+  }).catch(function(err) {
+    res.status(500).json(err);
+  });
+};
+
+exports.get_user_lists = function (req, res, next) {
+  List.findAll({
+    where: {
+      user: req.params.userID
+    },
+    include: [ Album ]
+  }).then(function(lists) {
+    if (lists.length < 1) return res.status(404).send({ "message" : "This user has not created any lists." });
+    res.send(lists);
+  }).catch(function(err) {
+    res.status(500).json(err);
+  });
+};
+
+exports.get_album_lists = function (req, res, next) {
+  List.findAll({
+    include: [{
+      model: Album,
+      where: { 
+        appleAlbumID: req.params.appleAlbumID
+      }
+    }]
+  }).then(function(lists) {
+    if (lists.length < 1) return res.status(404).send({ "message" : "This album is not in any lists." });
+    res.send(lists);
+  }).catch(function(err) {
+    res.status(500).json(err);
+  });
 };
 
 // temporary utility to drop all tables quickly from postman
