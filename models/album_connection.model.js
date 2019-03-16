@@ -1,6 +1,5 @@
 const Sequelize = require('sequelize');
 const sequelize = require('../sequelize.js');
-const Album = require('./album_info.model.js');
 
 const Connection = sequelize.define('connection', {
   albumOne: { type: Sequelize.INTEGER, allowNull: false },
