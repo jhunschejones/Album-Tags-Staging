@@ -94,7 +94,7 @@ function getList() {
     // GET SHARED FAVORITES LIST
     $.ajax({
       method: "GET",
-      url: "/api/v1/list/favorites/" + listID,
+      url: "/api/v1/favorite/virtual/" + listID,
       success: function(data) {
         if (data.message) {
           alert(data.message);
@@ -124,20 +124,22 @@ function getList() {
     // GET FAVORITES LIST FOR CURRENT USER
     $.ajax({
       method: "GET",
-      url: "/api/v1/album/favorites/" + userID,
+      url: "/api/v1/favorite/" + userID,
       success: function(data) {
         if (data.message && data.message === "This user does not have any favorited albums.") {
           listData = [];
           $('#main-page-loader').hide();
           populateList();
-        } else if (data.message) {
-          alert(data.message);
         } else {
+          let cleanAlbums = [];
+          data.forEach(element => {
+            cleanAlbums.push(element.album)
+          });
           listData = {
             user: userID,
             displayName: "You!",
             title: "My Favorites",
-            albums: data
+            albums: cleanAlbums
           };
           $('#main-page-loader').hide();
           populateList();
@@ -156,21 +158,20 @@ function getList() {
   
     $.ajax({
       method: "GET",
-      url: "/api/v1/album/matchingtags/" + databaseTags,
+      url: "/api/v1/tag/" + databaseTags,
       success: function(data) {
         if (data.message) {
-          alert(data.message);
-        } else {
-          listData = {
-            user: userID || null,
-            displayName: "All Users",
-            // title: `Tags: ${decodeURIComponent(tagSearch).split(',').join(', ')}`, // TAGS AS TEXT
-            title: `Tags: ${sellectedTagsHTML}`, // TAGS AS BADGES
-            albums: data
-          };
-          $('#main-page-loader').hide();
-          populateList();
-        }
+          data = [];
+        } 
+        listData = {
+          user: userID || null,
+          displayName: "All Users",
+          // title: `Tags: ${decodeURIComponent(tagSearch).split(',').join(', ')}`, // TAGS AS TEXT
+          title: `Tags: ${sellectedTagsHTML}`, // TAGS AS BADGES
+          albums: data
+        };
+        $('#main-page-loader').hide();
+        populateList();
       }
     });
   }
@@ -304,7 +305,7 @@ function populateList() {
 
 function removeListAlbum(albumID) {
   if (listData.user !== userID) { alert("Sorry, only the list creator can delete albums from a list."); return; }
-  let thisAlbum = listData.albums.find(x => x.appleAlbumID === albumID);
+  let thisAlbum = listData.albums.find(x => x.appleAlbumID === parseInt(albumID));
   let confirmed = confirm(`Are you sure you want to remove "${thisAlbum.title}" from this list? You cannot undo this operation.`);
   
   if (confirmed) {
@@ -323,7 +324,7 @@ function removeListAlbum(albumID) {
       contentType: 'application/json',
       data: JSON.stringify(deleteObject),
       success: function(data) {
-        listData = data;
+        removeFromArray(listData.albums, thisAlbum);
         populateList();
       }
     });
@@ -348,14 +349,10 @@ function editDisplayName() {
     contentType: 'application/json',
     data: JSON.stringify(updateObject),
     success: function(data) {
-      if (!data.message) {
-        listData = data;
-        populateList();
-        $('#list-update-success').html("List info updated! &#10003;");
-        setTimeout(function(){ $('#list-update-success').html('&nbsp;'); }, 3000);
-      } else {
-        alert(data.message);
-      }
+      listData.displayName = data.displayName;
+      populateList();
+      $('#list-update-success').html("List info updated! &#10003;");
+      setTimeout(function(){ $('#list-update-success').html('&nbsp;'); }, 3000);
     }
   });
 }
@@ -379,14 +376,10 @@ function editListTitle() {
       contentType: 'application/json',
       data: JSON.stringify(updateObject),
       success: function(data) {
-        if (!data.message) {
-          listData = data;
+          listData.title = data.title;
           populateList();
           $('#list-update-success').html("List info updated! &#10003;");
           setTimeout(function(){ $('#list-update-success').html('&nbsp;'); }, 3000);
-        } else {
-          alert(data.message);
-        }
       }
     });
   } else {
@@ -455,21 +448,19 @@ function addToList(selectedAlbum) {
       artist: selectedAlbum.artist,
       releaseDate: selectedAlbum.releaseDate,
       cover: selectedAlbum.cover,
-      genres: selectedAlbum.genres
+      genres: selectedAlbum.genres,
+      appleURL: selectedAlbum.appleURL,
+      recordCompany: selectedAlbum.recordCompany
     };
     $.ajax({
       method: "PUT",
-      url: "/api/v1/list/" + listData._id,
+      url: "/api/v1/list/" + listData.id,
       contentType: 'application/json',
       data: JSON.stringify(addAlbumToListBody),
       success: function(data) {
-        if (!data.message) {
-          listData = data;
-          populateList();
-          $('#editListModal').modal('hide');
-        } else {
-          alert(data.message);
-        }
+        listData.albums.push(selectedAlbum);
+        $('#editListModal').modal('hide');
+        populateList();
       }
     });
   }
@@ -703,23 +694,19 @@ function addToFavorites(selectedAlbum) {
   if (alreadyInFavorites) return alert(`"${selectedAlbum.title}" is already in your favorites.`);
 
   if (selectedAlbum && userID) {
-    $.ajax('/api/v1/album/favorites/new', {
+    $.ajax('/api/v1/favorite', {
       method: 'POST',
       contentType: 'application/json',
       data: JSON.stringify({ 
         "user" : userID,
-        "albumData" : selectedAlbum
+        "album" : selectedAlbum
       }),
       success: function(album) {
-        if (!album.message) {
-          listData.albums.push(album);
-          $('#addFavoritesAlbumModal').modal("hide");
-          $('#add-favorites-album-input').val('');
-          $('#favorites-search-results').html('');
-          populateList();
-        } else {
-          alert(album.message);
-        }
+        listData.albums.push(selectedAlbum);
+        $('#addFavoritesAlbumModal').modal("hide");
+        $('#add-favorites-album-input').val('');
+        $('#favorites-search-results').html('');
+        populateList();
       }
     });
   }
@@ -727,14 +714,17 @@ function addToFavorites(selectedAlbum) {
 
 function removeFavoritesAlbum(selectedAlbum) {
   if (listData.user !== userID) return alert("Sorry, only the list creator can delete albums from a list."); 
-  let albumToRemove = listData.albums.find(x => x.appleAlbumID === selectedAlbum);
+  let albumToRemove = listData.albums.find(x => x.appleAlbumID === parseInt(selectedAlbum));
   let confirmed = confirm(`Are you sure you want to remove "${albumToRemove.title}" from your favorites? You cannot undo this operation.`);
 
   if (confirmed && albumToRemove) {
-    $.ajax(`/api/v1/album/favorites/${selectedAlbum}`, {
+    $.ajax('/api/v1/favorite', {
       method: 'DELETE',
       contentType: 'application/json',
-      data: JSON.stringify({ "user" : userID }),
+      data: JSON.stringify({ 
+        "user" : userID,
+        "appleAlbumID" : albumToRemove.appleAlbumID
+      }),
       success: function(data) {
         if (!data.message) {
           removeFromArray(listData.albums, albumToRemove);
@@ -757,7 +747,7 @@ $("#favorites-display-name-input").keyup(function(event) {
 $('#get-shareable-link').click(function() {
   let displayName = $('#favorites-display-name-input').val();
 
-  $.ajax(`/api/v1/list/favorites/${userID}`, {
+  $.ajax(`/api/v1/favorite/virtual/${userID}`, {
     method: 'POST',
     contentType: 'application/json',
     data: JSON.stringify({

@@ -61,12 +61,8 @@ let listsWithAlbum = [];
 function getAlbumDetails(userLoggedIn) {
   $.ajax('/api/v1/album/' + albumID, {
     method: 'GET',
-    success: function(album) {
-      albumResult = album;
-      populateAlbumPage(userLoggedIn);
-    },
-    error: function(err) {
-      if (JSON.parse(err.responseText).message.slice(0,14) === "No album found") {
+    success: function(response) {
+      if (response.message && response.message.slice(0,14) === "No album found") {
         $.getJSON ( '/api/v1/apple/details/' + albumID, function(appleAlbum) { 
           if (!appleAlbum.message) {
             albumResult = appleAlbum;
@@ -77,7 +73,8 @@ function getAlbumDetails(userLoggedIn) {
           }
         });
       } else {
-        console.log(err);
+        albumResult = response;
+        populateAlbumPage(userLoggedIn);
       }
     }
   });
@@ -141,9 +138,9 @@ function addToFavorites() {
       "album" : albumResult
     }),
     success: function(response) {
+      $('#updateListModal').modal('hide');
       albumResult.favorited = true;
       populateListsWithAlbum();
-      $('#updateListModal').modal('hide');
       $('#list-options').get(0).selectedIndex = 0;
     }
   });
@@ -202,6 +199,8 @@ function checkUserFavorites(userLoggedIn) {
         populateListsWithAlbum(userLoggedIn);
       }
     })
+  } else {
+    populateListsWithAlbum(userLoggedIn);
   }
 }
 
@@ -411,13 +410,12 @@ function getConnections() {
     method: 'GET',
     contentType: 'application/json',
     success: function(results) {
-      albumResult.connectionObjects = results;
-      populateConnections();
-      updateConnectionDisplay();
-    },
-    error: function(err) {
-      if (err.responseJSON.message === "This user has not created any connections for this album.") {
+      if (results.message === "This user has not created any connections for this album.") {
         albumResult.connectionObjects = [];
+        populateConnections();
+        updateConnectionDisplay();
+      } else {
+        albumResult.connectionObjects = results;
         populateConnections();
         updateConnectionDisplay();
       }
@@ -469,12 +467,8 @@ function addConnection(selectedAlbum) {
         "creator": userID
       }),
       success: function(result) {
-        if (!result.message) {
-          $('#updateConnectionModal').modal('hide');
-          getConnections();
-        } else {
-          alert(result.message);
-        }
+        $('#updateConnectionModal').modal('hide');
+        getConnections();
       }
     });
     $('#add-connection-input').val('');

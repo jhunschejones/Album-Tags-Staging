@@ -21,7 +21,7 @@ let allTags = [];
 let tagElements;
 
 function populateTags() {
-    $.getJSON ( '/api/v1/album/tags/all', function(allTags) {      
+    $.getJSON ( '/api/v1/tag', function(allTags) {      
       $(".all_tags").text('');
       allTags.forEach(tag => {
 

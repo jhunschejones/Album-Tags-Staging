@@ -1,3 +1,6 @@
+const request = require('request');
+const Cryptr = require('cryptr');
+const cryptr = new Cryptr(process.env.ENCRYPT_KEY);
 const Sequelize = require('sequelize');
 const sequelize = require('../sequelize.js');
 const Op = Sequelize.Op;
@@ -28,6 +31,25 @@ function cleanAlbumData(album) {
   album.dataValues.tagObjects = album.dataValues.tags;
 
   return album;
+}
+
+async function findAppleAlbumData(album) {
+  const options = {
+    url: `https://www.albumtags.com/api/v1/apple/details/${album}`,  
+    json: true  
+  };
+
+  return new Promise(function(resolve, reject) {
+    request.get(options, function(err, resp, body) {
+      if (err) {
+        reject(err);
+      } else if (body) {
+        resolve(body);
+      } else {
+        resolve({ "message" : `unable to find an album with ID ${album}` });
+      }
+    })
+  })
 }
 
 exports.add_new_album = async function (req, res, next) {
@@ -80,7 +102,7 @@ exports.get_album = function (req, res, next) {
     include: [ Song, Genre, Tag ] // LEFT JOIN's with these tables
   })
     .then(async function(album) {
-      if (!album) return res.status(404).send({ "message" : `No album found with Apple Album ID: '${req.params.appleAlbumID}'` });
+      if (!album) return res.send({ "message" : `No album found with Apple Album ID: '${req.params.appleAlbumID}'` });
       res.send(cleanAlbumData(album));
     }).catch(function(err) {
       console.log(err);
@@ -113,7 +135,25 @@ exports.add_favorite = function (req, res, next) {
       recordCompany: req.body.album.recordCompany,
       cover: req.body.album.cover
     }
-  }).then(function(album) {
+  }).then(async function(album) {
+    if (album[0]._options.isNewRecord) {
+      let album = await findAppleAlbumData(req.body.album.appleAlbumID);
+      for (let index = 0; index < album.songNames.length; index++) {
+        const song = album.songNames[index];
+        await Song.create({
+          name: song,
+          order: index + 1,
+          appleAlbumID: album.appleAlbumID
+        });
+      }
+      for (let index = 0; index < album.genres.length; index++) {
+        const genre = album.genres[index];
+        await Genre.create({
+          genre: genre,
+          appleAlbumID: album.appleAlbumID
+        });
+      }
+    }
     Favorite.findOrCreate({
       where: {
         userID: req.body.user,
@@ -134,7 +174,7 @@ exports.get_user_favorites = function (req, res, next) {
     },
     include: [ Album ]
   }).then(function(albums) {
-    if (albums.length < 1) return res.status(404).send({ "message" : `User '${req.params.userID}' does not have any favorited records.`});
+    // if (albums.length < 1) return res.status(404).send({ "message" : `User '${req.params.userID}' does not have any favorited records.`});
     res.send(albums);
   }).catch(function(err) {
     res.status(500).json(err);
@@ -156,7 +196,7 @@ exports.delete_favorite = function (req, res, next) {
     });
 };
 
-exports.add_tag = function (req, res, next) {
+exports.add_tag = async function (req, res, next) {
   Tag.findOrCreate({
     where: {
       text: req.body.tag,
@@ -164,7 +204,7 @@ exports.add_tag = function (req, res, next) {
       customGenre: req.body.customGenre,
       appleAlbumID: req.body.album.appleAlbumID
     }
-  }).then(function(tag) {
+  }).then(async function(tag) {
     Album.findOrCreate({
       where: {
         appleAlbumID: req.body.album.appleAlbumID,
@@ -193,7 +233,6 @@ exports.add_tag = function (req, res, next) {
           });
         }
       }
-      // bluebird thinks I should be returning something from this promise
       album[0].addTag(tag[0])
       .then(function(albumTag) {
         if (albumTag.length < 1) return res.send({ "message": "This tag already exists." });
@@ -243,46 +282,66 @@ exports.find_by_tags = function (req, res, next) {
         results.push(album);
       }
     }
-    if (results.length < 1) return res.status(404).send({ "message": "No albums match this combination of tags." });
+    if (results.length < 1) return res.send({ "message": "No albums match this combination of tags." });
     res.send(results);
   }).catch(function(err) {
     res.status(500).json(err);
   });
 };
 
-exports.delete_tag = function (req, res, next) {
+exports.get_all_tags = function(req, res, next) {
+  Tag.findAll({}).then(function(tags) {
+    let justTags = [];
+    tags.forEach(tag => {
+      if (justTags.indexOf(tag) === -1) { justTags.push(tag.text); }
+    });
+    res.send(justTags);
+  }).catch(function(err) {
+    res.status(500).json(err);
+  });
+};
+
+exports.delete_tag = async function (req, res, next) {
   Tag.findOne({
     where: {
       text: req.body.text,
       creator: req.body.creator,
       appleAlbumID: req.body.appleAlbumID
     }
-  }).then(function(tag) {
+  }).then(async function(tag) {
     Album.findOne({
       where: {
         appleAlbumID: req.body.appleAlbumID
       }
-    }).then(function(album){
-      // bluebird thinks I should be returning something from this promise
+    }).then(async function(album){
+      // remove the record from `albumTags`
       album.removeTag(tag)
-      .then(function(albumTag) {
+      .then(async function(albumTag) {
         // this check is currently not being hit when a delete request is sent for a non-existent
         if (albumTag.length < 1) return res.status(404).send({ "message": "This tag does not exist." });
-
-        Album.findOne({
+        // remove the record from `tags` table
+        Tag.destroy({
           where: {
+            text: req.body.text,
+            creator: req.body.creator,
             appleAlbumID: req.body.appleAlbumID
-          },
-          include: [ Song, Genre, Tag ]
-        }).then(function(updatedAlbum) {
-          updatedAlbum.dataValues.tagObjects = updatedAlbum.dataValues.tags;
-          delete updatedAlbum.dataValues.tags;
-          res.send(updatedAlbum);
-        })
-      }).catch(function(err) {
-        // this catch is hit if a delete request is sent for a non-existent tag (instead of the check above)
-        // res.status(404).send({ "message": "This tag does not exist." });
-        res.status(500).json(err);
+          }
+        }).then(async function() {
+          Album.findOne({
+            where: {
+              appleAlbumID: req.body.appleAlbumID
+            },
+            include: [ Song, Genre, Tag ]
+          }).then(async function(updatedAlbum) {
+            updatedAlbum.dataValues.tagObjects = updatedAlbum.dataValues.tags;
+            delete updatedAlbum.dataValues.tags;
+            res.send(updatedAlbum);
+          })
+        }).catch(function(err) {
+          // this catch is hit if a delete request is sent for a non-existent tag (instead of the check above)
+          // res.status(404).send({ "message": "This tag does not exist." });
+          res.status(500).json(err);
+        });
       });
     });
   }).catch(function(err) {
@@ -291,8 +350,8 @@ exports.delete_tag = function (req, res, next) {
 };
 
 exports.add_connection = function (req, res, next) {
-  const albumOne = req.body.albumOne;
-  const albumTwo = req.body.albumTwo;
+  let albumOne = req.body.albumOne;
+  let albumTwo = req.body.albumTwo;
   Album.findOrCreate({
     where: {
       appleAlbumID: albumOne.appleAlbumID,
@@ -333,6 +392,7 @@ exports.add_connection = function (req, res, next) {
       }
     }).then(async function(seccondAlbum){
       if (seccondAlbum[0]._options.isNewRecord) {
+        albumTwo = await findAppleAlbumData(albumTwo.appleAlbumID);
         for (let index = 0; index < albumTwo.songNames.length; index++) {
           const song = albumTwo.songNames[index];
           await Song.create({
@@ -383,7 +443,7 @@ exports.get_connections = function (req, res, next) {
       }
     }]
   }).then(async function(album) {
-    if (!album) return res.status(404).send({ "message" : "This user has not created any connections for this album." });
+    if (!album) return res.send({ "message" : "This user has not created any connections for this album." });
 
     let connectedAlbums = [];
     for (let i = 0; i < album.dataValues.connections.length; i++) {
@@ -421,7 +481,7 @@ exports.delete_connection = function (req, res, next) {
   });
 };
 
-exports.create_new_list = function (req, res, next) {
+exports.create_new_list = async function (req, res, next) {
   List.findOrCreate({
     where: {
       user: req.body.user,
@@ -429,8 +489,8 @@ exports.create_new_list = function (req, res, next) {
       title: req.body.title,
       isPrivate: req.body.isPrivate
     }
-  }).then(function(list) {
-    if (!req.body.albums) return res.send(list);
+  }).then(async function(list) {
+    if (!req.body.albums || req.body.albums.length === 0) return res.send(list);
     Album.findOrCreate({
       where: {
         appleAlbumID: req.body.albums[0].appleAlbumID,
@@ -442,7 +502,6 @@ exports.create_new_list = function (req, res, next) {
         cover: req.body.albums[0].cover
       }
     }).then(async function(album){
-      // album[0] = cleanAlbumData(album[0]);
       if (album[0]._options.isNewRecord) {
         for (let index = 0; index < req.body.albums[0].songNames.length; index++) {
           const song = req.body.albums[0].songNames[index];
@@ -460,7 +519,6 @@ exports.create_new_list = function (req, res, next) {
           });
         }
       }
-      // Bluebird wants this to be resolving a promise
       list[0].addAlbum(album[0])
       .then(function(listAlbum) {
         if (listAlbum.length < 1) return res.send({ "message" : "This album is already in this list."});
@@ -476,13 +534,13 @@ exports.create_new_list = function (req, res, next) {
   });
 };
 
-exports.update_list = function (req, res, next) {
+exports.update_list = async function (req, res, next) {
   if (req.body.method === "add album") {
     List.findOne({
       where: {
         id: req.params.list
       }
-    }).then(function(list) {
+    }).then(async function(list) {
       Album.findOrCreate({
         where: {
           appleAlbumID: req.body.appleAlbumID,
@@ -495,19 +553,20 @@ exports.update_list = function (req, res, next) {
         }
       }).then(async function(album){
         if (album[0]._options.isNewRecord) {
-          for (let index = 0; index < req.body.songNames.length; index++) {
-            const song = req.body.songNames[index];
+          let fullAlbum = await findAppleAlbumData(req.body.appleAlbumID);
+          for (let index = 0; index < fullAlbum.songNames.length; index++) {
+            const song = fullAlbum.songNames[index];
             await Song.create({
               name: song,
               order: index + 1,
-              appleAlbumID: req.body.appleAlbumID
+              appleAlbumID: fullAlbum.appleAlbumID
             });
           }
-          for (let index = 0; index < req.body.genres.length; index++) {
-            const genre = req.body.genres[index];
+          for (let index = 0; index < fullAlbum.genres.length; index++) {
+            const genre = fullAlbum.genres[index];
             await Genre.create({
               genre: genre,
-              appleAlbumID: req.body.appleAlbumID
+              appleAlbumID: fullAlbum.appleAlbumID
             });
           }
         }
@@ -529,16 +588,15 @@ exports.update_list = function (req, res, next) {
       where: {
         id: req.params.list
       }
-    }).then(function(list) {
+    }).then(async function(list) {
       Album.findOne({
         where: {
           appleAlbumID: req.body.appleAlbumID
         }
-      }).then(function(album){
-        // Bluebird wants me to be resolving this promise
+      }).then(async function(album){
         list.removeAlbum(album)
         .then(function(removedAlbums) {
-          res.send({ "message": `${removedAlbums} albums remove from the list.` });
+          res.send({ "message": `${removedAlbums} albums removed from the list.` });
         }).catch(function(err) {
           res.status(500).json(err);
         })
@@ -632,6 +690,44 @@ exports.get_album_lists = function (req, res, next) {
   }).catch(function(err) {
     res.status(500).json(err);
   });
+};
+
+exports.create_virtual_favorites_list = function (req, res, next) {
+  res.send(cryptr.encrypt(`${req.params.id.trim()}\s\s\s${req.body.displayName.trim()}`));
+};
+
+exports.get_virtual_favorites_list = function (req, res, next) {
+  const requestArray = cryptr.decrypt(req.params.id).split("\s\s\s");
+  const userID = requestArray[0];
+  const displayName = requestArray[1];
+
+  request.get(  
+    {  
+      url: req.protocol + '://' + req.get('host') + '/api/v1/favorite/' + userID,  
+      json: true  
+    },  
+    (err, favoritesResponse, albumResult) => {  
+      if (err) return next(err); 
+      if (albumResult) {
+        let cleanAlbums = [];
+        albumResult.forEach(element => {
+          cleanAlbums.push(element.album)
+        });
+        let resultList = {
+          title: "My Favorites",
+          displayName: displayName || "",
+          user: userID,
+          albums: cleanAlbums
+        };
+        res.send(resultList);
+        return;
+
+      } else {
+        res.send({ "message" : `unable to find favorites for user "${displayName || "Unknown"}"` });
+        return;
+      }
+    }
+  );
 };
 
 // temporary utility to drop all tables quickly from postman

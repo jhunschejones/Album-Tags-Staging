@@ -6,7 +6,7 @@
 // ======
 function removeByID(arr, ID) {
   return arr.filter(function(ele){
-    return ele._id != ID;
+    return ele.id != ID;
   });
 }
 
@@ -45,7 +45,11 @@ function getAllLists() {
     method: "GET",
     url: "/api/v1/list/user/" + userID,
     success: function(data) {
-      allLists = data;
+      if (data.message) {
+        allLists = [];
+      } else {
+        allLists = data;
+      }
       $('#main-page-loader').hide();
       populateAllLists();
     }
@@ -53,7 +57,7 @@ function getAllLists() {
 }
 
 function removeList(listID) {
-  let thisList = allLists.find(x => x._id === listID);
+  let thisList = allLists.find(x => x.id === parseInt(listID));
   let confirmed = confirm(`Are you sure you want to delete your list "${thisList.title}"? You cannot undo this operation.`);
 
   if (confirmed) {
@@ -75,23 +79,25 @@ function populateAllLists() {
     for (let index = 0; index < allLists.length; index++) {
       const list = allLists[index];
       let listCreator = list.displayName;
-      if (listCreator.trim === "") { listCreator = "Unknown"; }
+      if (!listCreator || listCreator.trim === "") { listCreator = "Unknown"; }
       
       let listAlbumImages = [];
-      for (let index = 0; index < list.albums.length && index < 4; index++) {
-        const album = list.albums[index];
-        listAlbumImages.push(album.cover.replace('{w}', 130).replace('{h}', 130));
+      if (list.albums) {
+        for (let index = 0; index < list.albums.length && index < 4; index++) {
+          const album = list.albums[index];
+          listAlbumImages.push(album.cover.replace('{w}', 130).replace('{h}', 130));
+        }
       }
 
       const shortTitle = list.title.length > 40 ? truncate(list.title, 40) : list.title;
 
       const listImage = `<div class="list-image-background"><div class="row no-gutters"><div class="col"><img src="${listAlbumImages[0] || ""}" class="list-image"></img></div><div class="col"><img src="${listAlbumImages[1] || ""}" class="list-image"></img></div></div><div class="row no-gutters"><div class="col"><img src="${listAlbumImages[2] || ""}" class="list-image"></img></div><div class="col"><img src="${listAlbumImages[3] || ""}" class="list-image"></img></div></div></div>`;
 
-      $('#all-lists').append(`<div><div id="card-${index}" class="card list-card">${listImage}<div class="list-card-text"><h5 class="card-title list-title"><span class="long-list-title">${list.title}</span><span class="short-list-title">${shortTitle}</span></h5><p class="card-text text-secondary list-creator">by: ${listCreator}</p></div></div><span class="list-delete-button" data-list-id="${list._id}" data-toggle="tooltip" data-placement="right" title="Delete this list" data-trigger="hover">&#10005;</span></div>`);
+      $('#all-lists').append(`<div><div id="card-${index}" class="card list-card">${listImage}<div class="list-card-text"><h5 class="card-title list-title"><span class="long-list-title">${list.title}</span><span class="short-list-title">${shortTitle}</span></h5><p class="card-text text-secondary list-creator">by: ${listCreator}</p></div></div><span class="list-delete-button" data-list-id="${list.id}" data-toggle="tooltip" data-placement="right" title="Delete this list" data-trigger="hover">&#10005;</span></div>`);
 
       $(`#card-${index}`).click(function(event) {
         event.preventDefault();
-        window.location.href = `/list?type=userlist&id=${list._id}`;
+        window.location.href = `/list?type=userlist&id=${list.id}`;
       });
     }
   
@@ -105,7 +111,7 @@ function populateAllLists() {
   }
 }
 
-function addToNewList(listTitle, displayName) {
+function createNewList(listTitle, displayName) {
 
   // check to see if this user has a list with the same name
   let confirmed = true;
@@ -130,7 +136,7 @@ function addToNewList(listTitle, displayName) {
         data: JSON.stringify(newList),
         success: function(data) {
           if(!data.message) {
-            allLists.push(data);
+            allLists.push(data[0]);
             populateAllLists();
             $('#updateListModal').modal('hide');
             $('#new-list-title').val('');
@@ -175,7 +181,7 @@ $('#add-new-list-button').click(function(event) {
     return;
   } else {
     // storing title and display name as escaped html, displaying raw
-    addToNewList(escapeHtml(listTitle), escapeHtml(displayName));
+    createNewList(escapeHtml(listTitle), escapeHtml(displayName));
     document.getElementById("new-display-name").value = "";
     document.getElementById("new-list-title").value = "";
   }
