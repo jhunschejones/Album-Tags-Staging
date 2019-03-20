@@ -5,8 +5,6 @@ const Sequelize = require('sequelize');
 const sequelize = require('../sequelize.js');
 const Op = Sequelize.Op;
 const Album = require('../models/album_info.model.js');
-const Song = require('../models/album_song.model.js');
-const Genre = require('../models/album_apple_genre.model.js');
 const Favorite = require('../models/album_favorite.model.js');
 const Tag = require('../models/album_tag.model.js');
 const Connection = require('../models/album_connection.model.js');
@@ -17,18 +15,21 @@ const List = require('../models/list_info.model.js');
 const _this = this;
 
 function cleanAlbumData(album) {
-  // clean up song and genre formatting
-  let songs = [];
-  let appleGenres = [];
-  album.songs.forEach(song => { songs[song.order - 1] = song.name; });
-  album.appleGenres.forEach(appleGenre => { appleGenres.push(appleGenre.genre) });
-  album.dataValues.songNames = songs;
-  album.dataValues.genres = appleGenres;
-  delete album.dataValues.songs;
-  delete album.dataValues.appleGenres;
+  if (album.dataValues) {
+    // clean up song name and apple genre formatting
+    album.dataValues.songNames = album.dataValues.songNames.split(',,');
+    album.dataValues.genres = album.dataValues.genres.split(',,');
 
-  // rename tags key
-  album.dataValues.tagObjects = album.dataValues.tags;
+    // rename tags key
+    album.dataValues.tagObjects = album.dataValues.tags;
+  } else {
+    // clean up song name and apple genre formatting
+    album.songNames = album.songNames.split(',,');
+    album.genres = album.genres.split(',,');
+
+    // rename tags key
+    album.tagObjects = album.tags;
+  }
 
   return album;
 }
@@ -52,6 +53,30 @@ async function findAppleAlbumData(album) {
   })
 }
 
+function createSongString(songs) {
+  let songString = "";
+  songs.forEach(song => {
+    if (songs.indexOf(song) === songs.length - 1) {
+      songString = songString + song;
+    } else {
+      songString = songString + song + ",,";
+    }
+  });
+  return songString;
+}
+
+function createGenreString(genres) {
+  let genreString = "";
+  genres.forEach(genre => {
+    if (genres.indexOf(genre) === genres.length -1) {
+      genreString = genreString + genre;
+    } else {
+      genreString = genreString + genre + ",,";
+    }
+  });
+  return genreString;
+}
+
 exports.add_new_album = async function (req, res, next) {
   const newAlbum = {
     appleAlbumID: req.body.appleAlbumID,
@@ -60,28 +85,14 @@ exports.add_new_album = async function (req, res, next) {
     artist: req.body.artist,
     releaseDate: req.body.releaseDate,
     recordCompany: req.body.recordCompany,
-    cover: req.body.cover
+    cover: req.body.cover,
+    songNames: createSongString(req.body.songNames),
+    genres: createGenreString(req.body.genres)
   };
 
   Album.create(newAlbum)
-    .then(async function() {
+    .then(function() {
       newAlbum = cleanAlbumData(newAlbum);
-      for (let index = 0; index < req.body.songNames.length; index++) {
-        const song = req.body.songNames[index];
-        await Song.create({
-          name: song,
-          order: index + 1,
-          appleAlbumID: req.body.appleAlbumID
-        });
-      }
-      for (let index = 0; index < req.body.genres.length; index++) {
-        const genre = req.body.genres[index];
-        await Genre.create({
-          genre: genre,
-          appleAlbumID: req.body.appleAlbumID
-        });
-      }
-
       if (res) { res.send("Album added!"); }
       else { return(newAlbum); }
     })
@@ -99,9 +110,9 @@ exports.get_album = function (req, res, next) {
     where: {
       appleAlbumID: req.params.appleAlbumID
     },
-    include: [ Song, Genre, Tag ] // LEFT JOIN's with these tables
+    include: [ Tag ] // LEFT JOIN's with these tables
   })
-    .then(async function(album) {
+    .then(function(album) {
       if (!album) return res.send({ "message" : `No album found with Apple Album ID: '${req.params.appleAlbumID}'` });
       res.send(cleanAlbumData(album));
     }).catch(function(err) {
@@ -137,22 +148,11 @@ exports.add_favorite = function (req, res, next) {
     }
   }).then(async function(album) {
     if (album[0]._options.isNewRecord) {
-      let album = await findAppleAlbumData(req.body.album.appleAlbumID);
-      for (let index = 0; index < album.songNames.length; index++) {
-        const song = album.songNames[index];
-        await Song.create({
-          name: song,
-          order: index + 1,
-          appleAlbumID: album.appleAlbumID
-        });
-      }
-      for (let index = 0; index < album.genres.length; index++) {
-        const genre = album.genres[index];
-        await Genre.create({
-          genre: genre,
-          appleAlbumID: album.appleAlbumID
-        });
-      }
+      let fullAlbum = await findAppleAlbumData(req.body.album.appleAlbumID);
+      await album[0].update({
+        songNames: createSongString(fullAlbum.songNames),
+        genres: createGenreString(fullAlbum.genres)
+      })
     }
     Favorite.findOrCreate({
       where: {
@@ -174,9 +174,15 @@ exports.get_user_favorites = function (req, res, next) {
     },
     include: [ Album ]
   }).then(function(albums) {
-    // if (albums.length < 1) return res.status(404).send({ "message" : `User '${req.params.userID}' does not have any favorited records.`});
-    res.send(albums);
+    if (albums.length < 1) return res.send(albums);
+
+    let cleanAlbums = [];
+    albums.forEach(album => {
+      cleanAlbums.push(cleanAlbumData(album.dataValues.album));
+    });
+    res.send(cleanAlbums);
   }).catch(function(err) {
+    console.log(err)
     res.status(500).json(err);
   });
 };
@@ -217,21 +223,10 @@ exports.add_tag = async function (req, res, next) {
       }
     }).then(async function(album){
       if (album[0]._options.isNewRecord) {
-        for (let index = 0; index < req.body.album.songNames.length; index++) {
-          const song = req.body.album.songNames[index];
-          await Song.create({
-            name: song,
-            order: index + 1,
-            appleAlbumID: req.body.album.appleAlbumID
-          });
-        }
-        for (let index = 0; index < req.body.album.genres.length; index++) {
-          const genre = req.body.album.genres[index];
-          await Genre.create({
-            genre: genre,
-            appleAlbumID: req.body.album.appleAlbumID
-          });
-        }
+        await album[0].update({
+          songNames: createSongString(req.body.album.songNames),
+          genres: createGenreString(req.body.album.genres)
+        })
       }
       album[0].addTag(tag[0])
       .then(function(albumTag) {
@@ -241,7 +236,7 @@ exports.add_tag = async function (req, res, next) {
           where: {
             appleAlbumID: req.body.album.appleAlbumID
           },
-          include: [ Song, Genre, Tag ]
+          include: [ Tag ]
         }).then(function(updatedAlbum) {
           res.send(cleanAlbumData(updatedAlbum));
         })
@@ -331,11 +326,9 @@ exports.delete_tag = async function (req, res, next) {
             where: {
               appleAlbumID: req.body.appleAlbumID
             },
-            include: [ Song, Genre, Tag ]
+            include: [ Tag ]
           }).then(async function(updatedAlbum) {
-            updatedAlbum.dataValues.tagObjects = updatedAlbum.dataValues.tags;
-            delete updatedAlbum.dataValues.tags;
-            res.send(updatedAlbum);
+            res.send(cleanAlbumData(updatedAlbum));
           })
         }).catch(function(err) {
           // this catch is hit if a delete request is sent for a non-existent tag (instead of the check above)
@@ -364,21 +357,10 @@ exports.add_connection = function (req, res, next) {
     }
   }).then(async function(firstAlbum){
     if (firstAlbum[0]._options.isNewRecord) {
-      for (let index = 0; index < albumOne.songNames.length; index++) {
-        const song = albumOne.songNames[index];
-        await Song.create({
-          name: song,
-          order: index + 1,
-          appleAlbumID: albumOne.appleAlbumID
-        });
-      }
-      for (let index = 0; index < albumOne.genres.length; index++) {
-        const genre = albumOne.genres[index];
-        await Genre.create({
-          genre: genre,
-          appleAlbumID: albumOne.appleAlbumID
-        });
-      }
+      await firstAlbum[0].update({
+        songNames: createSongString(albumOne.songNames),
+        genres: createGenreString(albumOne.genres)
+      })
     }
     Album.findOrCreate({
       where: {
@@ -393,21 +375,10 @@ exports.add_connection = function (req, res, next) {
     }).then(async function(seccondAlbum){
       if (seccondAlbum[0]._options.isNewRecord) {
         albumTwo = await findAppleAlbumData(albumTwo.appleAlbumID);
-        for (let index = 0; index < albumTwo.songNames.length; index++) {
-          const song = albumTwo.songNames[index];
-          await Song.create({
-            name: song,
-            order: index + 1,
-            appleAlbumID: albumTwo.appleAlbumID
-          });
-        }
-        for (let index = 0; index < albumTwo.genres.length; index++) {
-          const genre = albumTwo.genres[index];
-          await Genre.create({
-            genre: genre,
-            appleAlbumID: albumTwo.appleAlbumID
-          });
-        }
+        await seccondAlbum[0].update({
+          songNames: createSongString(albumTwo.songNames),
+          genres: createGenreString(albumTwo.genres)
+        })
       }
       Connection.findOrCreate({
         where: {
@@ -503,21 +474,10 @@ exports.create_new_list = async function (req, res, next) {
       }
     }).then(async function(album){
       if (album[0]._options.isNewRecord) {
-        for (let index = 0; index < req.body.albums[0].songNames.length; index++) {
-          const song = req.body.albums[0].songNames[index];
-          await Song.create({
-            name: song,
-            order: index + 1,
-            appleAlbumID: req.body.albums[0].appleAlbumID
-          });
-        }
-        for (let index = 0; index < req.body.albums[0].genres.length; index++) {
-          const genre = req.body.albums[0].genres[index];
-          await Genre.create({
-            genre: genre,
-            appleAlbumID: req.body.albums[0].appleAlbumID
-          });
-        }
+        await album[0].update({
+          songNames: createSongString(req.body.albums[0].songNames),
+          genres: createGenreString(req.body.albums[0].genres)
+        })
       }
       list[0].addAlbum(album[0])
       .then(function(listAlbum) {
@@ -554,21 +514,10 @@ exports.update_list = async function (req, res, next) {
       }).then(async function(album){
         if (album[0]._options.isNewRecord) {
           let fullAlbum = await findAppleAlbumData(req.body.appleAlbumID);
-          for (let index = 0; index < fullAlbum.songNames.length; index++) {
-            const song = fullAlbum.songNames[index];
-            await Song.create({
-              name: song,
-              order: index + 1,
-              appleAlbumID: fullAlbum.appleAlbumID
-            });
-          }
-          for (let index = 0; index < fullAlbum.genres.length; index++) {
-            const genre = fullAlbum.genres[index];
-            await Genre.create({
-              genre: genre,
-              appleAlbumID: fullAlbum.appleAlbumID
-            });
-          }
+          await album[0].update({
+            songNames: createSongString(fullAlbum.songNames),
+            genres: createGenreString(fullAlbum.genres)
+          })
         }
 
         list.addAlbum(album[0])

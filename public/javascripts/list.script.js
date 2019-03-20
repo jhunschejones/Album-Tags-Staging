@@ -131,15 +131,11 @@ function getList() {
           $('#main-page-loader').hide();
           populateList();
         } else {
-          let cleanAlbums = [];
-          data.forEach(element => {
-            cleanAlbums.push(element.album)
-          });
           listData = {
             user: userID,
             displayName: "You!",
             title: "My Favorites",
-            albums: cleanAlbums
+            albums: data
           };
           $('#main-page-loader').hide();
           populateList();
@@ -305,7 +301,7 @@ function populateList() {
 
 function removeListAlbum(albumID) {
   if (listData.user !== userID) { alert("Sorry, only the list creator can delete albums from a list."); return; }
-  let thisAlbum = listData.albums.find(x => x.appleAlbumID === parseInt(albumID));
+  let thisAlbum = listData.albums.find(x => x.appleAlbumID === parseInt(albumID) || x.appleAlbumID === albumID);
   let confirmed = confirm(`Are you sure you want to remove "${thisAlbum.title}" from this list? You cannot undo this operation.`);
   
   if (confirmed) {
@@ -714,7 +710,7 @@ function addToFavorites(selectedAlbum) {
 
 function removeFavoritesAlbum(selectedAlbum) {
   if (listData.user !== userID) return alert("Sorry, only the list creator can delete albums from a list."); 
-  let albumToRemove = listData.albums.find(x => x.appleAlbumID === parseInt(selectedAlbum));
+  let albumToRemove = listData.albums.find(x => x.appleAlbumID === parseInt(selectedAlbum) || x.appleAlbumID === selectedAlbum);
   let confirmed = confirm(`Are you sure you want to remove "${albumToRemove.title}" from your favorites? You cannot undo this operation.`);
 
   if (confirmed && albumToRemove) {
