@@ -9,6 +9,7 @@ exports.config = {
   /**
    * Array of application names.
    */
+  // agent_enabled: false,
   app_name: ['Album Tags Staging'],
   /**
    * Your New Relic license key.
