@@ -658,15 +658,11 @@ exports.get_virtual_favorites_list = function (req, res, next) {
     (err, favoritesResponse, albumResult) => {  
       if (err) return next(err); 
       if (albumResult) {
-        let cleanAlbums = [];
-        albumResult.forEach(element => {
-          cleanAlbums.push(element.album)
-        });
         let resultList = {
           title: "My Favorites",
           displayName: displayName || "",
           user: userID,
-          albums: cleanAlbums
+          albums: albumResult
         };
         res.send(resultList);
         return;
