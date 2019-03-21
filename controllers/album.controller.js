@@ -36,7 +36,7 @@ function cleanAlbumData(album) {
 
 async function findAppleAlbumData(album) {
   const options = {
-    url: `https://www.albumtags.com/api/v1/apple/details/${album}`,  
+    url: req.protocol + '://' + req.get('host') + '/api/v1/apple/details/' + album,
     json: true  
   };
 
