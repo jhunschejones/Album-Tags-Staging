@@ -1,9 +1,26 @@
 const Sequelize = require('sequelize');
-const sequelize = new Sequelize('database', 'username', 'password', {
-  dialect: 'sqlite',
-  storage: 'data/db/dev.sqlite',
+// const sequelize = new Sequelize('database', 'username', 'password', {
+//   dialect: 'sqlite',
+//   storage: 'data/db/dev.sqlite',
+//   operatorsAliases: false,
+//   logging: false
+// });
+
+// http://docs.sequelizejs.com/manual/usage.html
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
+  dialect: 'mysql',
+  host: process.env.DB_HOST,
   operatorsAliases: false,
   logging: false
 });
+
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log('MySQL connection established successfully.');
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
+  });
 
 module.exports = sequelize;

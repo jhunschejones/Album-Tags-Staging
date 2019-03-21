@@ -13,8 +13,8 @@ const Album = sequelize.define('album', {
   releaseDate: { type: Sequelize.STRING, allowNull: false },
   recordCompany: { type: Sequelize.STRING, allowNull: false },
   cover: { type: Sequelize.STRING, allowNull: false },
-  songNames: { type: Sequelize.STRING, allowNull: true },
-  genres: { type: Sequelize.STRING, allowNull: true }
+  songNames: { type: Sequelize.STRING(2000), allowNull: true },
+  genres: { type: Sequelize.STRING(2000), allowNull: true }
 });
 
 Album.hasMany(Favorite, {foreignKey: 'appleAlbumID', sourceKey: 'appleAlbumID'}, { onDelete: 'cascade', hooks:true });
