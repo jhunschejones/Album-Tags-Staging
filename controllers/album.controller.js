@@ -34,7 +34,7 @@ function cleanAlbumData(album) {
   return album;
 }
 
-async function findAppleAlbumData(album) {
+async function findAppleAlbumData(req, album) {
   const options = {
     url: req.protocol + '://' + req.get('host') + '/api/v1/apple/details/' + album,
     json: true  
@@ -148,7 +148,7 @@ exports.add_favorite = function (req, res, next) {
     }
   }).then(async function(album) {
     if (album[0]._options.isNewRecord) {
-      let fullAlbum = await findAppleAlbumData(req.body.album.appleAlbumID);
+      let fullAlbum = await findAppleAlbumData(req, req.body.album.appleAlbumID);
       await album[0].update({
         songNames: createSongString(fullAlbum.songNames),
         genres: createGenreString(fullAlbum.genres)
@@ -374,7 +374,7 @@ exports.add_connection = function (req, res, next) {
       }
     }).then(async function(seccondAlbum){
       if (seccondAlbum[0]._options.isNewRecord) {
-        albumTwo = await findAppleAlbumData(albumTwo.appleAlbumID);
+        albumTwo = await findAppleAlbumData(req, albumTwo.appleAlbumID);
         await seccondAlbum[0].update({
           songNames: createSongString(albumTwo.songNames),
           genres: createGenreString(albumTwo.genres)
@@ -513,7 +513,7 @@ exports.update_list = async function (req, res, next) {
         }
       }).then(async function(album){
         if (album[0]._options.isNewRecord) {
-          let fullAlbum = await findAppleAlbumData(req.body.appleAlbumID);
+          let fullAlbum = await findAppleAlbumData(req, req.body.appleAlbumID);
           await album[0].update({
             songNames: createSongString(fullAlbum.songNames),
             genres: createGenreString(fullAlbum.genres)
