@@ -50,6 +50,10 @@ function toTitleCase(str) {
     return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
   });
 }
+
+function removeFromArray(arr, ele){
+  if (arr.indexOf(ele) !== -1) { arr.splice(arr.indexOf(ele), 1); }
+}
 // ====== END UTILITY SECTION ======
 
 const albumID = window.location.pathname.replace('/album/', '');
@@ -667,14 +671,16 @@ function deleteTag(tagID) {
         "creator": creator,
         "appleAlbumID": albumResult.appleAlbumID
       }),
-      success: function(album) {
-        if (!album.message) {
-          albumResult = album;
+      success: function(response) {
+        if (!response.message) {
+          if (response.deleted === 1) { 
+            const deletedTag = albumResult.tagObjects.find(x => x.text === response.tag.text && x.creator === response.tag.creator);
+            removeFromArray(albumResult.tagObjects, deletedTag); 
+          }
           populateTags();
           updateTagDisplay(); 
-          // if (albumResult.tagObjects.length > albumResult.tags.length) { fixShortTagsArray(); }
         } else {
-          alert(album.message);
+          alert(response.message);
         }
       }
     });
@@ -738,14 +744,15 @@ function addTag() {
         "tag": newTag,
         "customGenre": customGenre
       }),
-      success: function (album) {
-        if (!album.message) {
-          albumResult = album;
+      success: function (result) {
+        if (!result.message) {
+          if (!albumResult.tagObjects) { albumResult.tagObjects = []; }
+          albumResult.tagObjects.push(result);
           populateTags();
           $('#tag-success').html("Added! &#10003;");
           setTimeout(function(){ $('#tag-success').html('&nbsp;'); }, 3000);
         } else {
-          return alert(album.message);
+          return alert(result.message);
         }
       },
       error: function (err) {

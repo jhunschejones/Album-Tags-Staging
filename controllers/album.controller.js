@@ -147,20 +147,23 @@ exports.add_favorite = function (req, res, next) {
       cover: req.body.album.cover
     }
   }).then(async function(album) {
-    if (album[0]._options.isNewRecord) {
-      let fullAlbum = await findAppleAlbumData(req, req.body.album.appleAlbumID);
-      await album[0].update({
-        songNames: createSongString(fullAlbum.songNames),
-        genres: createGenreString(fullAlbum.genres)
-      })
-    }
     Favorite.findOrCreate({
       where: {
         userID: req.body.user,
         appleAlbumID: req.body.album.appleAlbumID
       }
-    }).then(function(result) {
+    }).then(async function(result) {
       res.send("Favorite added!");
+
+      // running after response is sent because this database update won't cause
+      // a failed `add to favorites` operation but it does extend response time 
+      if (album[0]._options.isNewRecord) {
+        let fullAlbum = !req.body.album.songNames ? await findAppleAlbumData(req, req.body.album.appleAlbumID) : null;
+        await album[0].update({
+          songNames: createSongString(req.body.album.songNames || fullAlbum.songNames),
+          genres: createGenreString(req.body.album.genres || fullAlbum.genres)
+        })
+      }
     }).catch(function(err) {
       res.status(500).json(err);
     });
@@ -177,9 +180,10 @@ exports.get_user_favorites = function (req, res, next) {
     if (albums.length < 1) return res.send(albums);
 
     let cleanAlbums = [];
-    albums.forEach(album => {
+    for (let i = 0; i < albums.length; i++) {
+      const album = albums[i];
       cleanAlbums.push(cleanAlbumData(album.dataValues.album));
-    });
+    }
     res.send(cleanAlbums);
   }).catch(function(err) {
     console.log(err)
@@ -207,8 +211,7 @@ exports.add_tag = async function (req, res, next) {
     where: {
       text: req.body.tag,
       creator: req.body.creator,
-      customGenre: req.body.customGenre,
-      appleAlbumID: req.body.album.appleAlbumID
+      customGenre: req.body.customGenre
     }
   }).then(async function(tag) {
     Album.findOrCreate({
@@ -222,24 +225,27 @@ exports.add_tag = async function (req, res, next) {
         cover: req.body.album.cover
       }
     }).then(async function(album){
-      if (album[0]._options.isNewRecord) {
-        await album[0].update({
-          songNames: createSongString(req.body.album.songNames),
-          genres: createGenreString(req.body.album.genres)
-        })
-      }
       album[0].addTag(tag[0])
-      .then(function(albumTag) {
+      .then(async function(albumTag) {
         if (albumTag.length < 1) return res.send({ "message": "This tag already exists." });
-        
-        Album.findOne({
-          where: {
-            appleAlbumID: req.body.album.appleAlbumID
-          },
-          include: [ Tag ]
-        }).then(function(updatedAlbum) {
-          res.send(cleanAlbumData(updatedAlbum));
-        })
+        res.send(tag[0]);
+        // Album.findOne({
+        //   where: {
+        //     appleAlbumID: req.body.album.appleAlbumID
+        //   },
+        //   include: [ Tag ]
+        // }).then(function(updatedAlbum) {
+        //   res.send(cleanAlbumData(updatedAlbum));
+        // })
+
+        // running after response is sent because this database update won't cause
+        // a failed `add tag` operation but it does extend response time 
+        if (album[0]._options.isNewRecord) {
+          await album[0].update({
+            songNames: createSongString(req.body.album.songNames),
+            genres: createGenreString(req.body.album.genres)
+          })
+        }
       });
     });
   }).catch(function(err) {
@@ -300,8 +306,7 @@ exports.delete_tag = async function (req, res, next) {
   Tag.findOne({
     where: {
       text: req.body.text,
-      creator: req.body.creator,
-      appleAlbumID: req.body.appleAlbumID
+      creator: req.body.creator
     }
   }).then(async function(tag) {
     Album.findOne({
@@ -318,18 +323,18 @@ exports.delete_tag = async function (req, res, next) {
         Tag.destroy({
           where: {
             text: req.body.text,
-            creator: req.body.creator,
-            appleAlbumID: req.body.appleAlbumID
+            creator: req.body.creator
           }
-        }).then(async function() {
-          Album.findOne({
-            where: {
-              appleAlbumID: req.body.appleAlbumID
-            },
-            include: [ Tag ]
-          }).then(async function(updatedAlbum) {
-            res.send(cleanAlbumData(updatedAlbum));
-          })
+        }).then(async function(destroyed) {
+          res.send({ "deleted" : destroyed, "tag" : tag });
+          // Album.findOne({
+          //   where: {
+          //     appleAlbumID: req.body.appleAlbumID
+          //   },
+          //   include: [ Tag ]
+          // }).then(function(updatedAlbum) {
+          //   res.send(cleanAlbumData(updatedAlbum));
+          // })
         }).catch(function(err) {
           // this catch is hit if a delete request is sent for a non-existent tag (instead of the check above)
           // res.status(404).send({ "message": "This tag does not exist." });
@@ -356,12 +361,6 @@ exports.add_connection = function (req, res, next) {
       cover: albumOne.cover
     }
   }).then(async function(firstAlbum){
-    if (firstAlbum[0]._options.isNewRecord) {
-      await firstAlbum[0].update({
-        songNames: createSongString(albumOne.songNames),
-        genres: createGenreString(albumOne.genres)
-      })
-    }
     Album.findOrCreate({
       where: {
         appleAlbumID: albumTwo.appleAlbumID,
@@ -373,28 +372,37 @@ exports.add_connection = function (req, res, next) {
         cover: albumTwo.cover
       }
     }).then(async function(seccondAlbum){
-      if (seccondAlbum[0]._options.isNewRecord) {
-        albumTwo = await findAppleAlbumData(req, albumTwo.appleAlbumID);
-        await seccondAlbum[0].update({
-          songNames: createSongString(albumTwo.songNames),
-          genres: createGenreString(albumTwo.genres)
-        })
-      }
       Connection.findOrCreate({
         where: {
           albumOne: albumOne.appleAlbumID,
           albumTwo: albumTwo.appleAlbumID,
           creator: req.body.creator
         }
-      }).then(function(connectionOne) {
+      }).then(async function(connectionOne) {
         Connection.findOrCreate({
           where: {
             albumOne: albumTwo.appleAlbumID,
             albumTwo: albumOne.appleAlbumID,
             creator: req.body.creator
           }
-        }).then(function(connectionTwo){
+        }).then(async function(connectionTwo){
           res.send({ "one": connectionOne[0], "two": connectionTwo[0] });
+
+          // running after response is sent because these database updates won't 
+          // cause a failed connection but they do extend response time 
+          if (firstAlbum[0]._options.isNewRecord) {
+            await firstAlbum[0].update({
+              songNames: createSongString(albumOne.songNames),
+              genres: createGenreString(albumOne.genres)
+            })
+          }
+          if (seccondAlbum[0]._options.isNewRecord) {
+            albumTwo = await findAppleAlbumData(req, albumTwo.appleAlbumID);
+            await seccondAlbum[0].update({
+              songNames: createSongString(albumTwo.songNames),
+              genres: createGenreString(albumTwo.genres)
+            })
+          }
         })
       })
     });
@@ -430,7 +438,6 @@ exports.get_connections = function (req, res, next) {
 };
 
 exports.delete_connection = function (req, res, next) {
-  console.log(JSON.stringify(req.body))
   Connection.destroy({
     where: {
       albumOne: req.body.albumOne,
@@ -461,7 +468,9 @@ exports.create_new_list = async function (req, res, next) {
       isPrivate: req.body.isPrivate
     }
   }).then(async function(list) {
+    // new list is created without albums
     if (!req.body.albums || req.body.albums.length === 0) return res.send(list);
+    // new list is created with albums
     Album.findOrCreate({
       where: {
         appleAlbumID: req.body.albums[0].appleAlbumID,
@@ -473,23 +482,24 @@ exports.create_new_list = async function (req, res, next) {
         cover: req.body.albums[0].cover
       }
     }).then(async function(album){
-      if (album[0]._options.isNewRecord) {
-        await album[0].update({
-          songNames: createSongString(req.body.albums[0].songNames),
-          genres: createGenreString(req.body.albums[0].genres)
-        })
-      }
       list[0].addAlbum(album[0])
-      .then(function(listAlbum) {
+      .then(async function(listAlbum) {
         if (listAlbum.length < 1) return res.send({ "message" : "This album is already in this list."});
         res.send(list[0]);
+
+        // running after response is sent because this database update won't cause
+        // a failed `create new list` operation but it does extend response time 
+        if (album[0]._options.isNewRecord) {
+          await album[0].update({
+            songNames: createSongString(req.body.albums[0].songNames),
+            genres: createGenreString(req.body.albums[0].genres)
+          })
+        }
       }).catch(function(err) {
-        console.log(err)
         res.status(500).json(err);
       })
     })
   }).catch(function(err) {
-    console.log(err)
     res.status(500).json(err);
   });
 };
@@ -512,18 +522,20 @@ exports.update_list = async function (req, res, next) {
           cover: req.body.cover
         }
       }).then(async function(album){
-        if (album[0]._options.isNewRecord) {
-          let fullAlbum = await findAppleAlbumData(req, req.body.appleAlbumID);
-          await album[0].update({
-            songNames: createSongString(fullAlbum.songNames),
-            genres: createGenreString(fullAlbum.genres)
-          })
-        }
-
         list.addAlbum(album[0])
-        .then(function(listAlbum) {
+        .then(async function(listAlbum) {
           if (listAlbum.length < 1) return res.send({ "message" : "This album is already in this list."});
           res.send(list);
+
+          // running after response is sent because this database update won't cause
+          // a failed `add album to list` operation but it does extend response time 
+          if (album[0]._options.isNewRecord) {
+            let fullAlbum = await findAppleAlbumData(req, req.body.appleAlbumID);
+            await album[0].update({
+              songNames: createSongString(fullAlbum.songNames),
+              genres: createGenreString(fullAlbum.genres)
+            })
+          }
         }).catch(function(err) {
           res.status(500).json(err);
         })
