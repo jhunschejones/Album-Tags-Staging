@@ -16,19 +16,25 @@ const _this = this;
 
 function cleanAlbumData(album) {
   if (album.dataValues) {
-    // clean up song name and apple genre formatting
-    album.dataValues.songNames = album.dataValues.songNames.split(',,');
-    album.dataValues.genres = album.dataValues.genres.split(',,');
-
-    // rename tags key
-    album.dataValues.tagObjects = album.dataValues.tags;
+    if (album.dataValues.songNames && album.dataValues.genres) {
+      // clean up song name and apple genre formatting
+      album.dataValues.songNames = album.dataValues.songNames.split(',,');
+      album.dataValues.genres = album.dataValues.genres.split(',,');
+    }
+    if (album.dataValues.tags) {
+      // rename tags key
+      album.dataValues.tagObjects = album.dataValues.tags;
+    }
   } else {
-    // clean up song name and apple genre formatting
-    album.songNames = album.songNames.split(',,');
-    album.genres = album.genres.split(',,');
-
-    // rename tags key
-    album.tagObjects = album.tags;
+    if (album.songNames && album.genres) {
+      // clean up song name and apple genre formatting
+      album.songNames = album.songNames.split(',,');
+      album.genres = album.genres.split(',,');
+    }
+    if (album.tags) {
+      // rename tags key
+      album.tagObjects = album.tags;
+    }
   }
 
   return album;
@@ -92,16 +98,12 @@ exports.add_new_album = async function (req, res, next) {
 
   Album.create(newAlbum)
     .then(function() {
-      newAlbum = cleanAlbumData(newAlbum);
-      if (res) { res.send("Album added!"); }
-      else { return(newAlbum); }
+      res.send({ "message" : "Album added!" });
     })
-    .catch(async function(err) {
-      if (res) {
-        if (err.errors[0].message === "appleAlbumID must be unique") return res.status(409).send({ "message" : `An album with Apple Album ID '${req.body.appleAlbumID}' already exists.` });
-        if (err.name === "SequelizeValidationError") return res.status(400).send(err);
-        res.status(500).json(err);
-      }
+    .catch(function(err) {
+      if (err.errors[0].message === "appleAlbumID must be unique" || err.errors[0].message === "PRIMARY must be unique") return res.send({ "message" : `An album with Apple Album ID '${req.body.appleAlbumID}' already exists.` });
+      if (err.name === "SequelizeValidationError") return res.status(400).send(err);
+      res.status(500).json(err);
     });
 };
 
@@ -138,7 +140,9 @@ exports.delete_album = function (req, res, next) {
 exports.add_favorite = function (req, res, next) {
   Album.findOrCreate({
     where: {
-      appleAlbumID: req.body.album.appleAlbumID,
+      appleAlbumID: req.body.album.appleAlbumID
+    },
+    defaults: {
       appleURL: req.body.album.appleURL,
       title: req.body.album.title,
       artist: req.body.album.artist,
@@ -153,7 +157,9 @@ exports.add_favorite = function (req, res, next) {
         appleAlbumID: req.body.album.appleAlbumID
       }
     }).then(async function(result) {
-      res.send("Favorite added!");
+      if (result[0]._options.isNewRecord) { res.send("Favorite added!"); }
+      else { res.send({ "message" : "You've already favorited this album!" }); }
+      
 
       // running after response is sent because this database update won't cause
       // a failed `add to favorites` operation but it does extend response time 
@@ -216,7 +222,9 @@ exports.add_tag = async function (req, res, next) {
   }).then(async function(tag) {
     Album.findOrCreate({
       where: {
-        appleAlbumID: req.body.album.appleAlbumID,
+        appleAlbumID: req.body.album.appleAlbumID
+      },
+      defaults: {
         appleURL: req.body.album.appleURL,
         title: req.body.album.title,
         artist: req.body.album.artist,
@@ -228,15 +236,15 @@ exports.add_tag = async function (req, res, next) {
       album[0].addTag(tag[0])
       .then(async function(albumTag) {
         if (albumTag.length < 1) return res.send({ "message": "This tag already exists." });
-        res.send(tag[0]);
-        // Album.findOne({
-        //   where: {
-        //     appleAlbumID: req.body.album.appleAlbumID
-        //   },
-        //   include: [ Tag ]
-        // }).then(function(updatedAlbum) {
-        //   res.send(cleanAlbumData(updatedAlbum));
-        // })
+        // res.send(tag[0]);
+        Album.findOne({
+          where: {
+            appleAlbumID: req.body.album.appleAlbumID
+          },
+          include: [ Tag ]
+        }).then(async function(updatedAlbum) {
+          res.send(cleanAlbumData(updatedAlbum));
+        })
 
         // running after response is sent because this database update won't cause
         // a failed `add tag` operation but it does extend response time 
@@ -249,6 +257,7 @@ exports.add_tag = async function (req, res, next) {
       });
     });
   }).catch(function(err) {
+    console.log(err);
     res.status(500).json(err);
   });
 };
@@ -306,7 +315,8 @@ exports.delete_tag = async function (req, res, next) {
   Tag.findOne({
     where: {
       text: req.body.text,
-      creator: req.body.creator
+      creator: req.body.creator,
+      customGenre: req.body.customGenre
     }
   }).then(async function(tag) {
     Album.findOne({
@@ -317,29 +327,20 @@ exports.delete_tag = async function (req, res, next) {
       // remove the record from `albumTags`
       album.removeTag(tag)
       .then(async function(albumTag) {
-        // this check is currently not being hit when a delete request is sent for a non-existent
-        if (albumTag.length < 1) return res.status(404).send({ "message": "This tag does not exist." });
-        // remove the record from `tags` table
-        Tag.destroy({
+      // this check is currently not being hit when a delete request is sent for a non-existent
+      if (albumTag.length < 1) return res.status(404).send({ "message": "This tag does not exist." });
+        Album.findOne({
           where: {
-            text: req.body.text,
-            creator: req.body.creator
-          }
-        }).then(async function(destroyed) {
-          res.send({ "deleted" : destroyed, "tag" : tag });
-          // Album.findOne({
-          //   where: {
-          //     appleAlbumID: req.body.appleAlbumID
-          //   },
-          //   include: [ Tag ]
-          // }).then(function(updatedAlbum) {
-          //   res.send(cleanAlbumData(updatedAlbum));
-          // })
-        }).catch(function(err) {
-          // this catch is hit if a delete request is sent for a non-existent tag (instead of the check above)
-          // res.status(404).send({ "message": "This tag does not exist." });
-          res.status(500).json(err);
-        });
+            appleAlbumID: req.body.appleAlbumID
+          },
+          include: [ Tag ]
+        }).then(function(updatedAlbum) {
+          res.send(cleanAlbumData(updatedAlbum));
+        })
+      }).catch(function(err) {
+        // this catch is hit if a delete request is sent for a non-existent tag (instead of the check above)
+        // res.status(404).send({ "message": "This tag does not exist." });
+        res.status(500).json(err);
       });
     });
   }).catch(function(err) {
@@ -352,7 +353,9 @@ exports.add_connection = function (req, res, next) {
   let albumTwo = req.body.albumTwo;
   Album.findOrCreate({
     where: {
-      appleAlbumID: albumOne.appleAlbumID,
+      appleAlbumID: albumOne.appleAlbumID
+    }, 
+    defaults: {
       appleURL: albumOne.appleURL,
       title: albumOne.title,
       artist: albumOne.artist,
@@ -363,7 +366,9 @@ exports.add_connection = function (req, res, next) {
   }).then(async function(firstAlbum){
     Album.findOrCreate({
       where: {
-        appleAlbumID: albumTwo.appleAlbumID,
+        appleAlbumID: albumTwo.appleAlbumID
+      }, 
+      defaults: {
         appleURL: albumTwo.appleURL,
         title: albumTwo.title,
         artist: albumTwo.artist,
@@ -386,7 +391,11 @@ exports.add_connection = function (req, res, next) {
             creator: req.body.creator
           }
         }).then(async function(connectionTwo){
-          res.send({ "one": connectionOne[0], "two": connectionTwo[0] });
+          if (!connectionOne[0]._options.isNewRecord || !connectionTwo[0]._options.isNewRecord) {
+            res.send({ "message" : `'${albumOne.title}' is already connected to '${albumTwo.title}'` });
+          } else {
+            res.send({ "message" : `'${albumOne.title}' is now connected to '${albumTwo.title}'` });
+          }
 
           // running after response is sent because these database updates won't 
           // cause a failed connection but they do extend response time 
@@ -403,10 +412,22 @@ exports.add_connection = function (req, res, next) {
               genres: createGenreString(albumTwo.genres)
             })
           }
+        }).catch(function(err) {
+          console.log(err.errors[0])
+          // if (err.errors[0].message === "appleAlbumID must be unique") return res.send({ "message" : `An album with Apple Album ID '${req.body.appleAlbumID}' already exists.` });
         })
+      }).catch(function(err) {
+        console.log(err.errors[0])
+        // if (err.errors[0].message === "appleAlbumID must be unique") return res.send({ "message" : `An album with Apple Album ID '${req.body.appleAlbumID}' already exists.` });
       })
-    });
-  });
+    }).catch(function(err) {
+      console.log(err.errors[0])
+      // if (err.errors[0].message === "appleAlbumID must be unique") return res.send({ "message" : `An album with Apple Album ID '${req.body.appleAlbumID}' already exists.` });
+    })
+  }).catch(function(err) {
+    console.log(err.errors[0])
+    // if (err.errors[0].message === "appleAlbumID must be unique") return res.send({ "message" : `An album with Apple Album ID '${req.body.appleAlbumID}' already exists.` });
+  })
 };
 
 exports.get_connections = function (req, res, next) {
@@ -473,7 +494,9 @@ exports.create_new_list = async function (req, res, next) {
     // new list is created with albums
     Album.findOrCreate({
       where: {
-        appleAlbumID: req.body.albums[0].appleAlbumID,
+        appleAlbumID: req.body.albums[0].appleAlbumID
+      },
+      defaults: {
         appleURL: req.body.albums[0].appleURL,
         title: req.body.albums[0].title,
         artist: req.body.albums[0].artist,
@@ -513,7 +536,9 @@ exports.update_list = async function (req, res, next) {
     }).then(async function(list) {
       Album.findOrCreate({
         where: {
-          appleAlbumID: req.body.appleAlbumID,
+          appleAlbumID: req.body.appleAlbumID
+        },
+        defaults: {
           appleURL: req.body.appleURL,
           title: req.body.title,
           artist: req.body.artist,
