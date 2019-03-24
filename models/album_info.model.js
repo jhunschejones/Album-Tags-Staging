@@ -25,8 +25,8 @@ Connection.belongsTo(Album, {foreignKey: 'albumOne', targetKey: 'appleAlbumID'})
 Album.belongsToMany(Tag, { through: 'albumTags' });
 Tag.belongsToMany(Album, { through: 'albumTags' });
 
-List.belongsToMany(Album, { through: 'albumLists', foreignKey: 'appleAlbumID' });
-Album.belongsToMany(List, { through: 'albumLists', foreignKey: 'id' });
+List.belongsToMany(Album, { through: 'albumLists' });
+Album.belongsToMany(List, { through: 'albumLists' });
 
 sequelize.sync();
 
