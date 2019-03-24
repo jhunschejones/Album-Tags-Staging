@@ -656,6 +656,7 @@ function modifySelectedTags(tag) {
 
 function deleteTag(tagID) {
   const creator = $(`#${tagID}`).data('creator');
+  const customGenre = $(`#${tagID}`).data('custom-genre');
   const tag = $(`#${tagID}`).data('rawtag');
 
   let confirmation = confirm(`Are you sure you want to delete the "${tag}" tag? You cannot undo this operation.`);
@@ -669,14 +670,16 @@ function deleteTag(tagID) {
         // in case the raw tag is just a number (like a year)
         "text": escapeHtml(tag.toString()),
         "creator": creator,
-        "appleAlbumID": albumResult.appleAlbumID
+        "appleAlbumID": albumResult.appleAlbumID,
+        "customGenre": customGenre
       }),
       success: function(response) {
         if (!response.message) {
-          if (response.deleted === 1) { 
-            const deletedTag = albumResult.tagObjects.find(x => x.text === response.tag.text && x.creator === response.tag.creator);
-            removeFromArray(albumResult.tagObjects, deletedTag); 
-          }
+          // if (response.deleted === 1) { 
+          //   const deletedTag = albumResult.tagObjects.find(x => x.text === response.tag.text && x.creator === response.tag.creator);
+          //   removeFromArray(albumResult.tagObjects, deletedTag); 
+          // }
+          albumResult = response;
           populateTags();
           updateTagDisplay(); 
         } else {
@@ -746,8 +749,13 @@ function addTag() {
       }),
       success: function (result) {
         if (!result.message) {
-          if (!albumResult.tagObjects) { albumResult.tagObjects = []; }
-          albumResult.tagObjects.push(result);
+          // if (!albumResult.tagObjects) { albumResult.tagObjects = []; }
+          // albumResult.tagObjects.push(result);
+          if (!result.songNames || !result.genres) {
+            result.songNames = albumResult.songNames;
+            result.genres = albumResult.genres;
+          }
+          albumResult = result;
           populateTags();
           $('#tag-success').html("Added! &#10003;");
           setTimeout(function(){ $('#tag-success').html('&nbsp;'); }, 3000);
