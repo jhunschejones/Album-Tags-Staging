@@ -64,3 +64,4 @@ typings/
 public/javascripts/closure-compiler-v20190121.jar
 public/javascripts/compiler.jar
 data/db/dev.sqlite
+data/db/dev.sqlite.lock
