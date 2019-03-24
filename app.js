@@ -1,3 +1,4 @@
+const newrelic = require('newrelic')
 if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging') {
   require('dotenv').load();
 }
@@ -11,6 +12,8 @@ const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS
 const cors = require('cors')
 // module.exports allows me to access `app` later in tests
 const app = express()
+// in express, this lets you call newrelic from within a template
+app.locals.newrelic = newrelic;
 
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
