@@ -336,6 +336,24 @@ exports.delete_tag = async function (req, res, next) {
           include: [ Tag ]
         }).then(function(updatedAlbum) {
           res.send(cleanAlbumData(updatedAlbum));
+
+          // destroy tag if it is not in any albumTags relationships
+          sequelize.query("SELECT * FROM `albumTags` WHERE `albumTags`.`tagId` = " + tag.id, { type: sequelize.QueryTypes.SELECT})
+            .then(albumTags => {
+              if (albumTags.length < 1) {
+                return Tag.destroy({
+                  where: {
+                    text: req.body.text,
+                    creator: req.body.creator,
+                    customGenre: req.body.customGenre
+                  }
+                }).catch(function(err) {
+                  console.log(err);
+                })
+              }
+            }).catch(function(err) {
+              console.log(err);
+            })
         })
       }).catch(function(err) {
         // this catch is hit if a delete request is sent for a non-existent tag (instead of the check above)
