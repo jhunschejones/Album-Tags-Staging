@@ -117,7 +117,7 @@ function populateAlbumPage(userLoggedIn) {
   });
   // ------ fill cards ------
   populateTags();
-  getConnections();
+  populateConnections();
   getListsWithAlbum(userLoggedIn);
   getUserLists();
   if (userLoggedIn) { 
@@ -130,7 +130,7 @@ function populateAlbumPage(userLoggedIn) {
 }
 
 function addToFavorites() {
-  if (albumResult.favorited) {
+  if (!!albumResult.favorites.find(x => x.userID === userID)) {
     populateUserLists();
     return alert("This album is already in your \"My Favorites\" list.");
   }
@@ -143,8 +143,9 @@ function addToFavorites() {
     }),
     success: function(response) {
       $('#updateListModal').modal('hide');
-      albumResult.favorited = true;
+      albumResult.favorites.push({"userID": userID});
       populateListsWithAlbum();
+      updateListDisplay();
       $('#list-options').get(0).selectedIndex = 0;
     }
   });
@@ -161,8 +162,9 @@ function removeFromFavorites() {
         "appleAlbumID" : albumResult.appleAlbumID
       }),
       success: function(response) {
-        albumResult.favorited = false;
+        removeFromArray(albumResult.favorites, albumResult.favorites.find(x => x.userID === userID));
         populateListsWithAlbum();
+        updateListDisplay();
       }
     });
   }
@@ -188,31 +190,16 @@ function getListsWithAlbum(userLoggedIn) {
     success: function(data) {
       if (data.message || data === "") { listsWithAlbum = []; } 
       else { listsWithAlbum = data; }
-      checkUserFavorites(userLoggedIn);
+      populateListsWithAlbum(userLoggedIn);
     }
   })
-}
-
-function checkUserFavorites(userLoggedIn) {
-  if (userID) {
-    $.ajax({
-      method: "GET",
-      url: "/api/v1/favorite/" + userID,
-      success: function(allUserFavorites) {
-        albumResult.favorited = !!allUserFavorites.find(x => x.appleAlbumID === albumResult.appleAlbumID);
-        populateListsWithAlbum(userLoggedIn);
-      }
-    })
-  } else {
-    populateListsWithAlbum(userLoggedIn);
-  }
 }
 
 function populateListsWithAlbum(userLoggedIn) {
   $('#all-lists').html('');
   $('.list-message').remove();
   // check if album is favorited
-  if (userID && albumResult.favorited) {
+  if (userID && albumResult.favorites && !!albumResult.favorites.find(x => x.userID === userID)) { 
     $('#all-lists').append(`<li class="list my-list" data-creator="${userID}"><a href="/list?type=myfavorites">My Favorites</a><span class="text-secondary"> by: You!</span><span class="remove-from-list-button" data-list-type="myfavorites">&#10005;</span></li>`);
   }
   listsWithAlbum.forEach(list => {
@@ -278,6 +265,7 @@ function addToList(chosenList) {
       success: function(data) {
         listsWithAlbum.push(data);
         populateListsWithAlbum();
+        updateListDisplay();
         $('#updateListModal').modal('hide');
         $('#list-options').get(0).selectedIndex = 0;
       },
@@ -320,6 +308,7 @@ function addToNewList(listTitle, displayName) {
             listsWithAlbum.push(data);
             populateUserLists();
             populateListsWithAlbum();
+            updateListDisplay();
             $('#updateListModal').modal('hide');
             $('#new-list-title').val('');
             $('#new-display-name').val('');
@@ -355,6 +344,7 @@ function removeFromList(listID) {
         let index = listsWithAlbum.indexOf(thisList);
         listsWithAlbum.splice(index, 1);
         populateListsWithAlbum();
+        updateListDisplay();
       }
     });
   }
@@ -409,30 +399,12 @@ function displayMyLists() {
   });
 }
 
-function getConnections() {
-  $.ajax('/api/v1/connection/' + albumResult.appleAlbumID, {
-    method: 'GET',
-    contentType: 'application/json',
-    success: function(results) {
-      if (results.message === "This user has not created any connections for this album.") {
-        albumResult.connectionObjects = [];
-        populateConnections();
-        updateConnectionDisplay();
-      } else {
-        albumResult.connectionObjects = results;
-        populateConnections();
-        updateConnectionDisplay();
-      }
-    }
-  });
-}
-
 function populateConnections() {
-  if (albumResult.connectionObjects) {
+  if (albumResult.connections) {
     $('#connected-albums').html('');
 
-    for (let index = 0; index < albumResult.connectionObjects.length; index++) {
-      const connectedAlbum = albumResult.connectionObjects[index];
+    for (let index = 0; index < albumResult.connections.length; index++) {
+      const connectedAlbum = albumResult.connections[index];
 
       if (connectedAlbum.appleAlbumID != albumResult.appleAlbumID) {
         const cover = connectedAlbum.cover.replace('{w}', 105).replace('{h}', 105);
@@ -472,7 +444,9 @@ function addConnection(selectedAlbum) {
       }),
       success: function(result) {
         $('#updateConnectionModal').modal('hide');
-        getConnections();
+        albumResult.connections = result;
+        populateConnections();
+        updateConnectionDisplay();
       }
     });
     $('#add-connection-input').val('');
@@ -545,8 +519,9 @@ function deleteConnection(connectedAlbum) {
         "creator": userID
       }),
       success: function(result) {
-          getConnections();
-          updateConnectionDisplay();
+        albumResult.connections = result;
+        populateConnections();
+        updateConnectionDisplay();
       },
       error: function(err) {
         if (err.responseJSON && err.responseJSON.message) return alert(err.responseJSON.message);
@@ -675,10 +650,6 @@ function deleteTag(tagID) {
       }),
       success: function(response) {
         if (!response.message) {
-          // if (response.deleted === 1) { 
-          //   const deletedTag = albumResult.tagObjects.find(x => x.text === response.tag.text && x.creator === response.tag.creator);
-          //   removeFromArray(albumResult.tagObjects, deletedTag); 
-          // }
           albumResult = response;
           populateTags();
           updateTagDisplay(); 
@@ -749,14 +720,13 @@ function addTag() {
       }),
       success: function (result) {
         if (!result.message) {
-          // if (!albumResult.tagObjects) { albumResult.tagObjects = []; }
-          // albumResult.tagObjects.push(result);
           if (!result.songNames || !result.genres) {
             result.songNames = albumResult.songNames;
             result.genres = albumResult.genres;
           }
           albumResult = result;
           populateTags();
+          updateTagDisplay();
           $('#tag-success').html("Added! &#10003;");
           setTimeout(function(){ $('#tag-success').html('&nbsp;'); }, 3000);
         } else {
