@@ -316,8 +316,9 @@ exports.get_all_tags = function(req, res, next) {
   Tag.findAll({}).then(function(tags) {
     let justTags = [];
     tags.forEach(tag => {
-      if (justTags.indexOf(tag) === -1) { justTags.push(tag.text); }
+      if (justTags.indexOf(tag.text) === -1) { justTags.push(tag.text); }
     });
+    justTags.sort();
     res.send(justTags);
   }).catch(function(err) {
     res.status(500).json(err);
