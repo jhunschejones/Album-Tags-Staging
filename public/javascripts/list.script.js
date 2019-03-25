@@ -487,8 +487,8 @@ function getCleanAlbumArray(arr) {
       album.tagGenres = [];
       album.tagObjects.forEach(tagObject => {
         // check if the tag is created by the same person who created the list
-        if (tagObject.creator === listData.user && (isGenre(tagObject.tag) || tagObject.customGenre) && album.tagGenres.indexOf(tagObject.tag) === -1) {
-          album.tagGenres.push(tagObject.tag);
+        if (tagObject.creator === listData.user && (isGenre(tagObject.text) || tagObject.customGenre) && album.tagGenres.indexOf(tagObject.text) === -1) {
+          album.tagGenres.push(tagObject.text);
         }
       });
     }
