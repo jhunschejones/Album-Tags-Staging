@@ -107,15 +107,23 @@ exports.add_new_album = async function (req, res, next) {
     });
 };
 
-exports.get_album = function (req, res, next) {
+exports.get_album = async function (req, res, next) {
   Album.findOne({
     where: {
       appleAlbumID: req.params.appleAlbumID
     },
-    include: [ Tag ] // LEFT JOIN's with these tables
-  })
-    .then(function(album) {
+    include: [ Tag, Favorite, Connection ] // LEFT JOIN's with these tables
+  }).then(async function(album) {
       if (!album) return res.send({ "message" : `No album found with Apple Album ID: '${req.params.appleAlbumID}'` });
+
+      let connectedAlbums = [];
+      for (let i = 0; i < album.dataValues.connections.length; i++) {
+        const conection = album.dataValues.connections[i];
+        const connectedAlbum = await Album.findOne({ where: { appleAlbumID: conection.dataValues.albumTwo }, attributes: [ "appleAlbumID", "title", "artist", "cover" ] });
+        connectedAlbum.dataValues.creator = conection.dataValues.creator;
+        connectedAlbums.push(connectedAlbum);
+      }
+      album.dataValues.connections = connectedAlbums;
       res.send(cleanAlbumData(album));
     }).catch(function(err) {
       console.log(err);
@@ -160,7 +168,6 @@ exports.add_favorite = function (req, res, next) {
       if (result[0]._options.isNewRecord) { res.send("Favorite added!"); }
       else { res.send({ "message" : "You've already favorited this album!" }); }
       
-
       // running after response is sent because this database update won't cause
       // a failed `add to favorites` operation but it does extend response time 
       if (album[0]._options.isNewRecord) {
@@ -181,7 +188,12 @@ exports.get_user_favorites = function (req, res, next) {
     where: {
       userID: req.params.userID
     },
-    include: [ Album ]
+    include: [ 
+      {
+        model: Album,
+        include: [ Tag ]
+      }
+    ]
   }).then(function(albums) {
     if (albums.length < 1) return res.send(albums);
 
@@ -264,37 +276,38 @@ exports.add_tag = async function (req, res, next) {
 
 exports.find_by_tags = function (req, res, next) {
   const searchedTags = req.params.tags.split(',');
-
-  Album.findAll({
+  Tag.findAll({
+    where: { 
+      // matches ANY of the searched tags
+      text: {
+        [Op.in]: searchedTags
+      }
+    },
     include: [{
-      model: Tag,
-      through: { 
-        attributes: [],
-      },
-      where: { 
-        // currently returns all albums with ANY of the searched tags
-        text: {
-          [Op.in]: searchedTags
+      model: Album,
+      include: [ Tag ]
+    }]
+  }).then(function(tagResults) {
+    let results = [];
+    for (let i = 0; i < tagResults.length; i++) {
+      const tagResult = tagResults[i];
+      for (let j = 0; j < tagResult.albums.length; j++) {
+        const album = tagResult.albums[j];
+        let tags = [];
+        for (let k = 0; k < album.tags.length; k++) {
+          const tag = album.tags[k];
+          tags.push(tag.dataValues.text);
+        }
+        if (searchedTags.every(function(tag) { return tags.indexOf(tag) !== -1; })) {
+          if (!results.find(x => x.dataValues.appleAlbumID === album.dataValues.appleAlbumID)) {
+            results.push(cleanAlbumData(album));
+          }
         }
       }
-    }]
-  }).then(function(albums) {
-    // filters albums down to results that only have ALL the searched tags
-    let results = [];
-    for (let i = 0; i < albums.length; i++) {
-      const album = albums[i];
-      let tags = [];
-      for (let j = 0; j < album.tags.length; j++) {
-        const tag = album.tags[j];
-        tags.push(tag.dataValues.text);
-      }
-      if (searchedTags.every(function(tag) { return tags.indexOf(tag) !== -1; })) {
-        results.push(album);
-      }
     }
-    if (results.length < 1) return res.send({ "message": "No albums match this combination of tags." });
     res.send(results);
   }).catch(function(err) {
+    console.log(err)
     res.status(500).json(err);
   });
 };
@@ -411,9 +424,10 @@ exports.add_connection = function (req, res, next) {
         }).then(async function(connectionTwo){
           if (!connectionOne[0]._options.isNewRecord || !connectionTwo[0]._options.isNewRecord) {
             res.send({ "message" : `'${albumOne.title}' is already connected to '${albumTwo.title}'` });
-          } else {
-            res.send({ "message" : `'${albumOne.title}' is now connected to '${albumTwo.title}'` });
-          }
+          } 
+          // else { res.send({ "message" : `'${albumOne.title}' is now connected to '${albumTwo.title}'`}); }
+          req.params.appleAlbumID = albumOne.appleAlbumID;
+          _this.get_connections(req, res);
 
           // running after response is sent because these database updates won't 
           // cause a failed connection but they do extend response time 
@@ -430,22 +444,10 @@ exports.add_connection = function (req, res, next) {
               genres: createGenreString(albumTwo.genres)
             })
           }
-        }).catch(function(err) {
-          console.log(err.errors[0])
-          // if (err.errors[0].message === "appleAlbumID must be unique") return res.send({ "message" : `An album with Apple Album ID '${req.body.appleAlbumID}' already exists.` });
-        })
-      }).catch(function(err) {
-        console.log(err.errors[0])
-        // if (err.errors[0].message === "appleAlbumID must be unique") return res.send({ "message" : `An album with Apple Album ID '${req.body.appleAlbumID}' already exists.` });
-      })
-    }).catch(function(err) {
-      console.log(err.errors[0])
-      // if (err.errors[0].message === "appleAlbumID must be unique") return res.send({ "message" : `An album with Apple Album ID '${req.body.appleAlbumID}' already exists.` });
-    })
-  }).catch(function(err) {
-    console.log(err.errors[0])
-    // if (err.errors[0].message === "appleAlbumID must be unique") return res.send({ "message" : `An album with Apple Album ID '${req.body.appleAlbumID}' already exists.` });
-  })
+        }).catch(function(err) { console.log(err.errors[0]) })
+      }).catch(function(err) { console.log(err.errors[0]) })
+    }).catch(function(err) { console.log(err.errors[0]) })
+  }).catch(function(err) { console.log(err.errors[0]) })
 };
 
 exports.get_connections = function (req, res, next) {
@@ -476,23 +478,26 @@ exports.get_connections = function (req, res, next) {
   })
 };
 
-exports.delete_connection = function (req, res, next) {
+exports.delete_connection = async function (req, res, next) {
   Connection.destroy({
     where: {
       albumOne: req.body.albumOne,
       albumTwo: req.body.albumTwo,
       creator: req.body.creator
     }
-  }).then(function(deletedConnectionOne) {
+  }).then(async function(deletedConnectionOne) {
     Connection.destroy({
       where: {
         albumOne: req.body.albumTwo,
         albumTwo: req.body.albumOne,
         creator: req.body.creator
       }
-    }).then(function(deletedConnectionTwo) {
-      res.send(`${deletedConnectionOne + deletedConnectionTwo} connections deleted.`);
+    }).then(async function(deletedConnectionTwo) {
+      // res.send(`${deletedConnectionOne + deletedConnectionTwo} connections deleted.`);
+      req.params.appleAlbumID = req.body.albumOne;
+      _this.get_connections(req, res);
     }).catch(function(err) {
+      console.log(err)
       res.status(500).json(err);
     });
   });
@@ -644,10 +649,22 @@ exports.get_list = function (req, res, next) {
     where: {
       id: req.params.list
     },
-    include: [ Album ]
+    include: [ 
+      {
+        model: Album,
+        include: [ Tag ]
+      }
+    ]
   }).then(function(list) {
+    let cleanAlbums = [];
+    for (let i = 0; i < list.dataValues.albums.length; i++) {
+      const album = list.dataValues.albums[i];
+      cleanAlbums.push(cleanAlbumData(album.dataValues));
+    }
+    list.albums = cleanAlbums;
     res.send(list);
   }).catch(function(err) {
+    console.log(err)
     res.status(500).json(err);
   });
 };
