@@ -425,10 +425,11 @@ exports.add_connection = function (req, res, next) {
         }).then(async function(connectionTwo){
           if (!connectionOne[0]._options.isNewRecord || !connectionTwo[0]._options.isNewRecord) {
             res.send({ "message" : `'${albumOne.title}' is already connected to '${albumTwo.title}'` });
-          } 
-          // else { res.send({ "message" : `'${albumOne.title}' is now connected to '${albumTwo.title}'`}); }
-          req.params.appleAlbumID = albumOne.appleAlbumID;
-          _this.get_connections(req, res);
+          } else {
+            // res.send({ "message" : `'${albumOne.title}' is now connected to '${albumTwo.title}'`});
+            req.params.appleAlbumID = albumOne.appleAlbumID;
+            _this.get_connections(req, res);
+          }
 
           // running after response is sent because these database updates won't 
           // cause a failed connection but they do extend response time 
