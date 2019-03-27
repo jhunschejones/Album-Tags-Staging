@@ -131,6 +131,14 @@ exports.get_album = async function (req, res, next) {
     });
 };
 
+exports.get_all_albums = function(req, res, next) {
+  Album.findAll({
+    include: [ Tag, Favorite, Connection, List ]
+  }).then(function(albums){ 
+    res.send(albums); 
+  }).catch(function(err) { console.log(err); });
+};
+
 exports.delete_album = function (req, res, next) {
   Album.destroy({
     where: {
