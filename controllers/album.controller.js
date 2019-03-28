@@ -112,7 +112,7 @@ exports.get_album = async function (req, res, next) {
     where: {
       appleAlbumID: req.params.appleAlbumID
     },
-    include: [ Tag, Favorite, Connection ] // LEFT JOIN's with these tables
+    include: [ Tag, Favorite, Connection, List ] // LEFT JOIN's with these tables
   }).then(async function(album) {
       if (!album) return res.send({ "message" : `No album found with Apple Album ID: '${req.params.appleAlbumID}'` });
 

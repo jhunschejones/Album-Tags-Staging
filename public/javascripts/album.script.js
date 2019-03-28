@@ -60,7 +60,6 @@ const albumID = window.location.pathname.replace('/album/', '');
 let albumResult;
 let selectedTags = [];
 let userLists = [];
-let listsWithAlbum = [];
 
 function getAlbumDetails(userLoggedIn) {
   $.ajax('/api/v1/album/' + albumID, {
@@ -118,11 +117,11 @@ function populateAlbumPage(userLoggedIn) {
   // ------ fill cards ------
   populateTags();
   populateConnections();
-  getListsWithAlbum(userLoggedIn);
   getUserLists();
   if (userLoggedIn) { 
     updateTagDisplay(userLoggedIn); 
     updateConnectionDisplay(userLoggedIn);
+    populateListsWithAlbum(userLoggedIn);
   } else {
     if ($('.album-tag').length === 0) { $('#current-tags').html('<div class="text-primary text-center"><small>There are currently no tags for this album. Log in to start adding your own tags!</small></div>'); }
     if ($('.connection').length === 0) { $('#connected-albums').html('<div class="text-primary text-center"><small>There are currently no connections for this album. Log in to start adding your own connections!</small><br/><br/></div>'); }
@@ -183,18 +182,6 @@ function getUserLists() {
   });
 }
 
-function getListsWithAlbum(userLoggedIn) {
-  $.ajax({
-    method: "GET",
-    url: "/api/v1/list/album/" + albumResult.appleAlbumID,
-    success: function(data) {
-      if (data.message || data === "") { listsWithAlbum = []; } 
-      else { listsWithAlbum = data; }
-      populateListsWithAlbum(userLoggedIn);
-    }
-  })
-}
-
 function populateListsWithAlbum(userLoggedIn) {
   $('#all-lists').html('');
   $('.list-message').remove();
@@ -202,22 +189,24 @@ function populateListsWithAlbum(userLoggedIn) {
   if (userID && albumResult.favorites && !!albumResult.favorites.find(x => x.userID === userID)) { 
     $('#all-lists').append(`<li class="list my-list" data-creator="${userID}"><a href="/list?type=myfavorites">My Favorites</a><span class="text-secondary"> by: You!</span><span class="remove-from-list-button" data-list-type="myfavorites">&#10005;</span></li>`);
   }
-  listsWithAlbum.forEach(list => {
-    if(!list.isPrivate) {
-      let listCreator = list.displayName;
-      if (!listCreator || listCreator.trim === "") { listCreator = "Unknown"; }
-
-      if (list.user === userID) {
-        $('#all-lists').append(`<li class="list my-list" data-creator="${list.user}"><a href="/list?type=userlist&id=${list.id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span><span class="remove-from-list-button" data-list-id="${list.id}" data-list-type="userlist">&#10005;</span></li>`);
-      } else {
-        $('#all-lists').append(`<li class="list other-list" data-creator="${list.user}"><a href="/list?type=userlist&id=${list.id}">${list.title}</a><span class="text-secondary" data-list-type="userlist"> by: ${listCreator}</span></li>`);
+  if (albumResult.lists) {
+    albumResult.lists.forEach(list => {
+      if(!list.isPrivate) {
+        let listCreator = list.displayName;
+        if (!listCreator || listCreator.trim === "") { listCreator = "Unknown"; }
+  
+        if (list.user === userID) {
+          $('#all-lists').append(`<li class="list my-list" data-creator="${list.user}"><a href="/list?type=userlist&id=${list.id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span><span class="remove-from-list-button" data-list-id="${list.id}" data-list-type="userlist">&#10005;</span></li>`);
+        } else {
+          $('#all-lists').append(`<li class="list other-list" data-creator="${list.user}"><a href="/list?type=userlist&id=${list.id}">${list.title}</a><span class="text-secondary" data-list-type="userlist"> by: ${listCreator}</span></li>`);
+        }
       }
-    }
-  });
-  $('.remove-from-list-button').click(function() {
-    if ($(this).data('list-type') === "myfavorites") return removeFromFavorites();
-    removeFromList($(this).data('list-id'));
-  });
+    });
+    $('.remove-from-list-button').click(function() {
+      if ($(this).data('list-type') === "myfavorites") return removeFromFavorites();
+      removeFromList($(this).data('list-id'));
+    });
+  }
   if (userLoggedIn) return updateListDisplay();
 
   if ($('.list').length === 0) { 
@@ -239,7 +228,7 @@ function addToList(chosenList) {
   if (chosenList) {
     if (chosenList === "myfavorites") return addToFavorites();
 
-    let alreadyInList = listsWithAlbum.find(x => x.id === chosenList);
+    let alreadyInList = albumResult.lists.find(x => x.id === chosenList);
     if (alreadyInList) {
       $('#list-options').get(0).selectedIndex = 0;
       return alert(`This album is already in your "${alreadyInList.title}" list.`);
@@ -263,7 +252,7 @@ function addToList(chosenList) {
       contentType: 'application/json',
       data: JSON.stringify(addAlbumToListBody),
       success: function(data) {
-        listsWithAlbum.push(data);
+        albumResult.lists.push(data);
         populateListsWithAlbum();
         updateListDisplay();
         $('#updateListModal').modal('hide');
@@ -305,7 +294,7 @@ function addToNewList(listTitle, displayName) {
           // update the UI without making any additional API calls
           if(!data.message) {
             userLists.push(data);
-            listsWithAlbum.push(data);
+            albumResult.lists.push(data);
             populateUserLists();
             populateListsWithAlbum();
             updateListDisplay();
@@ -322,7 +311,7 @@ function addToNewList(listTitle, displayName) {
 }
 
 function removeFromList(listID) {
-  let thisList = listsWithAlbum.find(x => x.id === listID);
+  let thisList = albumResult.lists.find(x => x.id === listID);
   let confirmed = confirm(`Are you sure you want to remove this album from the "${thisList.title}" list? You cannot undo this operation.`);
   
   if (confirmed) {
@@ -341,8 +330,8 @@ function removeFromList(listID) {
       contentType: 'application/json',
       data: JSON.stringify(deleteObject),
       success: function(data) {
-        let index = listsWithAlbum.indexOf(thisList);
-        listsWithAlbum.splice(index, 1);
+        let index = albumResult.lists.indexOf(thisList);
+        albumResult.lists.splice(index, 1);
         populateListsWithAlbum();
         updateListDisplay();
       }
@@ -580,6 +569,7 @@ function displayMyConnections() {
 function populateTags() {
   clearTagArray();
   if (albumResult.tagObjects) {
+    albumResult.tagObjects = albumResult.tagObjects.sort((a, b) => (a.text > b.text) ? 1 : -1);
     $('#current-tags').html('');
     for (let index = 0; index < albumResult.tagObjects.length; index++) {
       let tag = albumResult.tagObjects[index].text;
@@ -873,6 +863,15 @@ $("#add-tag-input").keyup(function(event) {
     $("#add-tag-button").click();
   }
 });
+$('#custom-genre-checkbox').keyup(function(event) {
+  if (event.keyCode === 13) {
+    $("#add-tag-button").click();
+  }
+});
+$('#custom-genre-checkbox-text').click(function() {
+  $('#custom-genre-checkbox').click();
+  $('#custom-genre-checkbox').select();
+});
 $("#add-connection-button").click(function() {
   const search = $('#add-connection-input').val().trim();
   $('#no-results-message').remove();
@@ -925,9 +924,6 @@ $('#add-to-new-list-button').click(function() {
   addToNewList(escapeHtml(listTitle), escapeHtml(displayName));
   document.getElementById("new-display-name").value = "";
   document.getElementById("new-list-title").value = "";
-});
-$('#custom-genre-checkbox-text').click(function() {
-  $('#custom-genre-checkbox').click();
 });
 
 // make hover scrollbar always visible on touchscreens
