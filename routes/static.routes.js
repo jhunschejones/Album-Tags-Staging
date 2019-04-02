@@ -101,11 +101,10 @@ router.get('/list', function(req, res) {
 })
 
 // GET utility page
+// Deprecated spring 2019 in favor of https://github.com/jhunschejones/Album-Tags-Utilities
 router.get('/utility', function(req, res) {
-  res.render('utility', {
-    pageTitle: ': Utility',
-    subTitle: 'Utility Tools',
-  })
+  newrelic.recordCustomEvent('DeprecatedPageCalled', {'call': 'GET', 'page': req.url});
+  res.redirect('/');
 })
 
 // GET /robots.txt
