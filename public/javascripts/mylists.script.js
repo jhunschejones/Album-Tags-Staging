@@ -136,7 +136,7 @@ function createNewList(listTitle, displayName) {
         data: JSON.stringify(newList),
         success: function(data) {
           if(!data.message) {
-            allLists.push(data[0]);
+            allLists.push(data);
             populateAllLists();
             $('#updateListModal').modal('hide');
             $('#new-list-title').val('');

@@ -537,7 +537,7 @@ exports.create_new_list = async function (req, res, next) {
     }
   }).then(async function(list) {
     // new list is created without albums
-    if (!req.body.albums || req.body.albums.length === 0) return res.send(list);
+    if (!req.body.albums || req.body.albums.length === 0) return res.send(list[0]);
     // new list is created with albums
     Album.findOrCreate({
       where: {
@@ -701,7 +701,7 @@ exports.delete_list = function (req, res, next) {
       id: req.params.list
     }
   }).then(function(listsDeleted) {
-    if (listsDeleted === 1) return res.send("List deleted!");
+    if (listsDeleted === 1) return res.send({ "message": "List deleted!" });
     if (listsDeleted === 0) return res.status(404).send({ "message" : `Unable to find list with id '${req.params.list}'` });
     res.send({ "message": `${listsDeleted} lists were deleted remove from the list.` });
   }).catch(function(err) {
