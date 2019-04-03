@@ -272,3 +272,177 @@ describe('add and remove an album from favorites', function() {
       })
   })
 })
+
+// ====== TESTING CREATE/EDIT/DELETE LIST FUNCTIONALITY ======
+describe('create, edit, delete list', function() {
+  let newListID
+  it('should create a new list', function(done){
+    request
+      .post('/api/v1/list')
+      .send({
+        user: "Test User",
+        displayName: "T. User",
+        title: "Test List",
+        isPrivate: false
+      })
+      .expect("Content-type",/json/)
+      .expect(200)
+      .end(function(err,res){
+        res.status.should.equal(200)
+        newListID = res.body.id
+        done()
+      })
+  })
+  it('should change the list title', function(done){
+    request
+      .put('/api/v1/list/' + newListID)
+      .send({
+        title: "Improved Test List",
+        method: "change title"
+      })
+      .expect("Content-type",/json/)
+      .expect(200)
+      .end(function(err,res){
+        res.status.should.equal(200)
+        res.body.title.should.equal("Improved Test List")
+        done()
+      })
+  })
+  it('should change the list display name', function(done){
+    request
+      .put('/api/v1/list/' + newListID)
+      .send({
+        displayName: "Test User I",
+        method: "change display name"
+      })
+      .expect("Content-type",/json/)
+      .expect(200)
+      .end(function(err,res){
+        res.status.should.equal(200)
+        res.body.displayName.should.equal("Test User I")
+        done()
+      })
+  })
+  it('should delete the new list', function(done){
+    request
+      .delete('/api/v1/list/' + newListID)
+      .send({
+        "apiToken": apiToken
+      })
+      .expect("Content-type",/json/)
+      .expect(200)
+      .end(function(err,res){
+        res.status.should.equal(200)
+        res.body.message.should.equal("List deleted!")
+        done()
+      })
+  })
+})
+
+// ====== TESTING ADD TO LIST FUNCTIONALITY ======
+describe('add albums to a new list', function() {
+  let newListID
+  it('create a new list with a new album', function(done){
+    request
+      .post('/api/v1/list')
+      .send({
+        user: "Test User",
+        displayName: "T. User",
+        title: "Test List",
+        isPrivate: false,
+        albums: [
+          {
+            appleAlbumID: 0006,
+            appleURL: "Test Apple URL",
+            title: "Test Title",
+            artist: "Test Artist",
+            songNames: [ "Test Song 1", "My Love Is Not A Test" ],
+            cover: "Test Cover",
+            releaseDate: "2019-04-01",
+            recordCompany: "Test Records",
+            genres: [ "Genre 1", "Genre 2" ]
+          }
+        ]
+      })
+      .expect("Content-type",/json/)
+      .expect(200)
+      .end(function(err,res){
+        res.status.should.equal(200)
+        newListID = res.body.id
+        done()
+      })
+  })
+  it('should add a second new album to the list', function(done){
+    request
+      .put('/api/v1/list/' + newListID)
+      .send({
+        method: "add album",
+        appleAlbumID: 0007,
+        appleURL: "Test URL 2",
+        title: "Test Album Two",
+        artist: "Nifty Artist",
+        releaseDate: "2019-04-01",
+        recordCompany: "Test Records",
+        cover: "Test URL 2",
+        songNames: [ "Test Song 1", "My Love Is Not A Test" ],
+        genres: [ "Hair Jazz", "Quite Delicate" ]
+      })
+      .expect("Content-type",/json/)
+      .expect(200)
+      .end(function(err,res){
+        res.status.should.equal(200)
+        done()
+      })
+  })
+  it('should return both new albums with the list', function(done){
+    request
+      .get('/api/v1/list/' + newListID)
+      .expect("Content-type",/json/)
+      .expect(200)
+      .end(function(err,res){
+        res.status.should.equal(200)
+        res.body.albums.length.should.equal(2)
+        done()
+      })
+  })
+  it('should delete the new list', function(done){
+    request
+      .delete('/api/v1/list/' + newListID)
+      .send({
+        "apiToken": apiToken
+      })
+      .expect("Content-type",/json/)
+      .expect(200)
+      .end(function(err,res){
+        res.status.should.equal(200)
+        res.body.message.should.equal("List deleted!")
+        done()
+      })
+  })
+  it('should delete the first new album', function(done) {
+    request
+      .delete('/api/v1/album/0006')
+      .send({
+        "apiToken": apiToken
+      })
+      .expect("Content-type",/json/)
+      .expect(200)
+      .end(function(err,res){
+        res.status.should.equal(200)
+        done()
+      })
+  })
+  it('should delete the second new album', function(done) {
+    request
+      .delete('/api/v1/album/0007')
+      .send({
+        "apiToken": apiToken
+      })
+      .expect("Content-type",/json/)
+      .expect(200)
+      .end(function(err,res){
+        res.status.should.equal(200)
+        done()
+      })
+  })
+})
