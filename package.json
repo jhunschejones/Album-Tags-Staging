@@ -7,6 +7,10 @@
     "test": "mocha",
     "start": "node bin/www"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jhunschejones/Album-Tags-Staging"
+  },
   "author": "Joshua Hunsche Jones",
   "license": "MIT",
   "dependencies": {
