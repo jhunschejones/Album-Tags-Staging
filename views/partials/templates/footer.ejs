@@ -15,18 +15,12 @@
 <% const authPages = ["Your Favorite Albums", "Update Album Tags", "Album Details", "Create & Manage Album Lists", "View & Edit Album Lists"] %>
 <% if (authPages.indexOf(subTitle) !== -1) { %>
     <!-- NEW FIREBASE -->
-    <script src="https://www.gstatic.com/firebasejs/5.5.9/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/5.5.9/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.9.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.9.2/firebase-auth.js"></script>
 <% } %>
 <!-- END PAGE SPECIFIC SCRIPT LOADING -->
 
-
 <!-- SCRIPTS TO LOAD ON EVERY PAGE -->
-<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f" crossorigin="anonymous"></script>
-
-<!-- local versions of libraries, dowloaded 07/06/18 -->
-<script src="/javascripts/libraries/popper.1.12.9.min.js"></script>
-<script src="/javascripts/libraries/bootstrap.4.0.0.min.js"></script>
-<!-- CDN versions of above libraries, used from start to 07/06/18 -->
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script> -->
-<!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script> -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT" crossorigin="anonymous"></script>
+<script src="/javascripts/libraries/popper.1.14.7.min.js"></script>
+<script src="/javascripts/libraries/bootstrap.4.3.1.min.js"></script>
