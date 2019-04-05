@@ -129,7 +129,7 @@ function populateAlbumPage(userLoggedIn) {
 }
 
 function addToFavorites() {
-  if (!!albumResult.favorites.find(x => x.userID === userID)) {
+  if (albumResult.favorites && !!albumResult.favorites.find(x => x.userID === userID)) {
     populateUserLists();
     return alert("This album is already in your \"My Favorites\" list.");
   }
@@ -142,6 +142,7 @@ function addToFavorites() {
     }),
     success: function(response) {
       $('#updateListModal').modal('hide');
+      if (!albumResult.favorites) { albumResult.favorites = []; }
       albumResult.favorites.push({"userID": userID});
       populateListsWithAlbum();
       updateListDisplay();
@@ -202,11 +203,11 @@ function populateListsWithAlbum(userLoggedIn) {
         }
       }
     });
-    $('.remove-from-list-button').click(function() {
-      if ($(this).data('list-type') === "myfavorites") return removeFromFavorites();
-      removeFromList($(this).data('list-id'));
-    });
   }
+  $('.remove-from-list-button').click(function() {
+    if ($(this).data('list-type') === "myfavorites") return removeFromFavorites();
+    removeFromList($(this).data('list-id'));
+  });
   if (userLoggedIn) return updateListDisplay();
 
   if ($('.list').length === 0) { 
@@ -228,10 +229,12 @@ function addToList(chosenList) {
   if (chosenList) {
     if (chosenList === "myfavorites") return addToFavorites();
 
-    let alreadyInList = albumResult.lists.find(x => x.id === chosenList);
-    if (alreadyInList) {
-      $('#list-options').get(0).selectedIndex = 0;
-      return alert(`This album is already in your "${alreadyInList.title}" list.`);
+    if (albumResult.lists) {
+      let alreadyInList = albumResult.lists.find(x => x.id === chosenList);
+      if (alreadyInList) {
+        $('#list-options').get(0).selectedIndex = 0;
+        return alert(`This album is already in your "${alreadyInList.title}" list.`);
+      }
     }
 
     let addAlbumToListBody = {
@@ -252,6 +255,7 @@ function addToList(chosenList) {
       contentType: 'application/json',
       data: JSON.stringify(addAlbumToListBody),
       success: function(data) {
+        if (!albumResult.lists) { albumResult.lists = []; }
         albumResult.lists.push(data);
         populateListsWithAlbum();
         updateListDisplay();
@@ -294,6 +298,7 @@ function addToNewList(listTitle, displayName) {
           // update the UI without making any additional API calls
           if(!data.message) {
             userLists.push(data);
+            if (!albumResult.lists) { albumResult.lists = []; }
             albumResult.lists.push(data);
             populateUserLists();
             populateListsWithAlbum();
