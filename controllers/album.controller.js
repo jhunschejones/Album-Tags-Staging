@@ -10,11 +10,10 @@ const Tag = require('../models/album_tag.model.js');
 const Connection = require('../models/album_connection.model.js');
 const List = require('../models/list_info.model.js');
 
-// need to define `_this` so I can use it to re-use functions 
-// within this controller
+// defining `_this` so I can re-use utility functions within this controller
 const _this = this;
 
-function cleanAlbumData(album) {
+exports.cleanAlbumData = function (album) {
   if (album.dataValues) {
     if (album.dataValues.songNames && album.dataValues.genres) {
       // clean up song name and apple genre formatting
@@ -59,7 +58,7 @@ async function findAppleAlbumData(req, album) {
   })
 }
 
-function createSongString(songs) {
+exports.createSongString = function (songs) {
   let songString = "";
   songs.forEach(song => {
     if (songs.indexOf(song) === songs.length - 1) {
@@ -71,7 +70,7 @@ function createSongString(songs) {
   return songString;
 }
 
-function createGenreString(genres) {
+exports.createGenreString = function (genres) {
   let genreString = "";
   genres.forEach(genre => {
     if (genres.indexOf(genre) === genres.length -1) {
@@ -92,8 +91,8 @@ exports.add_new_album = async function (req, res, next) {
     releaseDate: req.body.releaseDate,
     recordCompany: req.body.recordCompany,
     cover: req.body.cover,
-    songNames: createSongString(req.body.songNames),
-    genres: createGenreString(req.body.genres)
+    songNames: _this.createSongString(req.body.songNames),
+    genres: _this.createGenreString(req.body.genres)
   };
 
   Album.create(newAlbum)
@@ -124,7 +123,7 @@ exports.get_album = async function (req, res, next) {
         connectedAlbums.push(connectedAlbum);
       }
       album.dataValues.connections = connectedAlbums;
-      res.send(cleanAlbumData(album));
+      res.send(_this.cleanAlbumData(album));
     }).catch(function(err) {
       console.log(err);
       res.status(500).json(err);
@@ -193,8 +192,8 @@ exports.add_favorite = function (req, res, next) {
       if (album[0]._options.isNewRecord && req.body.album.appleAlbumID.length > 4) {
         let fullAlbum = !req.body.album.songNames ? await findAppleAlbumData(req, req.body.album.appleAlbumID) : null;
         await album[0].update({
-          songNames: createSongString(req.body.album.songNames || fullAlbum.songNames),
-          genres: createGenreString(req.body.album.genres || fullAlbum.genres)
+          songNames: _this.createSongString(req.body.album.songNames || fullAlbum.songNames),
+          genres: _this.createGenreString(req.body.album.genres || fullAlbum.genres)
         })
       }
     }).catch(function(err) {
@@ -220,7 +219,7 @@ exports.get_user_favorites = function (req, res, next) {
     let cleanAlbums = [];
     for (let i = 0; i < albums.length; i++) {
       const album = albums[i];
-      cleanAlbums.push(cleanAlbumData(album.dataValues.album));
+      cleanAlbums.push(_this.cleanAlbumData(album.dataValues.album));
     }
     res.send(cleanAlbums);
   }).catch(function(err) {
@@ -275,7 +274,7 @@ exports.add_tag = async function (req, res, next) {
           },
           include: [ Tag ]
         }).then(async function(updatedAlbum) {
-          res.send(cleanAlbumData(updatedAlbum));
+          res.send(_this.cleanAlbumData(updatedAlbum));
         })
 
         // running after response is sent because this database update won't cause
@@ -283,8 +282,8 @@ exports.add_tag = async function (req, res, next) {
         // NOTE: all album ID's in tests have only 4 digits to distinguish from prod
         if (album[0]._options.isNewRecord && req.body.album.appleAlbumID.length > 4) {
           await album[0].update({
-            songNames: createSongString(req.body.album.songNames),
-            genres: createGenreString(req.body.album.genres)
+            songNames: _this.createSongString(req.body.album.songNames),
+            genres: _this.createGenreString(req.body.album.genres)
           })
         }
       });
@@ -321,7 +320,7 @@ exports.find_by_tags = function (req, res, next) {
         }
         if (searchedTags.every(function(tag) { return tags.indexOf(tag) !== -1; })) {
           if (!results.find(x => x.dataValues.appleAlbumID === album.dataValues.appleAlbumID)) {
-            results.push(cleanAlbumData(album));
+            results.push(_this.cleanAlbumData(album));
           }
         }
       }
@@ -370,7 +369,7 @@ exports.delete_tag = async function (req, res, next) {
           },
           include: [ Tag ]
         }).then(function(updatedAlbum) {
-          res.send(cleanAlbumData(updatedAlbum));
+          res.send(_this.cleanAlbumData(updatedAlbum));
 
           // destroy tag if it is not in any albumTags relationships
           sequelize.query("SELECT * FROM `albumTags` WHERE `albumTags`.`tagId` = " + tag.id, { type: sequelize.QueryTypes.SELECT})
@@ -457,15 +456,15 @@ exports.add_connection = function (req, res, next) {
           // NOTE: all album ID's in tests have only 4 digits to distinguish from prod
           if (firstAlbum[0]._options.isNewRecord && albumOne.appleAlbumID.length > 4) {
             await firstAlbum[0].update({
-              songNames: createSongString(albumOne.songNames),
-              genres: createGenreString(albumOne.genres)
+              songNames: _this.createSongString(albumOne.songNames),
+              genres: _this.createGenreString(albumOne.genres)
             })
           }
           if (seccondAlbum[0]._options.isNewRecord && albumOne.appleAlbumID.length > 4) {
             albumTwo = await findAppleAlbumData(req, albumTwo.appleAlbumID);
             await seccondAlbum[0].update({
-              songNames: createSongString(albumTwo.songNames),
-              genres: createGenreString(albumTwo.genres)
+              songNames: _this.createSongString(albumTwo.songNames),
+              genres: _this.createGenreString(albumTwo.genres)
             })
           }
         }).catch(function(err) { console.log(err) })
@@ -562,8 +561,8 @@ exports.create_new_list = async function (req, res, next) {
         // NOTE: all album ID's in tests have only 4 digits to distinguish from prod
         if (album[0]._options.isNewRecord && req.body.albums[0].appleAlbumID.length > 4) {
           await album[0].update({
-            songNames: createSongString(req.body.albums[0].songNames),
-            genres: createGenreString(req.body.albums[0].genres)
+            songNames: _this.createSongString(req.body.albums[0].songNames),
+            genres: _this.createGenreString(req.body.albums[0].genres)
           })
         }
       }).catch(function(err) {
@@ -606,8 +605,8 @@ exports.update_list = async function (req, res, next) {
           if (album[0]._options.isNewRecord && req.body.appleAlbumID.length > 4) {
             let fullAlbum = await findAppleAlbumData(req, req.body.appleAlbumID);
             await album[0].update({
-              songNames: createSongString(fullAlbum.songNames),
-              genres: createGenreString(fullAlbum.genres)
+              songNames: _this.createSongString(fullAlbum.songNames),
+              genres: _this.createGenreString(fullAlbum.genres)
             })
           }
         }).catch(function(err) {
@@ -685,7 +684,7 @@ exports.get_list = function (req, res, next) {
     let cleanAlbums = [];
     for (let i = 0; i < list.dataValues.albums.length; i++) {
       const album = list.dataValues.albums[i];
-      cleanAlbums.push(cleanAlbumData(album.dataValues));
+      cleanAlbums.push(_this.cleanAlbumData(album.dataValues));
     }
     list.albums = cleanAlbums;
     res.send(list);
