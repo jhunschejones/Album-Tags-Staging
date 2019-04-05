@@ -722,7 +722,7 @@ function removeFavoritesAlbum(selectedAlbum) {
         "appleAlbumID" : albumToRemove.appleAlbumID
       }),
       success: function(data) {
-        if (!data.message) {
+        if (!data.message || data.message === "User favorite deleted!") {
           removeFromArray(listData.albums, albumToRemove);
           populateList();
         } else {
