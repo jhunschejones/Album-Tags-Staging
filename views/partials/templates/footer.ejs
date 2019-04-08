@@ -12,6 +12,11 @@
 <!-- END FOOTER HTML -->
 
 <!-- START PAGE SPECIFIC SCRIPT LOADING -->
+<% if (subTitle === "Album Details") { %>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<% } %>
+
 <% const authPages = ["Your Favorite Albums", "Update Album Tags", "Album Details", "Create & Manage Album Lists", "View & Edit Album Lists"] %>
 <% if (authPages.indexOf(subTitle) !== -1) { %>
     <!-- NEW FIREBASE -->

@@ -11,15 +11,15 @@
     <% include partials/templates/navbar_basic.ejs %>
 
     <!-- START PAGE CONTENT -->
-    <div class="container-fluid">
+    <div id="app" class="container-fluid">
       <!-- top main row -->
       <div class="row no-gutters">
         <!-- left main column -->
         <div class="col col-xl-4 mr-md-4 mb-md-5">
-          <h2 id="album-title"></h2>
-          <p id="band-name" class="text-secondary"></p>
-          <img src="" id="album-cover" class="img-fluid">
-          <div id="album-cover-loader" class="new-loader text-center" style="margin-top:150px;margin-bottom:190px;"><span class="text-secondary">Loading...</span></div>
+          <h2 v-cloak id="album-title">{{ album.title }}</h2>
+          <p v-cloak id="band-name" class="text-secondary">{{ album.artist }}</p>
+          <img v-if="album.cover" v-on:load="coverLoaded = true" id="album-cover" class="img-fluid" :src="coverImage">
+          <div v-if="!coverLoaded" id="album-cover-loader" class="new-loader text-center" style="margin-top:200px;margin-bottom:190px;"><span class="text-secondary">Loading...</span></div>
         </div>
         <!-- right main column -->
         <div class="col-md-6 mr-md-2 mt-md-5 mt-3">
@@ -44,10 +44,12 @@
             <div id="info-info-card-body" class="card-body info-card-body">
               <h5 class="card-title">Album information<span class="text-secondary ml-2 page-info-button" data-toggle="modal" data-target="#pageInfoModal">&#9432;</span></h5>
               <strong class="card-text mb-0 mt-2">Tracks:</strong>
-              <ol id="track-titles" class="text-secondary"></ol>
-              <p id="release-date" class="card-text"><strong>Released: </strong><span class="text-secondary"></span></p>
-              <p id="record-company" class="card-text"><strong>Record Label: </strong><span class="text-secondary"><span></p>
-              <p id="apple-album-id" class="card-text mb-1"><strong>Apple album ID: </strong><span class="text-secondary" data-toggle="tooltip" data-placement="top" title="Use this to connect albums" data-trigger="hover"></span></p>
+              <ol v-if="album.songNames" id="track-titles" class="text-secondary">
+                <li v-cloak v-for="song in album.songNames">{{ song }}</li>
+              </ol>
+              <p id="release-date" class="card-text"><strong>Released: </strong><span v-cloak v-if="album.releaseDate" class="text-secondary">{{ niceReleaseDate }}</span></p>
+              <p id="record-company" class="card-text"><strong>Record Label: </strong><span v-cloak v-if="album.recordCompany" class="text-secondary">{{ unescapedRecordCompany }}<span></p>
+              <p id="apple-album-id" class="card-text mb-1"><strong>Apple album ID: </strong><span v-cloak v-if="album.appleAlbumID" class="text-secondary">{{ album.appleAlbumID }}</span></p>
               <a id="more-by-this-artist" href="">Search albums by this artist</a><br/>
               <a id="apple-music-link" href="">Listen on Apple Music</a>
             </div>

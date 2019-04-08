@@ -129,3 +129,5 @@ hr {
 .hide_me {
   display: none !important;
 }
+
+[v-cloak] { display: none; }

@@ -56,62 +56,66 @@ function removeFromArray(arr, ele){
 }
 // ====== END UTILITY SECTION ======
 
-const albumID = window.location.pathname.replace('/album/', '');
-let albumResult;
-let selectedTags = [];
-let userLists = [];
-
-function getAlbumDetails(userLoggedIn) {
-  $.ajax('/api/v1/album/' + albumID, {
-    method: 'GET',
-    success: function(response) {
-      if (response.message && response.message.slice(0,14) === "No album found") {
-        $.getJSON ( '/api/v1/apple/details/' + albumID, function(appleAlbum) { 
-          if (!appleAlbum.message) {
-            albumResult = appleAlbum;
-            populateAlbumPage(userLoggedIn);
-          } else {
-            // message returned here means no album in the database or apple music API
-            alert(appleAlbum.message);
-          }
-        });
-      } else {
-        albumResult = response;
-        populateAlbumPage(userLoggedIn);
-      }
+// ====== START VUE.JS SECTION ======
+var app = new Vue({
+  el: '#app',
+  data: {
+    userID: false,
+    album: {},
+    userLists: [],
+    selectedTags: [],
+    connectionSearchResults: [],
+    coverLoaded: false
+  },
+  computed: {
+    unescapedRecordCompany: function() {
+      return this.album.recordCompany.replace("&amp;","&");
+    },
+    niceReleaseDate: function() {
+      return makeNiceDate(this.album.releaseDate);
+    },
+    coverImage: function() {
+      return this.album.cover.replace('{w}', 450).replace('{h}', 450);
     }
-  });
+  }
+});
+// ====== END VUE.JS SECTION ======
+
+const albumID = window.location.pathname.replace('/album/', '');
+
+async function getAlbumDetails(userLoggedIn) {
+  let databaseResponse = await fetch('/api/v1/album/' + albumID);
+  if (!databaseResponse.ok) throw Error(databaseResponse.statusText);
+  let databaseData = await databaseResponse.json();
+
+  if (databaseData.message && databaseData.message.slice(0,14) === "No album found") {
+    let appleResponse = await fetch('/api/v1/apple/details/' + albumID);
+    if (!appleResponse.ok) throw Error(appleResponse.statusText);
+    let appleData = await appleResponse.json();
+    // message returned here means no album in the database or apple music API
+    if (appleData.message) return alert(appleData.message);
+
+    app.album = appleData;
+    populateAlbumPage(userLoggedIn);
+  } else {
+    app.album = databaseData;
+    populateAlbumPage(userLoggedIn);
+  }
 }
 
 function populateAlbumPage(userLoggedIn) {
   // ------ put info on page ------
-  $('#album-title').text(albumResult.title);
-  $('#band-name').text(albumResult.artist);
-  $('#album-cover').attr('src', albumResult.cover.replace('{w}', 450).replace('{h}', 450));
-
-  // hide cover loader when main album cover has loaded
-  $('#album-cover').on('load', function(){
-    $('#album-cover-loader').hide();
-  });
-
-  $('#release-date span').text(makeNiceDate(albumResult.releaseDate));
-  $('#record-company span').text(albumResult.recordCompany);
-  $('#track-titles').html('');
-  albumResult.songNames.forEach(songName => {
-    $('#track-titles').append(`<li>${songName}</li>`);
-  });
-  $('#apple-album-id span').text(albumResult.appleAlbumID);
   $('#more-by-this-artist').click(function(event) {
     event.preventDefault();
 
     // NEW SEARCH-MODAL ARTIST SEARCH
     $('#searchModal').modal('show');
-    $('#search-modal-input').val(albumResult.artist);
-    executeSearch(albumResult.artist);
+    $('#search-modal-input').val(app.album.artist);
+    executeSearch(app.album.artist);
   });
   $('#apple-music-link').click(function(event){
     event.preventDefault();
-    const redirectWindow = window.open(albumResult.appleURL, '_blank');
+    const redirectWindow = window.open(app.album.appleURL, '_blank');
     return redirectWindow.location;
   });
   // ------ fill cards ------
@@ -129,7 +133,7 @@ function populateAlbumPage(userLoggedIn) {
 }
 
 function addToFavorites() {
-  if (albumResult.favorites && !!albumResult.favorites.find(x => x.userID === userID)) {
+  if (app.album.favorites && !!app.album.favorites.find(x => x.userID === app.userID)) {
     populateUserLists();
     return alert("This album is already in your \"My Favorites\" list.");
   }
@@ -137,13 +141,13 @@ function addToFavorites() {
     method: 'POST',
     contentType: 'application/json',
     data: JSON.stringify({ 
-      "user" : userID,
-      "album" : albumResult
+      "user" : app.userID,
+      "album" : app.album
     }),
     success: function(response) {
       $('#updateListModal').modal('hide');
-      if (!albumResult.favorites) { albumResult.favorites = []; }
-      albumResult.favorites.push({"userID": userID});
+      if (!app.album.favorites) { app.album.favorites = []; }
+      app.album.favorites.push({"userID": app.userID});
       populateListsWithAlbum();
       updateListDisplay();
       $('#list-options').get(0).selectedIndex = 0;
@@ -158,11 +162,11 @@ function removeFromFavorites() {
       method: 'DELETE',
       contentType: 'application/json',
       data: JSON.stringify({ 
-        "user" : userID,
-        "appleAlbumID" : albumResult.appleAlbumID
+        "user" : app.userID,
+        "appleAlbumID" : app.album.appleAlbumID
       }),
       success: function(response) {
-        removeFromArray(albumResult.favorites, albumResult.favorites.find(x => x.userID === userID));
+        removeFromArray(app.album.favorites, app.album.favorites.find(x => x.userID === app.userID));
         populateListsWithAlbum();
         updateListDisplay();
       }
@@ -173,11 +177,11 @@ function removeFromFavorites() {
 function getUserLists() {
   $.ajax({
     method: "GET",
-    url: "/api/v1/list/user/" + userID,
+    url: "/api/v1/list/user/" + app.userID,
     success: function(data) {
       // message returned here means no lists for this user
-      if (data.message) { userLists = []; } 
-      else { userLists = data; }
+      if (data.message) { app.userLists = []; } 
+      else { app.userLists = data; }
       populateUserLists();
     }
   });
@@ -187,16 +191,16 @@ function populateListsWithAlbum(userLoggedIn) {
   $('#all-lists').html('');
   $('.list-message').remove();
   // check if album is favorited
-  if (userID && albumResult.favorites && !!albumResult.favorites.find(x => x.userID === userID)) { 
-    $('#all-lists').append(`<li class="list my-list" data-creator="${userID}"><a href="/list?type=myfavorites">My Favorites</a><span class="text-secondary"> by: You!</span><span class="remove-from-list-button" data-list-type="myfavorites">&#10005;</span></li>`);
+  if (app.userID && app.album.favorites && !!app.album.favorites.find(x => x.userID === app.userID)) { 
+    $('#all-lists').append(`<li class="list my-list" data-creator="${app.userID}"><a href="/list?type=myfavorites">My Favorites</a><span class="text-secondary"> by: You!</span><span class="remove-from-list-button" data-list-type="myfavorites">&#10005;</span></li>`);
   }
-  if (albumResult.lists) {
-    albumResult.lists.forEach(list => {
+  if (app.album.lists) {
+    app.album.lists.forEach(list => {
       if(!list.isPrivate) {
         let listCreator = list.displayName;
         if (!listCreator || listCreator.trim === "") { listCreator = "Unknown"; }
   
-        if (list.user === userID) {
+        if (list.user === app.userID) {
           $('#all-lists').append(`<li class="list my-list" data-creator="${list.user}"><a href="/list?type=userlist&id=${list.id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span><span class="remove-from-list-button" data-list-id="${list.id}" data-list-type="userlist">&#10005;</span></li>`);
         } else {
           $('#all-lists').append(`<li class="list other-list" data-creator="${list.user}"><a href="/list?type=userlist&id=${list.id}">${list.title}</a><span class="text-secondary" data-list-type="userlist"> by: ${listCreator}</span></li>`);
@@ -220,7 +224,7 @@ function populateUserLists() {
   $('#list-options').html('');
   $("<option selected>Add to a list...</option>").appendTo("#list-options");
   $("<option value='myfavorites'>My Favorites</option>").appendTo("#list-options");
-  userLists.forEach(list => {
+  app.userLists.forEach(list => {
     $(`<option value="${list.id}">${list.title}</option>`).appendTo("#list-options");
   });
 }
@@ -229,8 +233,8 @@ function addToList(chosenList) {
   if (chosenList) {
     if (chosenList === "myfavorites") return addToFavorites();
 
-    if (albumResult.lists) {
-      let alreadyInList = albumResult.lists.find(x => x.id === chosenList);
+    if (app.album.lists) {
+      let alreadyInList = app.album.lists.find(x => x.id === chosenList);
       if (alreadyInList) {
         $('#list-options').get(0).selectedIndex = 0;
         return alert(`This album is already in your "${alreadyInList.title}" list.`);
@@ -239,15 +243,15 @@ function addToList(chosenList) {
 
     let addAlbumToListBody = {
       method: "add album",
-      appleAlbumID: albumResult.appleAlbumID,
-      title: albumResult.title,
-      artist: albumResult.artist,
-      releaseDate: albumResult.releaseDate,
-      cover: albumResult.cover,
-      genres: albumResult.genres,
-      songNames: albumResult.songNames,
-      appleURL: albumResult.appleURL,
-      recordCompany: albumResult.recordCompany,
+      appleAlbumID: app.album.appleAlbumID,
+      title: app.album.title,
+      artist: app.album.artist,
+      releaseDate: app.album.releaseDate,
+      cover: app.album.cover,
+      genres: app.album.genres,
+      songNames: app.album.songNames,
+      appleURL: app.album.appleURL,
+      recordCompany: app.album.recordCompany,
     };
     $.ajax({
       method: "PUT",
@@ -255,8 +259,8 @@ function addToList(chosenList) {
       contentType: 'application/json',
       data: JSON.stringify(addAlbumToListBody),
       success: function(data) {
-        if (!albumResult.lists) { albumResult.lists = []; }
-        albumResult.lists.push(data);
+        if (!app.album.lists) { app.album.lists = []; }
+        app.album.lists.push(data);
         populateListsWithAlbum();
         updateListDisplay();
         $('#updateListModal').modal('hide');
@@ -273,7 +277,7 @@ function addToNewList(listTitle, displayName) {
 
   // check to see if this user has a list with the same name
   let confirmed = true;
-  let listExists = userLists.find(x => x.title.toUpperCase() === listTitle.toUpperCase());
+  let listExists = app.userLists.find(x => x.title.toUpperCase() === listTitle.toUpperCase());
   if (listExists) { confirmed = confirm(`You already have a list called "${listExists.title}". Choose "ok" to create a new list, "cancel" to go back and add this album to an existing list.`); }
 
   // user either said okay to create a duplicate list, or there
@@ -283,11 +287,11 @@ function addToNewList(listTitle, displayName) {
     if ($('#private-checkbox').is(":checked")) { privateList = true; }
     if (listTitle && displayName) {
       let newList = {
-        user: userID,
+        user: app.userID,
         displayName: displayName,
         title: listTitle,
         isPrivate: privateList,
-        albums: [albumResult]
+        albums: [app.album]
       };
       $.ajax({
         method: "POST",
@@ -297,9 +301,9 @@ function addToNewList(listTitle, displayName) {
         success: function(data) {
           // update the UI without making any additional API calls
           if(!data.message) {
-            userLists.push(data);
-            if (!albumResult.lists) { albumResult.lists = []; }
-            albumResult.lists.push(data);
+            app.userLists.push(data);
+            if (!app.album.lists) { app.album.lists = []; }
+            app.album.lists.push(data);
             populateUserLists();
             populateListsWithAlbum();
             updateListDisplay();
@@ -316,17 +320,17 @@ function addToNewList(listTitle, displayName) {
 }
 
 function removeFromList(listID) {
-  let thisList = albumResult.lists.find(x => x.id === listID);
+  let thisList = app.album.lists.find(x => x.id === listID);
   let confirmed = confirm(`Are you sure you want to remove this album from the "${thisList.title}" list? You cannot undo this operation.`);
   
   if (confirmed) {
     let deleteObject = {
       method: "remove album",
-      appleAlbumID: albumResult.appleAlbumID,
-      title: albumResult.title,
-      artist: albumResult.artist,
-      releaseDate: albumResult.releaseDate,
-      cover: albumResult.cover
+      appleAlbumID: app.album.appleAlbumID,
+      title: app.album.title,
+      artist: app.album.artist,
+      releaseDate: app.album.releaseDate,
+      cover: app.album.cover
     };
     
     $.ajax({
@@ -335,8 +339,8 @@ function removeFromList(listID) {
       contentType: 'application/json',
       data: JSON.stringify(deleteObject),
       success: function(data) {
-        let index = albumResult.lists.indexOf(thisList);
-        albumResult.lists.splice(index, 1);
+        let index = app.album.lists.indexOf(thisList);
+        app.album.lists.splice(index, 1);
         populateListsWithAlbum();
         updateListDisplay();
       }
@@ -394,17 +398,17 @@ function displayMyLists() {
 }
 
 function populateConnections() {
-  if (albumResult.connections) {
+  if (app.album.connections) {
     $('#connected-albums').html('');
 
-    for (let index = 0; index < albumResult.connections.length; index++) {
-      const connectedAlbum = albumResult.connections[index];
+    for (let index = 0; index < app.album.connections.length; index++) {
+      const connectedAlbum = app.album.connections[index];
 
-      if (connectedAlbum.appleAlbumID != albumResult.appleAlbumID) {
+      if (connectedAlbum.appleAlbumID != app.album.appleAlbumID) {
         const cover = connectedAlbum.cover.replace('{w}', 105).replace('{h}', 105);
         const smallTitle = connectedAlbum.title.length > 20 ? truncate(connectedAlbum.title, 20) : connectedAlbum.title;
 
-        if (connectedAlbum.creator === userID) {
+        if (connectedAlbum.creator === app.userID) {
           $('#connected-albums').append(`<a href="/album/${connectedAlbum.appleAlbumID}" id="${connectedAlbum.appleAlbumID}" class="connection my-connection" data-creator="${connectedAlbum.creator}"><img class="connection-cover" src="${cover}" data-toggle="tooltip" data-placement="top" title="${smallTitle}" data-trigger="hover"><span class="delete-connection-button" data-connected-album-id="${connectedAlbum.appleAlbumID}">&#10005;</span></a>`);
         } else {
           $('#connected-albums').append(`<a href="/album/${connectedAlbum.appleAlbumID}" id="${connectedAlbum.appleAlbumID}" class="connection other-connection" data-creator="${connectedAlbum.creator}"><img class="connection-cover" src="${cover}" data-toggle="tooltip" data-placement="top" title="${smallTitle}" data-trigger="hover"></a>`);
@@ -420,9 +424,7 @@ function populateConnections() {
     var isTouchDevice = false;
     if ("ontouchstart" in document.documentElement) { isTouchDevice = true; }
     if (!isTouchDevice) { $('[data-toggle="tooltip"]').tooltip(); }
-  } else {
-    //there are no connected albums
-  }
+  } 
 }
 
 function addConnection(selectedAlbum) {
@@ -432,13 +434,13 @@ function addConnection(selectedAlbum) {
       method: 'POST',
       contentType: 'application/json',
       data: JSON.stringify({ 
-        "albumOne": albumResult,
+        "albumOne": app.album,
         "albumTwo": selectedAlbum,
-        "creator": userID
+        "creator": app.userID
       }),
       success: function(result) {
         $('#updateConnectionModal').modal('hide');
-        albumResult.connections = result;
+        app.album.connections = result;
         populateConnections();
         updateConnectionDisplay();
       }
@@ -447,7 +449,6 @@ function addConnection(selectedAlbum) {
   }
 } 
     
-let connectionSearchResults = [];
 function populateConnectionModalResults(data) {
   $('#connection-search-results').html('');
   $('#connection-loader').hide();
@@ -456,7 +457,7 @@ function populateConnectionModalResults(data) {
       const album = data.albums[index];
       const cardNumber = index + 1;
 
-      connectionSearchResults.push(album);
+      app.connectionSearchResults.push(album);
 
       createConnectionModalCard(album, cardNumber);
       populateConnectionModalCard(album, cardNumber);
@@ -468,8 +469,6 @@ function populateConnectionModalResults(data) {
     $('#connection-search-results').after('<div id="no-results-message" class="text-primary mb-3" style="text-align:center;">It looks like no albums matched your search terms. Try a different search!</div>');
   }
 }
-
-
 
 function createConnectionModalCard(album, cardNumber) {
   $('#connection-search-results').append(`<div id="connectionModalCard${cardNumber}" class="search-modal-card" data-apple-album-id="${album.appleAlbumID}"><a class="search-modal-card-album-link" href=""><img class="search-modal-card-image" src="" alt=""><a/><div class="search-modal-card-body"><h4 class="search-modal-card-title"></h4><span class="search-modal-card-album"></span></div></div>`);
@@ -493,7 +492,7 @@ function populateConnectionModalCard(album, cardNumber) {
     event.preventDefault();
     // connect to this album
     const selectedAlbumID = $(this).data("apple-album-id");
-    const selectedAlbum = connectionSearchResults.find(x => x.appleAlbumID === selectedAlbumID.toString());
+    const selectedAlbum = app.connectionSearchResults.find(x => x.appleAlbumID === selectedAlbumID.toString());
     addConnection(selectedAlbum);
   });
 }
@@ -501,19 +500,16 @@ function populateConnectionModalCard(album, cardNumber) {
 function deleteConnection(connectedAlbum) {
   const confirmation = confirm('Are you sure you want to delete a connection? You cannot undo this operation.');
   if (confirmation) {
-    // connectedAlbum is a database ID
-    // DELETE CONNECTION FROM CURRENT ALBUM
-    // DELETE CURRENT ALBUM FROM CONNECTED ALBUM
     $.ajax('/api/v1/connection', {
       method: 'DELETE',
       contentType: 'application/json',
       data: JSON.stringify({ 
         "albumTwo" : connectedAlbum.toString(),
-        "albumOne": albumResult.appleAlbumID.toString(),
-        "creator": userID
+        "albumOne": app.album.appleAlbumID.toString(),
+        "creator": app.userID
       }),
       success: function(result) {
-        albumResult.connections = result;
+        app.album.connections = result;
         populateConnections();
         updateConnectionDisplay();
       },
@@ -573,12 +569,12 @@ function displayMyConnections() {
 
 function populateTags() {
   clearTagArray();
-  if (albumResult.tagObjects) {
-    albumResult.tagObjects = albumResult.tagObjects.sort((a, b) => (a.text > b.text) ? 1 : -1);
+  if (app.album.tagObjects) {
+    app.album.tagObjects = app.album.tagObjects.sort((a, b) => (a.text > b.text) ? 1 : -1);
     $('#current-tags').html('');
-    for (let index = 0; index < albumResult.tagObjects.length; index++) {
-      let tag = albumResult.tagObjects[index].text;
-      const creator = albumResult.tagObjects[index].creator;
+    for (let index = 0; index < app.album.tagObjects.length; index++) {
+      let tag = app.album.tagObjects[index].text;
+      const creator = app.album.tagObjects[index].creator;
       
       // add tags
       let tagName;
@@ -589,12 +585,12 @@ function populateTags() {
         tagName = tag.replace(/[^A-Z0-9]+/ig,'');
       }
     
-      if (creator === userID) {
+      if (creator === app.userID) {
         // tags are stored escaped and displayed raw
-        $('#current-tags').append(`<a href="" id="${tagName}-${creator}" class="badge badge-light album-tag my-tag" data-creator="${creator}" data-rawtag="${escapeHtml(albumResult.tagObjects[index].text)}" data-custom-genre="${albumResult.tagObjects[index].customGenre || false}"><span>${tag}</span><span class="delete-tag-button ml-1" data-tag-id="${tagName}-${creator}">&#10005;</span></a>`);
+        $('#current-tags').append(`<a href="" id="${tagName}-${creator}" class="badge badge-light album-tag my-tag" data-creator="${creator}" data-rawtag="${escapeHtml(app.album.tagObjects[index].text)}" data-custom-genre="${app.album.tagObjects[index].customGenre || false}"><span>${tag}</span><span class="delete-tag-button ml-1" data-tag-id="${tagName}-${creator}">&#10005;</span></a>`);
       } else {
         // tags are stored escaped and displayed raw
-        $('#current-tags').append(`<a href="" id="${tagName}-${creator}" class="badge badge-light album-tag other-tag" data-creator="${creator}" data-rawtag="${escapeHtml(albumResult.tagObjects[index].text)}" data-custom-genre="${albumResult.tagObjects[index].customGenre || false}"><span>${tag}</span></a>`);
+        $('#current-tags').append(`<a href="" id="${tagName}-${creator}" class="badge badge-light album-tag other-tag" data-creator="${creator}" data-rawtag="${escapeHtml(app.album.tagObjects[index].text)}" data-custom-genre="${app.album.tagObjects[index].customGenre || false}"><span>${tag}</span></a>`);
       }
     }
     // ------ tag delete button event listener -----
@@ -621,7 +617,7 @@ function selectTag(tagName) {
 }
 
 function modifySelectedTags(tag) {
-  return selectedTags.indexOf(tag) === -1 ? selectedTags.push(tag) : selectedTags.splice(selectedTags.indexOf(tag), 1);
+  return app.selectedTags.indexOf(tag) === -1 ? app.selectedTags.push(tag) : app.selectedTags.splice(app.selectedTags.indexOf(tag), 1);
 }
 
 function deleteTag(tagID) {
@@ -640,12 +636,12 @@ function deleteTag(tagID) {
         // in case the raw tag is just a number (like a year)
         "text": escapeHtml(tag.toString()),
         "creator": creator,
-        "appleAlbumID": albumResult.appleAlbumID,
+        "appleAlbumID": app.album.appleAlbumID,
         "customGenre": customGenre
       }),
       success: function(response) {
         if (!response.message) {
-          albumResult = response;
+          app.album = response;
           populateTags();
           updateTagDisplay(); 
         } else {
@@ -678,12 +674,12 @@ function addTag() {
     newTag = escapeHtml(newTag);
 
     // only run these two checks if there are other tags
-    if (albumResult.tagObjects) {
+    if (app.album.tagObjects) {
 
       // check for duplicates by this user, hard fail
       let duplicates = 0;
-      albumResult.tagObjects.forEach(tagObject => {
-        if (tagObject.text === newTag && tagObject.creator === userID) { duplicates++; }
+      app.album.tagObjects.forEach(tagObject => {
+        if (tagObject.text === newTag && tagObject.creator === app.userID) { duplicates++; }
       });
       if (duplicates > 0) {
         $('#add-tag-input').val("");
@@ -692,7 +688,7 @@ function addTag() {
       }   
 
       // check for duplicates overall, option to proceed
-      let someoneElsesTag = albumResult.tagObjects.find(x => x.text === newTag);
+      let someoneElsesTag = app.album.tagObjects.find(x => x.text === newTag);
       if (someoneElsesTag) { 
         const confirmed = confirm(`Someone else already added the "${newTag}" tag to this album. Choose "ok" to add your tag, or "cancel" to avoid duplicates.`); 
         $('#add-tag-input').val("");
@@ -708,18 +704,18 @@ function addTag() {
       method: 'POST',
       contentType: 'application/json',
       data: JSON.stringify({
-        "album": albumResult,
-        "creator": userID,
+        "album": app.album,
+        "creator": app.userID,
         "tag": newTag,
         "customGenre": customGenre
       }),
       success: function (result) {
         if (!result.message) {
           if (!result.songNames || !result.genres) {
-            result.songNames = albumResult.songNames;
-            result.genres = albumResult.genres;
+            result.songNames = app.album.songNames;
+            result.genres = app.album.genres;
           }
-          albumResult = result;
+          app.album = result;
           populateTags();
           updateTagDisplay();
           $('#tag-success').html("Added! &#10003;");
@@ -753,14 +749,13 @@ function clearTagArray() {
     $(".selected-tag").toggleClass( "badge-primary" );
     $(".selected-tag").toggleClass( "badge-light" );
     $(".selected-tag").toggleClass( "selected-tag" );
-
-    selectedTags = [];
   }
+  app.selectedTags = [];
 }
 
 function updateTagDisplay(data) {
   let userIsLoggedIn = false;
-  if (data || userID) { userIsLoggedIn = true; }
+  if (data || app.userID) { userIsLoggedIn = true; }
 
   const whatTagsToShow = sessionStorage.getItem('tags');
   if (whatTagsToShow === 'My Tags' && userIsLoggedIn) {
@@ -848,11 +843,11 @@ $('#info-card .nav-link').click(function(event) {
 });
 $('#tag-search-button').click(function(event) {
   event.preventDefault();
-  if (selectedTags.length > 0) {
+  if (app.selectedTags.length > 0) {
     let listURL = new URL(document.location);
     listURL.pathname = "/list";
     listURL.searchParams.set("type", "tagsearch");
-    listURL.searchParams.set("search", selectedTags);
+    listURL.searchParams.set("search", app.selectedTags);
     window.location = (listURL.href);
   } else {
     alert("Select one or more tags to preform a tag search");
@@ -990,17 +985,16 @@ const defaultApp = firebase.initializeApp(config);
 // checking if user is logged in or logs in during session
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
-    userID = firebase.auth().currentUser.uid;
+    app.userID = firebase.auth().currentUser.uid;
     userIsLoggedIn();
   } 
   if (!user) {   
     // no user logged in 
-    userID = false;
+    app.userID = false;
     userIsLoggedOut();
   }
 });
 
-let userID;
 function logIn() {
   firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
   // local persistance remains if browser is closed
@@ -1009,7 +1003,7 @@ function logIn() {
     return firebase.auth().signInWithPopup(provider);
   })
   .then(function(result) {
-    userID = user.uid;
+    app.userID = user.uid;
     userIsLoggedIn();
 
   }).catch(function(error) {
@@ -1020,7 +1014,7 @@ function logIn() {
 function logOut() {
   firebase.auth().signOut().then(function() {
     // log out functionality
-    // userID = false;
+    // app.userID = false;
     // userIsLoggedOut();
     location.reload();
 
