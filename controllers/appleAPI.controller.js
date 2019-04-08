@@ -60,7 +60,7 @@ exports.return_album_details = function (req, res, next) {
       res.send(resultAlbum)
       return
     } else {
-      res.send({ "message" : `unable to find an album with ID ${thisAlbum}` })
+      res.send({ "message" : `Unable to find an album with ID '${thisAlbum}'` })
     }
   })
 }

@@ -52,7 +52,7 @@ async function findAppleAlbumData(req, album) {
       } else if (body) {
         resolve(body);
       } else {
-        resolve({ "message" : `unable to find an album with ID ${album}` });
+        resolve({ "message" : `Unable to find an album with ID '${album}'` });
       }
     })
   })
