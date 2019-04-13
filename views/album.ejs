@@ -44,14 +44,14 @@
             <div id="info-info-card-body" class="card-body info-card-body">
               <h5 class="card-title">Album information<span class="text-secondary ml-2 page-info-button" data-toggle="modal" data-target="#pageInfoModal">&#9432;</span></h5>
               <strong class="card-text mb-0 mt-2">Tracks:</strong>
-              <ol v-if="album.songNames" id="track-titles" class="text-secondary">
+              <ol v-cloak v-if="album.songNames" id="track-titles" class="text-secondary">
                 <li v-cloak v-for="song in album.songNames">{{ song }}</li>
               </ol>
               <p id="release-date" class="card-text"><strong>Released: </strong><span v-cloak v-if="album.releaseDate" class="text-secondary">{{ niceReleaseDate }}</span></p>
               <p id="record-company" class="card-text"><strong>Record Label: </strong><span v-cloak v-if="album.recordCompany" class="text-secondary">{{ unescapedRecordCompany }}<span></p>
               <p id="apple-album-id" class="card-text mb-1"><strong>Apple album ID: </strong><span v-cloak v-if="album.appleAlbumID" class="text-secondary">{{ album.appleAlbumID }}</span></p>
-              <a id="more-by-this-artist" href="">Search albums by this artist</a><br/>
-              <a id="apple-music-link" href="">Listen on Apple Music</a>
+              <a v-cloak v-on:click="moreByThisArtist" id="more-by-this-artist" href="">Search albums by this artist</a><br/>
+              <a v-cloak v-on:click="viewInAppleMusic" id="apple-music-link" href="">Listen on Apple Music</a>
             </div>
             <div id="tags-info-card-body" class="card-body info-card-body">
               <h5 class="card-title">Tags by <span id="tag-title-modifier">all users</span><span class="text-secondary ml-2 page-info-button" data-toggle="modal" data-target="#pageInfoModal">&#9432;</span><span id="tags-toggle" class="float-right"></span></h5>

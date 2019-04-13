@@ -202,7 +202,7 @@ exports.add_favorite = function (req, res, next) {
   });
 };
 
-exports.get_user_favorites = function (req, res, next) {
+exports.get_user_favorites = async function (req, res, next) {
   Favorite.findAll({
     where: {
       userID: req.params.userID
@@ -213,7 +213,7 @@ exports.get_user_favorites = function (req, res, next) {
         include: [ Tag ]
       }
     ]
-  }).then(function(albums) {
+  }).then(async function(albums) {
     if (albums.length < 1) return res.send(albums);
 
     let cleanAlbums = [];
@@ -222,7 +222,7 @@ exports.get_user_favorites = function (req, res, next) {
       cleanAlbums.push(_this.cleanAlbumData(album.dataValues.album));
     }
     res.send(cleanAlbums);
-  }).catch(function(err) {
+  }).catch(async function(err) {
     console.log(err)
     res.status(500).json(err);
   });
@@ -234,11 +234,23 @@ exports.delete_favorite = function (req, res, next) {
       userID: req.body.user,
       appleAlbumID: req.body.appleAlbumID
     }
-  })
-    .then(function(albumsDeleted) {
+  }).then(function(albumsDeleted) {
       if (albumsDeleted === 0) return res.status(404).send({ "message" : `User '${req.body.userID}' has not favorited album '${req.body.appleAlbumID}'` });
-      res.send({ "message": "User favorite deleted!" });
+      
+      if (req.body.returnData === "album") {
+        req.params.appleAlbumID = req.body.appleAlbumID;
+        return _this.get_album(req, res);
+      } 
+      
+      if (req.body.returnData === "list") {
+        req.params.userID = req.body.user;
+        // TODO: throws warning that there is an unreturned promise here
+        return _this.get_user_favorites(req, res);
+      } 
+      
+      res.send({ "message": "Album successfully removed from user favorites." });
     }).catch(function(err) {
+      console.log(err);
       res.status(500).json(err);
     });
 };

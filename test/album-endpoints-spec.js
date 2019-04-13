@@ -255,7 +255,7 @@ describe('add and remove an album from favorites', function() {
       .expect(200)
       .end(function(err,res){
         res.status.should.equal(200)
-        res.body.message.should.equal("User favorite deleted!")
+        res.body.message.should.equal("Album successfully removed from user favorites.")
         done()
       })
   })

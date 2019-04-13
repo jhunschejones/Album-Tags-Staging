@@ -283,9 +283,9 @@ function populateList() {
       if (listData.user !== userID) return alert("Sorry! Only the list creator can delete albums."); 
       
       if (listType === "userlist") {
-        removeListAlbum($(this).attr("data-album-id")); 
+        removeFromList($(this).attr("data-album-id")); 
       } else if (listType === "myfavorites") {
-        removeFavoritesAlbum($(this).attr("data-album-id")); 
+        removeFromFavorites($(this).attr("data-album-id")); 
       } else {
         return alert("Sorry! This type of list won't let you delete albums.");
       }
@@ -299,7 +299,7 @@ function populateList() {
   showAlbumCount();
 }
 
-function removeListAlbum(albumID) {
+function removeFromList(albumID) {
   if (listData.user !== userID) { alert("Sorry, only the list creator can delete albums from a list."); return; }
   let thisAlbum = listData.albums.find(x => x.appleAlbumID == albumID);
   let confirmed = confirm(`Are you sure you want to remove "${thisAlbum.title}" from this list? You cannot undo this operation.`);
@@ -708,7 +708,7 @@ function addToFavorites(selectedAlbum) {
   }
 }
 
-function removeFavoritesAlbum(selectedAlbum) {
+function removeFromFavorites(selectedAlbum) {
   if (listData.user !== userID) return alert("Sorry, only the list creator can delete albums from a list."); 
   let albumToRemove = listData.albums.find(x => x.appleAlbumID == selectedAlbum);
   let confirmed = confirm(`Are you sure you want to remove "${albumToRemove.title}" from your favorites? You cannot undo this operation.`);
@@ -719,14 +719,15 @@ function removeFavoritesAlbum(selectedAlbum) {
       contentType: 'application/json',
       data: JSON.stringify({ 
         "user" : userID,
-        "appleAlbumID" : albumToRemove.appleAlbumID
+        "appleAlbumID" : albumToRemove.appleAlbumID,
+        "returnData": "list"
       }),
-      success: function(data) {
-        if (!data.message || data.message === "User favorite deleted!") {
-          removeFromArray(listData.albums, albumToRemove);
+      success: function(response) {
+        if (!response.message || response.message === "Album successfully removed from user favorites.") {
+          listData.albums = response;
           populateList();
         } else {
-          alert(data.message);
+          alert(response.message);
         }
       }
     });

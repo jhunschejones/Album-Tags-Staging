@@ -27,10 +27,7 @@ function escapeHtml(text) {
   return text.replace(/[<>"'/\\{}]/g, function(m) { return map[m]; });
 }
 
-// removes accidental double spaces
-function removeExtraSpace(str) {
-  return str.replace(/\s\s+/g, ' ');
-}
+function removeExtraSpaces(str) { return str.replace(/\s\s+/g, ' ').trim(); }
 
 function truncate(str, len){
   // set up the substring
@@ -49,10 +46,6 @@ function toTitleCase(str) {
   return str.replace(/\b\w+/g, function(txt){
     return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
   });
-}
-
-function removeFromArray(arr, ele){
-  if (arr.indexOf(ele) !== -1) { arr.splice(arr.indexOf(ele), 1); }
 }
 // ====== END UTILITY SECTION ======
 
@@ -76,6 +69,19 @@ var app = new Vue({
     },
     coverImage: function() {
       return this.album.cover.replace('{w}', 450).replace('{h}', 450);
+    }
+  },
+  methods: {
+    moreByThisArtist: function(event) {
+      event.preventDefault();
+      $('#searchModal').modal('show'); // NOTE: there is no easy way to do this witout jQuery
+      document.getElementById("search-modal-input").value = app.album.artist;
+      executeSearch(app.album.artist);
+    },
+    viewInAppleMusic: function(event) {
+      event.preventDefault();
+      const redirectWindow = window.open(app.album.appleURL, '_blank');
+      return redirectWindow.location;
     }
   }
 });
@@ -104,21 +110,6 @@ async function getAlbumDetails(userLoggedIn) {
 }
 
 function populateAlbumPage(userLoggedIn) {
-  // ------ put info on page ------
-  $('#more-by-this-artist').click(function(event) {
-    event.preventDefault();
-
-    // NEW SEARCH-MODAL ARTIST SEARCH
-    $('#searchModal').modal('show');
-    $('#search-modal-input').val(app.album.artist);
-    executeSearch(app.album.artist);
-  });
-  $('#apple-music-link').click(function(event){
-    event.preventDefault();
-    const redirectWindow = window.open(app.album.appleURL, '_blank');
-    return redirectWindow.location;
-  });
-  // ------ fill cards ------
   populateTags();
   populateConnections();
   getUserLists();
@@ -163,10 +154,11 @@ function removeFromFavorites() {
       contentType: 'application/json',
       data: JSON.stringify({ 
         "user" : app.userID,
-        "appleAlbumID" : app.album.appleAlbumID
+        "appleAlbumID" : app.album.appleAlbumID,
+        "returnData": "album"
       }),
       success: function(response) {
-        removeFromArray(app.album.favorites, app.album.favorites.find(x => x.userID === app.userID));
+        app.album = response;
         populateListsWithAlbum();
         updateListDisplay();
       }
@@ -669,13 +661,13 @@ function addTag() {
       $("#custom-genre-checkbox").prop("checked", false);
       return;
     }
-    // tags are stored escaped and displayed raw
-    newTag = removeExtraSpace(toTitleCase(newTag)).trim();
+
+    newTag = removeExtraSpaces(toTitleCase(newTag));
+    // tags are stored html-escaped and displayed raw
     newTag = escapeHtml(newTag);
 
-    // only run these two checks if there are other tags
+    // only run these two checks if there are already existing tags
     if (app.album.tagObjects) {
-
       // check for duplicates by this user, hard fail
       let duplicates = 0;
       app.album.tagObjects.forEach(tagObject => {
@@ -812,11 +804,6 @@ function displayMyTags(userIsLoggedIn) {
 }
 
 // ------ START GENERAL EVENT LISTENERS ------
-$('#favorites-link').click(function() {
-  const favoritesURL = window.location.protocol + "//" + window.location.host + "/myfavorites";
-  const redirectWindow = window.open(favoritesURL, '_blank');
-  return redirectWindow.location;
-});
 $("#new-list-title").keyup(function(event) {
   if (event.keyCode === 13) {
     $("#add-to-new-list-button").click();
@@ -831,11 +818,6 @@ $("#list-options").keyup(function(event) {
   if (event.keyCode === 13) {
     $("#add-to-list-button").click();
   }
-});
-$('#search-for-second-album').click(function () {
-  const searchURL = window.location.protocol + "//" + window.location.host + "/search";
-  const redirectWindow = window.open(searchURL, '_blank');
-  return redirectWindow.location;
 });
 $('#info-card .nav-link').click(function(event) {
   event.preventDefault();
@@ -895,9 +877,7 @@ $('#add-to-new-list-button').click(function() {
   let displayName = document.getElementById("new-display-name").value.trim() || "Unknown";
   
   // at least a list title should be present
-  if (!listTitle) {
-    return alert("All lists require a title!");
-  }
+  if (!listTitle) return alert("All lists require a title!");
 
   // check for characters that will cause trouble but aren't that useful
   if ((listTitle.includes("<") && listTitle.includes(">")) || listTitle.includes(".") || listTitle.includes("{") || listTitle.includes("}")) {
