@@ -184,9 +184,10 @@ function populateListsWithAlbum(userLoggedIn) {
   $('.list-message').remove();
   // check if album is favorited
   if (app.userID && app.album.favorites && !!app.album.favorites.find(x => x.userID === app.userID)) { 
-    $('#all-lists').append(`<li class="list my-list" data-creator="${app.userID}"><a href="/list?type=myfavorites">My Favorites</a><span class="text-secondary"> by: You!</span><span class="remove-from-list-button" data-list-type="myfavorites">&#10005;</span></li>`);
+    $('#all-lists').append(`<li class="list my-list" data-creator="${app.userID}"><a href="/list?type=myfavorites">&#9825; My Favorites</a><span class="text-secondary"> by: You!</span><span class="remove-from-list-button" data-list-type="myfavorites">&#10005;</span></li>`);
   }
   if (app.album.lists) {
+    app.album.lists = app.album.lists.sort((a, b) => (a.title > b.title) ? 1 : -1);
     app.album.lists.forEach(list => {
       if(!list.isPrivate) {
         let listCreator = list.displayName;
@@ -215,7 +216,8 @@ function populateListsWithAlbum(userLoggedIn) {
 function populateUserLists() {
   $('#list-options').html('');
   $("<option selected>Add to a list...</option>").appendTo("#list-options");
-  $("<option value='myfavorites'>My Favorites</option>").appendTo("#list-options");
+  $("<option value='myfavorites'>&#9825; My Favorites</option>").appendTo("#list-options");
+  app.userLists = app.userLists.sort((a, b) => (a.title > b.title) ? 1 : -1);
   app.userLists.forEach(list => {
     $(`<option value="${list.id}">${list.title}</option>`).appendTo("#list-options");
   });
@@ -869,7 +871,7 @@ $("#add-connection-input").keyup(function(event) {
 $('#add-to-list-button').click(function() {
   let listOptions = document.getElementById("list-options");
   let chosenList = listOptions[listOptions.selectedIndex].value;
-  if (chosenList === "My Favorites") return addToFavorites();
+  if (chosenList === "&#9825; My Favorites") return addToFavorites();
   if (chosenList !== "Add to a list...") { addToList(chosenList); } 
 });
 $('#add-to-new-list-button').click(function() {
