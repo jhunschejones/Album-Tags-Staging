@@ -76,6 +76,7 @@ function populateAllLists() {
   $("#no-lists-message").hide();
   $('#all-lists').html('');
   if (allLists.length > 0) {
+    allLists = allLists.sort((a, b) => (a.title > b.title) ? 1 : -1);
     for (let index = 0; index < allLists.length; index++) {
       const list = allLists[index];
       let listCreator = list.displayName;
