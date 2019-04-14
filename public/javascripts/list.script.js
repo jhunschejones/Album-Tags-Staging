@@ -12,29 +12,10 @@ function truncate(str, len){
   return (subString.substr(0, subString.lastIndexOf(' ')).replace(/(^[,\s]+)|([,\s]+$)/g, '') + '...');
 }
 
-function removeDash(str) { return str.replace(/-/g, ''); }
-
-function bubbleSort(arr, prop) {
-  let swapped;
-  do {
-    swapped = false;
-    for (let i = 0; i < arr.length - 1; i++) {
-      if (parseInt(removeDash(arr[i][prop])) > parseInt(removeDash(arr[i + 1][prop]))) {
-        const temp = arr[i];
-        arr[i] = arr[i + 1];
-        arr[i + 1] = temp;
-        swapped = true;
-      }
-    }
-  } while (swapped);
-}
-
 function scrollToTop() {
   document.body.scrollTop = 0; // For Safari
   document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
 }
-
-function textToClassName(str) { return str.replace(/[^\w\s]/gi, '').replace(/\s\s+/g, ' ').replace(/ /g, '_').toLowerCase(); }
 
 function isGenre(str) {
   const myGenres = ['Metalcore', 'Pop Punk', 'Emo', 'Rock', 'Post-Hardcore', 'Accoustic', 'Screamo', 'Metal', 'Nu Metal', 'Alt Metal', 'Djent', 'Accoustic', 'Jazz', 'Ska', 'Rap-Rock', 'Progressive', 'Punk', 'Rap'];
@@ -47,16 +28,6 @@ function removeFromArray(arr, ele){
 
 function addToArray(arr, ele){
   if (arr.indexOf(ele) === -1) { arr.push(ele); }
-}
-
-function removeDuplicates(inputArray){
-  let outputArray = [];
-  for(let i = 0;i < inputArray.length; i++){
-    if(outputArray.indexOf(inputArray[i]) == -1){
-      outputArray.push(inputArray[i]);
-    }
-  }
-  return outputArray;
 }
 
 function escapeHtml(text) {
@@ -524,7 +495,7 @@ function filterAlbums() {
     albumArray = albumArray.filter(album => !!album.year && album.year === filterObject.year);
     showAppliedFilter(filterObject.year, "year");
   }
-  bubbleSort(albumArray, "releaseDate");
+  albumArray = albumArray.sort((a, b) => (a.releaseDate > b.releaseDate) ? 1 : -1);
   albumArray = albumArray.reverse(); // reverse shows newer albums first (generally)
   return albumArray;
 }
@@ -613,7 +584,6 @@ function searchFilter() {
     }
   } else {
     for (let i = 0; i < artistFilterElements.length; i++) {
-      // if (tagElements[i].value.toUpperCase().indexOf(userInput)!= -1) {
       if (artistFilterElements[i].dataset.artist.toUpperCase().indexOf(userInput)!= -1) {
         artistFilterElements[i].style.display = "";
       } else {
