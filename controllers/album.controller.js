@@ -60,25 +60,19 @@ async function findAppleAlbumData(req, album) {
 
 exports.createSongString = function (songs) {
   let songString = "";
-  songs.forEach(song => {
-    if (songs.indexOf(song) === songs.length - 1) {
-      songString = songString + song;
-    } else {
-      songString = songString + song + ",,";
-    }
-  });
+  for (let i = 0; i < songs.length - 1; i++) {
+    songString = songString + songs[i] + ",,";
+  }
+  songString = songString + songs[songs.length - 1];
   return songString;
 }
 
 exports.createGenreString = function (genres) {
   let genreString = "";
-  genres.forEach(genre => {
-    if (genres.indexOf(genre) === genres.length -1) {
-      genreString = genreString + genre;
-    } else {
-      genreString = genreString + genre + ",,";
-    }
-  });
+  for (let i = 0; i < genres.length - 1; i++) {
+    genreString = genreString + genres[i] + ",,";
+  }
+  genreString = genreString + genres[genres.length - 1];
   return genreString;
 }
 
@@ -346,12 +340,12 @@ exports.find_by_tags = function (req, res, next) {
 
 exports.get_all_tags = function(req, res, next) {
   Tag.findAll({}).then(function(tags) {
-    let justTags = [];
-    tags.forEach(tag => {
-      if (justTags.indexOf(tag.text) === -1) { justTags.push(tag.text); }
-    });
-    justTags.sort();
-    res.send(justTags);
+    let justTagText = {};
+    for (let i = 0; i < tags.length; i++) {
+      const tag = tags[i].text;
+      justTagText[tag] = 0;
+    }
+    res.send(Object.keys(justTagText).sort());
   }).catch(function(err) {
     res.status(500).json(err);
   });

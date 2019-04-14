@@ -33,11 +33,11 @@ describe('createSongString', function() {
 // ====== TESTING CREATEGENRESTRING UTILITY FUNCTION ======
 describe('createGenreString', function() {
   it('should return a string from input array', function() {
-    const result = album_controller.createSongString([ "Rock", "Metal" ])
+    const result = album_controller.createGenreString([ "Rock", "Metal" ])
     result.should.be.a.String()
   })
   it('should build string from array', function() {
-    const result = album_controller.createSongString([ "Rock", "Metal" ])
+    const result = album_controller.createGenreString([ "Rock", "Metal" ])
     should.deepEqual(result, "Rock,,Metal", 'the result string does not match expected')
   })
 })
