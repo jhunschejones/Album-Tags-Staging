@@ -7,7 +7,7 @@
         <span id="full_menu_page_title" class="subtitle text-muted font-weight-light"> <%= subTitle %> </span>
 
         <!-- login and logout buttons -->
-        <div id="full_menu_login_logout_container" class="float-right" style="display:none;">
+        <div id="full_menu_login_logout_container" class="hide_me float-right">
             <a class="btn btn-sm btn-primary hide_when_logged_in" id="full_menu_login_button">Log In</a>
             <a class="btn btn-sm btn-danger hide_when_logged_out" id="full_menu_logout_button">Log Out</a>
         </div>          
@@ -18,9 +18,9 @@
         <li class="nav-item dropdown">
             <a class="my_dropdown lead text-secondary nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><img id="menu_hamburger" style="height:23px" src="/images/menu.png"></a>
             <div class="dropdown-menu">
-                <a class="dropdown-item hide_when_logged_in" id="login_button" style="cursor:pointer;display:none;">Log In</a>
-                <a class="dropdown-item hide_when_logged_out" id="logout_button" style="cursor:pointer;display:none;">Log Out</a>
-                <div class="dropdown-divider" id="login_divider" style="display:none;"></div>
+                <a class="dropdown-item hide_when_logged_in hide_me" id="login_button" style="cursor:pointer;">Log In</a>
+                <a class="dropdown-item hide_when_logged_out hide_me" id="logout_button" style="cursor:pointer;">Log Out</a>
+                <div class="dropdown-divider" id="login_divider" class="hide_me"></div>
                 <a class="dropdown-item" href="/">Home</a>
                 <a class="dropdown-item" href="/about">About</a>
                 <a class="dropdown-item" href="" data-toggle="modal" data-target="#searchModal">Search</a>
