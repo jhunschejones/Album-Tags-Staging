@@ -13,21 +13,17 @@ function makeNiceDate(uglyDate) {
   return(`${niceMonth} ${day}, ${year}`);
 }
 
-function removeDOMElement(ele) {
-  if (ele[0] === ".") {
-    const c = document.getElementsByClassName(ele.substring(1));
-    if (c && c.length > 0) {
-      for (let i = 0; i < c.length; i++) {
-        c[i].parentNode.removeChild(c[i]);
-      }
+function removeSelectedElement(selector) {
+  if (selector[0] === ".") {
+    const c = document.querySelectorAll(selector);
+    for (let i = 0; i < c.length; i++) { 
+      c[i].parentNode.removeChild(c[i]);
     }
-  } else if (ele[0] === "#") {
-    const e = document.getElementById(ele.substring(1));
-    if (e && e.length > 0) {
-      e.parentNode.removeChild(e);
-    }
+  } else if (selector[0] === "#") {
+    const e = document.getElementById(selector.substring(1));
+    if (e) { e.parentNode.removeChild(e); }
   } else {
-    console.error("removeDOMElement() was passed an invalid selector");
+    console.error("removeSelectedElement() was passed an invalid selector");
   }
 }
 
@@ -38,17 +34,11 @@ function addClassEventListener(selector, eventType, myFunction) {
   }
 }
 
-function htmlToElement(html) {
+function stringToNode(html) {
   const template = document.createElement('template');
   template.innerHTML = html;
   return template.content.firstChild;
 }
-
-// function htmlToElements(html) {
-//   const template = document.createElement('template');
-//   template.innerHTML = html;
-//   return template.content.childNodes;
-// }
 
 function showClass(selector) {
   const otherLists = document.getElementsByClassName(selector);
@@ -126,10 +116,6 @@ var app = new Vue({
     moreByThisArtist: function(event) {
       event.preventDefault();
 
-      // bootstrap regular
-      // $('#searchModal').modal('show'); 
-
-      // bootstrap native
       const searchModal = new Modal(document.getElementById('searchModal'));
       searchModal.show();
 
@@ -177,86 +163,136 @@ function populateAlbumPage(userLoggedIn) {
     populateListsWithAlbum(userLoggedIn);
   } else {
     if (document.getElementsByClassName('album-tag').length === 0) { 
-      document.getElementById('current-tags').appendChild(htmlToElement('<div class="text-primary text-center"><small>There are currently no tags for this album. Log in to start adding your own tags!</small></div>'));
+      document.getElementById('current-tags').appendChild(stringToNode('<div class="text-primary text-center"><small>There are currently no tags for this album. Log in to start adding your own tags!</small></div>'));
       // $('#current-tags').html('<div class="text-primary text-center"><small>There are currently no tags for this album. Log in to start adding your own tags!</small></div>'); 
     }
     if (document.getElementsByClassName('connection').length === 0) { 
-      document.getElementById('connected-albums').appendChild(htmlToElement('<div class="text-primary text-center"><small>There are currently no connections for this album. Log in to start adding your own connections!</small><br/><br/></div>'));
+      document.getElementById('connected-albums').appendChild(stringToNode('<div class="text-primary text-center"><small>There are currently no connections for this album. Log in to start adding your own connections!</small><br/><br/></div>'));
       // $('#connected-albums').html('<div class="text-primary text-center"><small>There are currently no connections for this album. Log in to start adding your own connections!</small><br/><br/></div>'); 
+    }
+    if (document.getElementsByClassName("list").length === 0) { 
+      removeSelectedElement('.list-message');
+      document.getElementById("all-lists").appendChild(stringToNode('<div class="text-primary text-center list-message"><small>This album is not in any public user lists yet. Log in to get started working with lists!</small><br/><br/></div>'));
+      // $('#all-lists').after('<div class="text-primary text-center list-message"><small>This album is not in any public user lists yet. Log in to get started working with lists!</small><br/><br/></div>'); 
     }
   }
 }
 
-function addToFavorites() {
+async function addToFavorites() {
   if (app.album.favorites && !!app.album.favorites.find(x => x.userID === app.userID)) {
     populateUserLists();
     return alert("This album is already in your \"My Favorites\" list.");
   }
-  $.ajax('/api/v1/favorite', {
-    method: 'POST',
-    contentType: 'application/json',
-    data: JSON.stringify({ 
+
+  let response = await fetch('/api/v1/favorite', {
+    method: 'post',
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
       "user" : app.userID,
       "album" : app.album
-    }),
-    success: function(response) {
-      // bootstrap native
-      const updateListModal = new Modal(document.getElementById('updateListModal'));
-      updateListModal.hide();
-      // bootstrap regular
-      // $('#updateListModal').modal('hide');
-      if (!app.album.favorites) { app.album.favorites = []; }
-      app.album.favorites.push({"userID": app.userID});
-      populateListsWithAlbum();
-      updateListDisplay();
-      // $('#list-options').get(0).selectedIndex = 0;
-      document.getElementById("list-options").selectedIndex = 0;
-    }
+    })
   });
+  if (!response.ok) throw Error(response.statusText);
+  let data = await response.json();
+
+  const updateListModal = new Modal(document.getElementById('updateListModal'));
+  updateListModal.hide();
+  if (!app.album.favorites) { app.album.favorites = []; }
+  app.album.favorites.push({"userID": app.userID});
+  populateListsWithAlbum();
+  updateListDisplay();
+  // $('#list-options').get(0).selectedIndex = 0;
+  document.getElementById("list-options").selectedIndex = 0;
+
+  // $.ajax('/api/v1/favorite', {
+  //   method: 'POST',
+  //   contentType: 'application/json',
+  //   data: JSON.stringify({ 
+  //     "user" : app.userID,
+  //     "album" : app.album
+  //   }),
+  //   success: function(response) {
+  //     // bootstrap native
+  //     const updateListModal = new Modal(document.getElementById('updateListModal'));
+  //     updateListModal.hide();
+  //     // bootstrap regular
+  //     // $('#updateListModal').modal('hide');
+  //     if (!app.album.favorites) { app.album.favorites = []; }
+  //     app.album.favorites.push({"userID": app.userID});
+  //     populateListsWithAlbum();
+  //     updateListDisplay();
+  //     // $('#list-options').get(0).selectedIndex = 0;
+  //     document.getElementById("list-options").selectedIndex = 0;
+  //   }
+  // });
 }
 
-function removeFromFavorites() {
+async function removeFromFavorites() {
   let confirmed = confirm(`Are you sure you want to remove this album from the 'My Favorites' list? You cannot undo this operation.`);
   if (confirmed) {
-    $.ajax('/api/v1/favorite', {
-      method: 'DELETE',
-      contentType: 'application/json',
-      data: JSON.stringify({ 
+    let response = await fetch('/api/v1/favorite', {
+      method: 'delete',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
         "user" : app.userID,
         "appleAlbumID" : app.album.appleAlbumID,
         "returnData": "album"
-      }),
-      success: function(response) {
-        app.album = response;
-        populateListsWithAlbum();
-        updateListDisplay();
-      }
+      })
     });
+    if (!response.ok) throw Error(response.statusText);
+    let data = await response.json();
+    app.album = data;
+    populateListsWithAlbum();
+    updateListDisplay();
+
+    // $.ajax('/api/v1/favorite', {
+    //   method: 'DELETE',
+    //   contentType: 'application/json',
+    //   data: JSON.stringify({ 
+    //     "user" : app.userID,
+    //     "appleAlbumID" : app.album.appleAlbumID,
+    //     "returnData": "album"
+    //   }),
+    //   success: function(response) {
+    //     app.album = response;
+    //     populateListsWithAlbum();
+    //     updateListDisplay();
+    //   }
+    // });
   }
 }
 
-function getUserLists() {
-  $.ajax({
-    method: "GET",
-    url: "/api/v1/list/user/" + app.userID,
-    success: function(data) {
-      // message returned here means no lists for this user
-      if (data.message) { app.userLists = []; } 
-      else { app.userLists = data; }
-      populateUserLists();
-    }
-  });
+async function getUserLists() {
+  let response = await fetch("/api/v1/list/user/" + app.userID);
+  if (!response.ok) throw Error(response.statusText);
+  let data = await response.json();
+  // message returned here means no lists for this user
+  if (data.message) { app.userLists = []; } 
+  else { app.userLists = data; }
+  populateUserLists();
+  // $.ajax({
+  //   method: "GET",
+  //   url: "/api/v1/list/user/" + app.userID,
+  //   success: function(data) {
+  //     // message returned here means no lists for this user
+  //     if (data.message) { app.userLists = []; } 
+  //     else { app.userLists = data; }
+  //     populateUserLists();
+  //   }
+  // });
 }
 
 function populateListsWithAlbum(userLoggedIn) {
+  console.log("populating lists")
   document.getElementById('all-lists').innerHTML = '';
-  // $('#all-lists').html('');
-  removeDOMElement('.list-message');
+  removeSelectedElement('.list-message');
   // $('.list-message').remove();
 
   // check if album is favorited
   if (app.userID && app.album.favorites && !!app.album.favorites.find(x => x.userID === app.userID)) { 
-    document.getElementById("all-lists").appendChild(htmlToElement(`<li class="list my-list" data-creator="${app.userID}"><a href="/list?type=myfavorites">&#9825; My Favorites</a><span class="text-secondary"> by: You!</span><span class="remove-from-list-button" data-list-type="myfavorites">&#10005;</span></li>`));
+    document.getElementById("all-lists").appendChild(stringToNode(`<li class="list my-list" data-creator="${app.userID}"><a href="/list?type=myfavorites">&#9825; My Favorites</a><span class="text-secondary"> by: You!</span><span class="remove-from-list-button" data-list-type="myfavorites">&#10005;</span></li>`));
     // $('#all-lists').append(`<li class="list my-list" data-creator="${app.userID}"><a href="/list?type=myfavorites">&#9825; My Favorites</a><span class="text-secondary"> by: You!</span><span class="remove-from-list-button" data-list-type="myfavorites">&#10005;</span></li>`);
   }
   if (app.album.lists) {
@@ -267,10 +303,10 @@ function populateListsWithAlbum(userLoggedIn) {
         if (!listCreator || listCreator.trim === "") { listCreator = "Unknown"; }
   
         if (list.user === app.userID) {
-          document.getElementById("all-lists").appendChild(htmlToElement(`<li class="list my-list" data-creator="${list.user}"><a href="/list?type=userlist&id=${list.id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span><span class="remove-from-list-button" data-list-id="${list.id}" data-list-type="userlist">&#10005;</span></li>`));
+          document.getElementById("all-lists").appendChild(stringToNode(`<li class="list my-list" data-creator="${list.user}"><a href="/list?type=userlist&id=${list.id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span><span class="remove-from-list-button" data-list-id="${list.id}" data-list-type="userlist">&#10005;</span></li>`));
           // $('#all-lists').append(`<li class="list my-list" data-creator="${list.user}"><a href="/list?type=userlist&id=${list.id}">${list.title}</a><span class="text-secondary"> by: ${listCreator}</span><span class="remove-from-list-button" data-list-id="${list.id}" data-list-type="userlist">&#10005;</span></li>`);
         } else {
-          document.getElementById("all-lists").appendChild(htmlToElement(`<li class="list other-list" data-creator="${list.user}"><a href="/list?type=userlist&id=${list.id}">${list.title}</a><span class="text-secondary" data-list-type="userlist"> by: ${listCreator}</span></li>`));
+          document.getElementById("all-lists").appendChild(stringToNode(`<li class="list other-list" data-creator="${list.user}"><a href="/list?type=userlist&id=${list.id}">${list.title}</a><span class="text-secondary" data-list-type="userlist"> by: ${listCreator}</span></li>`));
           // $('#all-lists').append(`<li class="list other-list" data-creator="${list.user}"><a href="/list?type=userlist&id=${list.id}">${list.title}</a><span class="text-secondary" data-list-type="userlist"> by: ${listCreator}</span></li>`);
         }
       }
@@ -287,29 +323,27 @@ function populateListsWithAlbum(userLoggedIn) {
   if (userLoggedIn) return updateListDisplay();
 
   if (document.getElementsByClassName("list").length === 0) { 
-  // if ($('.list').length === 0) { 
-    removeDOMElement('.list-message');
-    // $('.list-message').remove();
-    document.getElementById("all-lists").appendChild(htmlToElement('<div class="text-primary text-center list-message"><small>This album is not in any public user lists yet. Log in to get started working with lists!</small><br/><br/></div>'));
+    removeSelectedElement('.list-message');
+    document.getElementById("all-lists").appendChild(stringToNode('<div class="text-primary text-center list-message"><small>This album is not in any public user lists yet. Log in to get started working with lists!</small><br/><br/></div>'));
     // $('#all-lists').after('<div class="text-primary text-center list-message"><small>This album is not in any public user lists yet. Log in to get started working with lists!</small><br/><br/></div>'); 
-  }
+  } 
 }
 
 function populateUserLists() {
   document.getElementById('list-options').innerHTML = '';
   // $('#list-options').html('');
-  document.getElementById("list-options").appendChild(htmlToElement('<option selected>Add to a list...</option>'));
+  document.getElementById("list-options").appendChild(stringToNode('<option selected>Add to a list...</option>'));
   // $("<option selected>Add to a list...</option>").appendTo("#list-options");
-  document.getElementById("list-options").appendChild(htmlToElement('<option value="myfavorites">&#9825; My Favorites</option>'));
+  document.getElementById("list-options").appendChild(stringToNode('<option value="myfavorites">&#9825; My Favorites</option>'));
   // $("<option value='myfavorites'>&#9825; My Favorites</option>").appendTo("#list-options");
   app.userLists = app.userLists.sort((a, b) => (a.title > b.title) ? 1 : -1);
   app.userLists.forEach(list => {
-    document.getElementById("list-options").appendChild(htmlToElement(`<option value="${list.id}">${list.title}</option>`));
+    document.getElementById("list-options").appendChild(stringToNode(`<option value="${list.id}">${list.title}</option>`));
     // $(`<option value="${list.id}">${list.title}</option>`).appendTo("#list-options");
   });
 }
 
-function addToList(chosenList) {
+async function addToList(chosenList) {
   if (chosenList) {
     if (chosenList === "myfavorites") return addToFavorites();
 
@@ -334,32 +368,51 @@ function addToList(chosenList) {
       appleURL: app.album.appleURL,
       recordCompany: app.album.recordCompany,
     };
-    $.ajax({
-      method: "PUT",
-      url: "/api/v1/list/" + chosenList,
-      contentType: 'application/json',
-      data: JSON.stringify(addAlbumToListBody),
-      success: function(data) {
-        if (!app.album.lists) { app.album.lists = []; }
-        app.album.lists.push(data);
-        populateListsWithAlbum();
-        updateListDisplay();
-        // bootstrap native
-        const updateListModal = new Modal(document.getElementById('updateListModal'));
-        updateListModal.hide();
-        // bootstrap regular        
-        // $('#updateListModal').modal('hide');
-        document.getElementById("list-options").selectedIndex = 0;
-        // $('#list-options').get(0).selectedIndex = 0;
-      },
-      error: function(err) {
-        console.log(err);
-      }
+    let response = await fetch("/api/v1/list/" + chosenList, {
+      method: 'put',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(addAlbumToListBody)
     });
+    if (!response.ok) throw Error(response.statusText);
+    let data = await response.json();
+
+    if (!app.album.lists) { app.album.lists = []; }
+    app.album.lists.push(data);
+    populateListsWithAlbum();
+    updateListDisplay();
+    // bootstrap native
+    const updateListModal = new Modal(document.getElementById('updateListModal'));
+    updateListModal.hide();
+    document.getElementById("list-options").selectedIndex = 0;
+    // $('#list-options').get(0).selectedIndex = 0;    
+
+    // $.ajax({
+    //   method: "PUT",
+    //   url: "/api/v1/list/" + chosenList,
+    //   contentType: 'application/json',
+    //   data: JSON.stringify(addAlbumToListBody),
+    //   success: function(data) {
+    //     if (!app.album.lists) { app.album.lists = []; }
+    //     app.album.lists.push(data);
+    //     populateListsWithAlbum();
+    //     updateListDisplay();
+    //     // bootstrap native
+    //     const updateListModal = new Modal(document.getElementById('updateListModal'));
+    //     updateListModal.hide();
+    //     // bootstrap regular        
+    //     // $('#updateListModal').modal('hide');
+    //     document.getElementById("list-options").selectedIndex = 0;
+    //     // $('#list-options').get(0).selectedIndex = 0;
+    //   },
+    //   error: function(err) {
+    //     console.log(err);
+    //   }
+    // });
   }
 }
 
-function addToNewList(listTitle, displayName) {
+async function addToNewList(listTitle, displayName) {
 
   // check to see if this user has a list with the same name
   let confirmed = true;
@@ -382,39 +435,63 @@ function addToNewList(listTitle, displayName) {
         isPrivate: privateList,
         albums: [app.album]
       };
-      $.ajax({
-        method: "POST",
-        url: "/api/v1/list/",
-        contentType: 'application/json',
-        data: JSON.stringify(newList),
-        success: function(data) {
-          // update the UI without making any additional API calls
-          if(!data.message) {
-            app.userLists.push(data);
-            if (!app.album.lists) { app.album.lists = []; }
-            app.album.lists.push(data);
-            populateUserLists();
-            populateListsWithAlbum();
-            updateListDisplay();
-            // bootstrap native
-            const updateListModal = new Modal(document.getElementById('updateListModal'));
-            updateListModal.hide();
-            // bootstrap regular            
-            // $('#updateListModal').modal('hide');
-            document.getElementById('new-list-title').value = '';
-            // $('#new-list-title').val('');
-            document.getElementById('new-display-name').value = '';
-            // $('#new-display-name').val('');
-          } else {
-            alert(data.message);
-          }
-        }
+      let response = await fetch("/api/v1/list/", {
+        method: 'post',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newList)
       });
+      if (!response.ok) throw Error(response.statusText);
+      let data = await response.json();
+
+      if(!data.message) {
+        app.userLists.push(data);
+        if (!app.album.lists) { app.album.lists = []; }
+        app.album.lists.push(data);
+        populateUserLists();
+        populateListsWithAlbum();
+        updateListDisplay();
+
+        const updateListModal = new Modal(document.getElementById('updateListModal'));
+        updateListModal.hide();
+        document.getElementById('new-list-title').value = '';
+        document.getElementById('new-display-name').value = '';
+      } else {
+        alert(data.message);
+      }      
+      // $.ajax({
+      //   method: "POST",
+      //   url: "/api/v1/list/",
+      //   contentType: 'application/json',
+      //   data: JSON.stringify(newList),
+      //   success: function(data) {
+      //     // update the UI without making any additional API calls
+      //     if(!data.message) {
+      //       app.userLists.push(data);
+      //       if (!app.album.lists) { app.album.lists = []; }
+      //       app.album.lists.push(data);
+      //       populateUserLists();
+      //       populateListsWithAlbum();
+      //       updateListDisplay();
+      //       // bootstrap native
+      //       const updateListModal = new Modal(document.getElementById('updateListModal'));
+      //       updateListModal.hide();
+      //       // bootstrap regular            
+      //       // $('#updateListModal').modal('hide');
+      //       document.getElementById('new-list-title').value = '';
+      //       // $('#new-list-title').val('');
+      //       document.getElementById('new-display-name').value = '';
+      //       // $('#new-display-name').val('');
+      //     } else {
+      //       alert(data.message);
+      //     }
+      //   }
+      // });
     }
   } 
 }
 
-function removeFromList(listID) {
+async function removeFromList(listID) {
   let thisList = app.album.lists.find(x => x.id === listID);
   let confirmed = confirm(`Are you sure you want to remove this album from the "${thisList.title}" list? You cannot undo this operation.`);
   
@@ -427,19 +504,33 @@ function removeFromList(listID) {
       releaseDate: app.album.releaseDate,
       cover: app.album.cover
     };
-    
-    $.ajax({
-      method: "PUT",
-      url: "/api/v1/list/" + thisList.id,
-      contentType: 'application/json',
-      data: JSON.stringify(deleteObject),
-      success: function(data) {
-        let index = app.album.lists.indexOf(thisList);
-        app.album.lists.splice(index, 1);
-        populateListsWithAlbum();
-        updateListDisplay();
-      }
+
+    let response = await fetch("/api/v1/list/" + thisList.id, {
+      method: 'post',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(deleteObject)
     });
+    if (!response.ok) throw Error(response.statusText);
+    let data = await response.json();
+
+    let index = app.album.lists.indexOf(thisList);
+    app.album.lists.splice(index, 1);
+    populateListsWithAlbum();
+    updateListDisplay();    
+    
+    // $.ajax({
+    //   method: "PUT",
+    //   url: "/api/v1/list/" + thisList.id,
+    //   contentType: 'application/json',
+    //   data: JSON.stringify(deleteObject),
+    //   success: function(data) {
+    //     let index = app.album.lists.indexOf(thisList);
+    //     app.album.lists.splice(index, 1);
+    //     populateListsWithAlbum();
+    //     updateListDisplay();
+    //   }
+    // });
   }
 }
 
@@ -450,7 +541,6 @@ function updateListDisplay() {
 
 function displayAllLists() {
   if (document.getElementById('lists-toggle').innerHTML.length === 0) {
-  // if ($("#lists-toggle").html().length === 0) {
     document.getElementById('lists-toggle').innerHTML = '<img src="/images/toggle_on.png" id="show-all-lists" class="toggle-switch" style="height:22px;margin-left:10px;"><img src="/images/toggle_off.png" id="show-my-lists" class="hide_me toggle-switch" style="height:22px;margin-left:10px;">';
     // $("#lists-toggle").html('<img src="/images/toggle_on.png" id="show-all-lists" style="height:22px;margin-left:10px;"><img src="/images/toggle_off.png" id="show-my-lists" style="height:22px;margin-left:10px;display:none;">');
   } else {
@@ -459,22 +549,13 @@ function displayAllLists() {
     document.getElementById('show-all-lists').classList.remove('hide_me');
     // $('#show-all-lists').show();
   }
-  const myLists = document.getElementsByClassName('my-list');
-  for (let i = 0; i < myLists.length; i++) {
-    myLists[i].classList.remove('hide_me');
-  }
-  // $('.my-list').show();
-  const otherLists = document.getElementsByClassName('other-list');
-  for (let i = 0; i < otherLists.length; i++) {
-    otherLists[i].classList.remove('hide_me');
-  }
-  // $('.other-list').show();
+  showClass('my-list');
+  showClass('other-list');
   document.getElementById('list-title-modifier').innerHTML = 'All <span class="large-button-text">user </span>';
-  // $('#list-title-modifier').html('All <span class="large-button-text">user </span>');
+  removeSelectedElement('.list-message');
 
-  removeDOMElement('.list-message');
   if (document.getElementsByClassName('list').length === 0) { 
-    document.getElementById('all-lists').parentNode.insertBefore(htmlToElement('<div class="text-primary text-center list-message"><small>This album is not in any public user lists. Click "Add to a list" below to get started!</small><br/><br/></div>'), document.getElementById('all-lists').nextSibling);
+    document.getElementById('all-lists').parentNode.insertBefore(stringToNode('<div class="text-primary text-center list-message"><small>This album is not in any public user lists. Click "Add to a list" below to get started!</small><br/><br/></div>'), document.getElementById('all-lists').nextSibling);
     // $('#all-lists').after('<div class="text-primary text-center list-message"><small>This album is not in any public user lists. Click "Add to a list" below to get started!</small><br/><br/></div>'); 
   }
 
@@ -507,10 +588,10 @@ function displayMyLists() {
   // $('.other-list').hide();
   document.getElementById('list-title-modifier').innerText = 'Your ';
 
-  removeDOMElement('.list-message');
+  removeSelectedElement('.list-message');
   // $('.list-message').remove();
   if (document.getElementsByClassName('my-list').length === 0) { 
-    document.getElementById('all-lists').parentNode.insertBefore(htmlToElement('<div class="text-primary text-center list-message"><small>You have not added this album to any lists. Click "Add to a list" below to get started!</small><br/><br/></div>'), document.getElementById('all-lists').nextSibling);
+    document.getElementById('all-lists').parentNode.insertBefore(stringToNode('<div class="text-primary text-center list-message"><small>You have not added this album to any lists. Click "Add to a list" below to get started!</small><br/><br/></div>'), document.getElementById('all-lists').nextSibling);
     // $('#all-lists').after('<div class="text-primary text-center list-message"><small>You have not added this album to any lists. Click "Add to a list" below to get started!</small><br/><br/></div>'); 
   }
 
@@ -533,10 +614,10 @@ function populateConnections() {
         const smallTitle = connectedAlbum.title.length > 20 ? truncate(connectedAlbum.title, 20) : connectedAlbum.title;
 
         if (connectedAlbum.creator === app.userID) {
-          document.getElementById('connected-albums').appendChild(htmlToElement(`<a href="/album/${connectedAlbum.appleAlbumID}" id="${connectedAlbum.appleAlbumID}" class="connection my-connection" data-creator="${connectedAlbum.creator}"><img class="connection-cover" src="${cover}" data-toggle="tooltip" data-placement="top" title="${smallTitle}" data-trigger="hover"><span class="delete-connection-button" data-connected-album-id="${connectedAlbum.appleAlbumID}">&#10005;</span></a>`));
+          document.getElementById('connected-albums').appendChild(stringToNode(`<a href="/album/${connectedAlbum.appleAlbumID}" id="${connectedAlbum.appleAlbumID}" class="connection my-connection" data-creator="${connectedAlbum.creator}"><img class="connection-cover" src="${cover}" data-toggle="tooltip" data-placement="top" title="${smallTitle}" data-trigger="hover"><span class="delete-connection-button" data-connected-album-id="${connectedAlbum.appleAlbumID}">&#10005;</span></a>`));
           // $('#connected-albums').append(`<a href="/album/${connectedAlbum.appleAlbumID}" id="${connectedAlbum.appleAlbumID}" class="connection my-connection" data-creator="${connectedAlbum.creator}"><img class="connection-cover" src="${cover}" data-toggle="tooltip" data-placement="top" title="${smallTitle}" data-trigger="hover"><span class="delete-connection-button" data-connected-album-id="${connectedAlbum.appleAlbumID}">&#10005;</span></a>`);
         } else {
-          document.getElementById('connected-albums').appendChild(htmlToElement(`<a href="/album/${connectedAlbum.appleAlbumID}" id="${connectedAlbum.appleAlbumID}" class="connection other-connection" data-creator="${connectedAlbum.creator}"><img class="connection-cover" src="${cover}" data-toggle="tooltip" data-placement="top" title="${smallTitle}" data-trigger="hover"></a>`));
+          document.getElementById('connected-albums').appendChild(stringToNode(`<a href="/album/${connectedAlbum.appleAlbumID}" id="${connectedAlbum.appleAlbumID}" class="connection other-connection" data-creator="${connectedAlbum.creator}"><img class="connection-cover" src="${cover}" data-toggle="tooltip" data-placement="top" title="${smallTitle}" data-trigger="hover"></a>`));
           // $('#connected-albums').append(`<a href="/album/${connectedAlbum.appleAlbumID}" id="${connectedAlbum.appleAlbumID}" class="connection other-connection" data-creator="${connectedAlbum.creator}"><img class="connection-cover" src="${cover}" data-toggle="tooltip" data-placement="top" title="${smallTitle}" data-trigger="hover"></a>`);
         }
       }
@@ -567,30 +648,47 @@ function populateConnections() {
   } 
 }
 
-function addConnection(selectedAlbum) {
+async function addConnection(selectedAlbum) {
   // make sure object passed in looks like an album object
   if (selectedAlbum && selectedAlbum.title) {
-    $.ajax('/api/v1/connection', {
-      method: 'POST',
-      contentType: 'application/json',
-      data: JSON.stringify({ 
+    let response = await fetch('/api/v1/connection', {
+      method: 'post',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
         "albumOne": app.album,
         "albumTwo": selectedAlbum,
         "creator": app.userID
-      }),
-      success: function(result) {
-        // bootstrap native
-        const updateConnectionModal = new Modal(document.getElementById('updateConnectionModal'));
-        updateConnectionModal.hide();
-        // bootstrap regular        
-        // $('#updateConnectionModal').modal('hide');
-        app.album.connections = result;
-        populateConnections();
-        updateConnectionDisplay();
-      }
+      })
     });
+    if (!response.ok) throw Error(response.statusText);
+    let data = await response.json();
+
+    const updateConnectionModal = new Modal(document.getElementById('updateConnectionModal'));
+    updateConnectionModal.hide();
+    app.album.connections = data;
+    populateConnections();
+    updateConnectionDisplay();
+    // $.ajax('/api/v1/connection', {
+    //   method: 'POST',
+    //   contentType: 'application/json',
+    //   data: JSON.stringify({ 
+    //     "albumOne": app.album,
+    //     "albumTwo": selectedAlbum,
+    //     "creator": app.userID
+    //   }),
+    //   success: function(result) {
+    //     // bootstrap native
+    //     const updateConnectionModal = new Modal(document.getElementById('updateConnectionModal'));
+    //     updateConnectionModal.hide();
+    //     // bootstrap regular        
+    //     // $('#updateConnectionModal').modal('hide');
+    //     app.album.connections = result;
+    //     populateConnections();
+    //     updateConnectionDisplay();
+    //   }
+    // });
     document.getElementById('add-connection-input').value = '';
-    // $('#add-connection-input').val('');
   }
 } 
     
@@ -611,16 +709,16 @@ function populateConnectionModalResults(data) {
     }
     // this adds an empty space at the end so the user can scroll 
     // all the way to the right to see the last album
-    document.getElementById('connection-search-results').appendChild(htmlToElement('<div id="connection-search-modal-placeholder">&nbsp;</div>'));
+    document.getElementById('connection-search-results').appendChild(stringToNode('<div id="connection-search-modal-placeholder">&nbsp;</div>'));
     // $('#connection-search-results').append('<div id="connection-search-modal-placeholder">&nbsp;</div>');
   } else {
-    document.getElementById('connection-search-results').parentNode.insertBefore(htmlToElement('<div id="no-results-message" class="text-primary mb-3" style="text-align:center;">It looks like no albums matched your search terms. Try a different search!</div>'), document.getElementById('connection-search-results').nextSibling);
+    document.getElementById('connection-search-results').parentNode.insertBefore(stringToNode('<div id="no-results-message" class="text-primary mb-3" style="text-align:center;">It looks like no albums matched your search terms. Try a different search!</div>'), document.getElementById('connection-search-results').nextSibling);
     // $('#connection-search-results').after('<div id="no-results-message" class="text-primary mb-3" style="text-align:center;">It looks like no albums matched your search terms. Try a different search!</div>');
   }
 }
 
 function createConnectionModalCard(album, cardNumber) {
-  document.getElementById('connection-search-results').appendChild(htmlToElement(`<div id="connectionModalCard${cardNumber}" class="search-modal-card" data-apple-album-id="${album.appleAlbumID}"><a class="search-modal-card-album-link" href=""><img class="search-modal-card-image" src="" alt=""><a/><div class="search-modal-card-body"><h4 class="search-modal-card-title"></h4><span class="search-modal-card-album"></span></div></div>`));
+  document.getElementById('connection-search-results').appendChild(stringToNode(`<div id="connectionModalCard${cardNumber}" class="search-modal-card" data-apple-album-id="${album.appleAlbumID}"><a class="search-modal-card-album-link" href=""><img class="search-modal-card-image" src="" alt=""><a/><div class="search-modal-card-body"><h4 class="search-modal-card-title"></h4><span class="search-modal-card-album"></span></div></div>`));
   // $('#connection-search-results').append(`<div id="connectionModalCard${cardNumber}" class="search-modal-card" data-apple-album-id="${album.appleAlbumID}"><a class="search-modal-card-album-link" href=""><img class="search-modal-card-image" src="" alt=""><a/><div class="search-modal-card-body"><h4 class="search-modal-card-title"></h4><span class="search-modal-card-album"></span></div></div>`);
 }
 
@@ -652,26 +750,42 @@ function populateConnectionModalCard(album, cardNumber) {
   });
 }
 
-function deleteConnection(connectedAlbum) {
+async function deleteConnection(connectedAlbum) {
   const confirmation = confirm('Are you sure you want to delete a connection? You cannot undo this operation.');
   if (confirmation) {
-    $.ajax('/api/v1/connection', {
-      method: 'DELETE',
-      contentType: 'application/json',
-      data: JSON.stringify({ 
+    let response = await fetch('/api/v1/connection', {
+      method: 'delete',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
         "albumTwo" : connectedAlbum.toString(),
         "albumOne": app.album.appleAlbumID.toString(),
         "creator": app.userID
-      }),
-      success: function(result) {
-        app.album.connections = result;
-        populateConnections();
-        updateConnectionDisplay();
-      },
-      error: function(err) {
-        if (err.responseJSON && err.responseJSON.message) return alert(err.responseJSON.message);
-      }
+      })
     });
+    if (!response.ok) throw Error(response.statusText);
+    let data = await response.json();
+    app.album.connections = data;
+    populateConnections();
+    updateConnectionDisplay();
+
+    // $.ajax('/api/v1/connection', {
+    //   method: 'DELETE',
+    //   contentType: 'application/json',
+    //   data: JSON.stringify({ 
+    //     "albumTwo" : connectedAlbum.toString(),
+    //     "albumOne": app.album.appleAlbumID.toString(),
+    //     "creator": app.userID
+    //   }),
+    //   success: function(result) {
+    //     app.album.connections = result;
+    //     populateConnections();
+    //     updateConnectionDisplay();
+    //   },
+    //   error: function(err) {
+    //     if (err.responseJSON && err.responseJSON.message) return alert(err.responseJSON.message);
+    //   }
+    // });
   }
 }
 
@@ -694,14 +808,14 @@ function displayAllConnections() {
   
   showClass('my-connection');
   // $('.my-connection').show();
-  hideClass('other-connection');
+  showClass('other-connection');
   // $('.other-connection').show();
   document.getElementById('connection-title-modifier').innerText = 'all users';
   // $('#connection-title-modifier').text('all users');
 
-  removeDOMElement('.no-my-connections');
+  removeSelectedElement('.no-my-connections');
   // $('#no-my-connections').remove();
-  removeDOMElement('.no-other-connections');
+  removeSelectedElement('.no-other-connections');
   // $('#no-other-connections').remove();
   if (document.getElementsByClassName('connection').length === 0) { 
     document.getElementById('connected-albums').innerHTML = '<div class="no-other-connections text-primary text-center"><small>There are currently no connections for this album. Click "Add connections" below to get started!</small><br/><br/></div>';
@@ -731,12 +845,12 @@ function displayMyConnections() {
   document.getElementById('connection-title-modifier').innerText = 'you';
   // $('#connection-title-modifier').text('you');
 
-  removeDOMElement('.no-my-connections');
+  removeSelectedElement('.no-my-connections');
   // $('#no-my-connections').remove();
-  removeDOMElement('.no-other-connections');
+  removeSelectedElement('.no-other-connections');
   // $('#no-other-connections').remove();
   if (document.getElementsByClassName('my-connection').length === 0) { 
-    document.getElementById('connected-albums').appendChild(htmlToElement('<div class="no-my-connections text-primary text-center"><small>You have not created any connections for this album. Click "Add connections" below to get started!</small><br/><br/></div>'));
+    document.getElementById('connected-albums').appendChild(stringToNode('<div class="no-my-connections text-primary text-center"><small>You have not created any connections for this album. Click "Add connections" below to get started!</small><br/><br/></div>'));
     // $('#connected-albums').append('<div id="no-my-connections" class="text-primary text-center"><small>You have not created any connections for this album. Click "Add connections" below to get started!</small><br/><br/></div>'); 
   }
 
@@ -766,11 +880,11 @@ function populateTags() {
     
       if (creator === app.userID) {
         // tags are stored escaped and displayed raw
-        document.getElementById('current-tags').appendChild(htmlToElement(`<a href="" id="${tagName}-${creator}" class="badge badge-light album-tag my-tag" data-creator="${creator}" data-rawtag="${escapeHtml(app.album.tagObjects[index].text)}" data-custom-genre="${app.album.tagObjects[index].customGenre || false}"><span>${tag}</span><span class="delete-tag-button ml-1" data-tag-id="${tagName}-${creator}">&#10005;</span></a>`));
+        document.getElementById('current-tags').appendChild(stringToNode(`<a href="" id="${tagName}-${creator}" class="badge badge-light album-tag my-tag" data-creator="${creator}" data-rawtag="${escapeHtml(app.album.tagObjects[index].text)}" data-custom-genre="${app.album.tagObjects[index].customGenre || false}"><span>${tag}</span><span class="delete-tag-button ml-1" data-tag-id="${tagName}-${creator}">&#10005;</span></a>`));
         // $('#current-tags').append(`<a href="" id="${tagName}-${creator}" class="badge badge-light album-tag my-tag" data-creator="${creator}" data-rawtag="${escapeHtml(app.album.tagObjects[index].text)}" data-custom-genre="${app.album.tagObjects[index].customGenre || false}"><span>${tag}</span><span class="delete-tag-button ml-1" data-tag-id="${tagName}-${creator}">&#10005;</span></a>`);
       } else {
         // tags are stored escaped and displayed raw
-        document.getElementById('current-tags').appendChild(htmlToElement(`<a href="" id="${tagName}-${creator}" class="badge badge-light album-tag other-tag" data-creator="${creator}" data-rawtag="${escapeHtml(app.album.tagObjects[index].text)}" data-custom-genre="${app.album.tagObjects[index].customGenre || false}"><span>${tag}</span></a>`));
+        document.getElementById('current-tags').appendChild(stringToNode(`<a href="" id="${tagName}-${creator}" class="badge badge-light album-tag other-tag" data-creator="${creator}" data-rawtag="${escapeHtml(app.album.tagObjects[index].text)}" data-custom-genre="${app.album.tagObjects[index].customGenre || false}"><span>${tag}</span></a>`));
         // $('#current-tags').append(`<a href="" id="${tagName}-${creator}" class="badge badge-light album-tag other-tag" data-creator="${creator}" data-rawtag="${escapeHtml(app.album.tagObjects[index].text)}" data-custom-genre="${app.album.tagObjects[index].customGenre || false}"><span>${tag}</span></a>`);
       }
     }
@@ -801,7 +915,7 @@ function modifySelectedTags(tag) {
   return app.selectedTags.indexOf(tag) === -1 ? app.selectedTags.push(tag) : app.selectedTags.splice(app.selectedTags.indexOf(tag), 1);
 }
 
-function deleteTag(tagID) {
+async function deleteTag(tagID) {
   
   const creator = document.getElementById(`${tagID}`).dataset.creator;
   const customGenre = document.getElementById(`${tagID}`).dataset.customGenre;
@@ -810,31 +924,54 @@ function deleteTag(tagID) {
   let confirmation = confirm(`Are you sure you want to delete the "${tag}" tag? You cannot undo this operation.`);
 
   if (confirmation) {
-    $.ajax('/api/v1/tag/', {
-      method: 'DELETE',
-      contentType: 'application/json',
-      data: JSON.stringify({ 
+    let response = await fetch('/api/v1/tag/', {
+      method: 'delete',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
         // tags are stored escaped and displayed raw, converting to string
         // in case the raw tag is just a number (like a year)
         "text": escapeHtml(tag.toString()),
         "creator": creator,
         "appleAlbumID": app.album.appleAlbumID,
         "customGenre": customGenre
-      }),
-      success: function(response) {
-        if (!response.message) {
-          app.album = response;
-          populateTags();
-          updateTagDisplay(); 
-        } else {
-          alert(response.message);
-        }
-      }
+      })
     });
+    if (!response.ok) throw Error(response.statusText);
+    let data = await response.json();
+    if (!data.message) {
+      app.album = data;
+      populateTags();
+      updateTagDisplay(); 
+    } else {
+      alert(data.message);
+    }
+
+    // $.ajax('/api/v1/tag/', {
+    //   method: 'DELETE',
+    //   contentType: 'application/json',
+    //   data: JSON.stringify({ 
+    //     // tags are stored escaped and displayed raw, converting to string
+    //     // in case the raw tag is just a number (like a year)
+    //     "text": escapeHtml(tag.toString()),
+    //     "creator": creator,
+    //     "appleAlbumID": app.album.appleAlbumID,
+    //     "customGenre": customGenre
+    //   }),
+    //   success: function(response) {
+    //     if (!response.message) {
+    //       app.album = response;
+    //       populateTags();
+    //       updateTagDisplay(); 
+    //     } else {
+    //       alert(response.message);
+    //     }
+    //   }
+    // });
   }
 }
 
-function addTag() {
+async function addTag() {
   let newTag = document.getElementById('add-tag-input').value.trim();
 
   if (newTag) {
@@ -886,37 +1023,67 @@ function addTag() {
     // const customGenre = $('#custom-genre-checkbox').is(":checked");
     const customGenre = document.getElementById('custom-genre-checkbox').checked
 
-    // ADD NEW TAG TO THE DATABASE
-    $.ajax('/api/v1/tag/', {
-      method: 'POST',
-      contentType: 'application/json',
-      data: JSON.stringify({
+    let response = await fetch('/api/v1/tag/', {
+      method: 'post',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
         "album": app.album,
         "creator": app.userID,
         "tag": newTag,
         "customGenre": customGenre
-      }),
-      success: function (result) {
-        if (!result.message) {
-          if (!result.songNames || !result.genres) {
-            result.songNames = app.album.songNames;
-            result.genres = app.album.genres;
-          }
-          app.album = result;
-          populateTags();
-          updateTagDisplay();
-          document.getElementById('tag-success').innerHTML = "Added! &#10003;";
-          setTimeout(function(){ 
-            document.getElementById('tag-success').innerHTML = '&nbsp;'
-          }, 3000);
-        } else {
-          return alert(result.message);
-        }
-      },
-      error: function (err) {
-        console.log(err);
-      }
+      })
     });
+    if (!response.ok) throw Error(response.statusText);
+    let data = await response.json();
+
+    if (!data.message) {
+      if (!data.songNames || !data.genres) {
+        data.songNames = app.album.songNames;
+        data.genres = app.album.genres;
+      }
+      app.album = data;
+      populateTags();
+      updateTagDisplay();
+      document.getElementById('tag-success').innerHTML = "Added! &#10003;";
+      setTimeout(function(){ 
+        document.getElementById('tag-success').innerHTML = '&nbsp;'
+      }, 3000);
+    } else {
+      return alert(data.message);
+    }
+
+    // ADD NEW TAG TO THE DATABASE
+    // $.ajax('/api/v1/tag/', {
+    //   method: 'POST',
+    //   contentType: 'application/json',
+    //   data: JSON.stringify({
+    //     "album": app.album,
+    //     "creator": app.userID,
+    //     "tag": newTag,
+    //     "customGenre": customGenre
+    //   }),
+    //   success: function (result) {
+    //     if (!result.message) {
+    //       if (!result.songNames || !result.genres) {
+    //         result.songNames = app.album.songNames;
+    //         result.genres = app.album.genres;
+    //       }
+    //       app.album = result;
+    //       populateTags();
+    //       updateTagDisplay();
+    //       document.getElementById('tag-success').innerHTML = "Added! &#10003;";
+    //       setTimeout(function(){ 
+    //         document.getElementById('tag-success').innerHTML = '&nbsp;'
+    //       }, 3000);
+    //     } else {
+    //       return alert(result.message);
+    //     }
+    //   },
+    //   error: function (err) {
+    //     console.log(err);
+    //   }
+    // });
   } else {
     alert("Please enter a non-empty tag.");
   } 
@@ -986,9 +1153,9 @@ function displayAllTags(userIsLoggedIn) {
   document.getElementById('tag-title-modifier').innerText = 'all users';
   // $('#tag-title-modifier').text('all users');
 
-  removeDOMElement('.no-all-tags');
+  removeSelectedElement('.no-all-tags');
   // $('#no-all-tags').remove();
-  removeDOMElement('.no-my-tags');
+  removeSelectedElement('.no-my-tags');
   // $('#no-my-tags').remove();
   if (document.getElementsByClassName('album-tag').length === 0) { 
     document.getElementById('current-tags').innerHTML = '<div class="no-all-tags text-primary text-center"><small>There are currently no tags for this album. Click "Add tags" below to get started!</small></div>';
@@ -1020,12 +1187,12 @@ function displayMyTags(userIsLoggedIn) {
   document.getElementById('tag-title-modifier').innerText = 'you';
   // $('#tag-title-modifier').text('you');
 
-  removeDOMElement('.no-all-tags');
+  removeSelectedElement('.no-all-tags');
   // $('#no-all-tags').remove();
-  removeDOMElement('.no-my-tags');
+  removeSelectedElement('.no-my-tags');
   // $('#no-my-tags').remove();
   if (document.getElementsByClassName('my-tag').length === 0) { 
-    document.getElementById('current-tags').appendChild(htmlToElement('<div class="no-my-tags text-primary text-center"><small>You have not created any tags for this album. Click "Add tags" below to get started!</small></div>'));
+    document.getElementById('current-tags').appendChild(stringToNode('<div class="no-my-tags text-primary text-center"><small>You have not created any tags for this album. Click "Add tags" below to get started!</small></div>'));
     // $('#current-tags').append('<div id="no-my-tags" class="text-primary text-center"><small>You have not created any tags for this album. Click "Add tags" below to get started!</small></div>'); 
   }
 
@@ -1113,7 +1280,7 @@ document.getElementById('custom-genre-checkbox-text').addEventListener('click', 
 });
 document.getElementById('add-connection-button').addEventListener('click', function() {
   const search = document.getElementById('add-connection-input').value.trim();
-  removeDOMElement('#no-results-message');
+  removeSelectedElement('#no-results-message');
   document.getElementById('connection-search-results').innerHTML = '';
   document.getElementById('connection-loader').classList.remove('hide_me');
   // $('#connection-loader').show();
@@ -1173,7 +1340,7 @@ document.addEventListener('DOMContentLoaded', function() {
     searchResultsBox.style.paddingBottom="0px";
     searchResultsBox.style.overflowX="scroll";
   }
-})
+});
 
 // ----- START FIREBASE AUTH SECTION ------
 function userIsLoggedIn() {
