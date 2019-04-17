@@ -56,9 +56,6 @@ if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'staging')
   app.use("/api/v1/", apiLimiter); 
 }
 
-// ====== Set up database connection ======
-
-
 // ====== Set up routes ======
 const appleAPIRoutes = require('./routes/appleAPI.routes')
 const staticRoutes = require('./routes/static.routes')
