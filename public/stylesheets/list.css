@@ -50,10 +50,6 @@
   max-height: 55vh;
 }
 
-#filter-by-genre-button {
-  display: none;
-}
-
 @media screen and (max-width: 350px) {
   #list-filters {
     margin-top: 0px;
@@ -113,7 +109,6 @@
 }
 
 #no-albums-message {
-  display: none;
   text-align: center;
   margin: 140px 10px;
 }
@@ -226,7 +221,6 @@
 #add-album-button,
 #share-favorites-button {
   padding: 5px 10px;
-  display: none;
 }
 
 #list-update-success {
@@ -260,7 +254,6 @@
   margin-left: 17px;
   margin-bottom: 8px;
   margin-top: -25px;
-  display: none;
 }
 
 #artist-tag-filter-input {

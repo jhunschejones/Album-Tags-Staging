@@ -19,17 +19,17 @@
       <!-- BEGIN LISTS -->
       <div id="list-top-line"><h3 id="list-title"></h3></div>
       <p id="list-creator" class="text-secondary"></p>
-      <div id="applied-filters" style="display:none;"></div>
+      <div id="applied-filters" class="hide_me"></div>
 
       <div id="main-page-loader" class="new-loader text-center"><span class="text-secondary">Loading...</span></div>
-      <p id="no-albums-message" class="text-secondary">There are currently no albums in this list. Click <span class="text-primary add-album-refrence" style="cursor:pointer;">Add Album</span> to find an album and add it to this list.</p>
+      <p id="no-albums-message" class="text-secondary hide_me">There are currently no albums in this list. Click <span class="text-primary add-album-refrence" style="cursor:pointer;">Add Album</span> to find an album and add it to this list.</p>
       <div id="albums" class="row no-gutters">
         <!-- lists go here -->
       </div>
       <br/>
       <!-- END LISTS -->   
 
-      <span id="log_in_message" style="display:none;"><div class="text-center"><br/><br/><br/><h4 class="text-secondary">Please <span class="login_button text-primary" style="cursor:pointer;">log in</span> to access your favorites!</h4><br/><br/><br/><br/><br/></div></span>
+      <span id="log_in_message" class="hide_me"><div class="text-center"><br/><br/><br/><h4 class="text-secondary">Please <span class="login_button text-primary" style="cursor:pointer;">log in</span> to access your favorites!</h4><br/><br/><br/><br/><br/></div></span>
 
       <!-- ====== EDIT LIST MODAL ====== -->
       <% include partials/content/modal/list/edit_modal.ejs %>
