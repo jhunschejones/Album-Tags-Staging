@@ -17,13 +17,12 @@
     <!--PAGE CONTROL BUTTONS-->
     <div id="page-control-buttons" class="sticky-top">
       <button id="back-button" class="btn btn-sm btn-light" onclick="window.history.back()"><img id="back_arrow" src="/images/back_arrow.png"><span class="button_text">Back</span></button>    
-      <button id="launch-new-list-modal-button" class="btn btn-sm btn-light" data-toggle="modal" data-target="#updateListModal" style="display:none;">New List</button>
-      <button id="info-modal-button" class="btn btn-sm btn-light" data-toggle="modal" data-target="#pageInfoModal" style="display:none;">&#9432;</button>
+      <button id="launch-new-list-modal-button" class="btn btn-sm btn-light hide_me" data-toggle="modal" data-target="#updateListModal">New List</button>
+      <button id="info-modal-button" class="btn btn-sm btn-light hide_me" data-toggle="modal" data-target="#pageInfoModal">&#9432;</button>
     </div>
   
     <!-- BEGIN LISTS -->
     <div class="container-fluid">
-      <!-- <h3 id="page-title">My Album Lists:</h3> -->
       <div id="main-page-loader" class="new-loader text-center"><span class="text-secondary">Loading...</span></div>
       <p id="no-lists-message" class="text-secondary">You do not have any custom album lists. <a href="" data-toggle="modal" data-target="#searchModal">Search</a> for an album and add it to a new list on the <i>Lists</i> tab.</p>
       <div id="all-lists" class="row">
@@ -31,7 +30,7 @@
       </div>
     </div>
     <!-- END LISTS -->  
-    <div id="login-message" style="display:none;" class="text-center">
+    <div id="login-message" class="text-center hide_me">
       <br/><br/><br/><br/>
       <h4 class="text-secondary">Please <span class="login_button text-primary" style="cursor:pointer;">log in</span> to access your custom album lists!</h4>
       <br/><br/><br/><br/><br/>

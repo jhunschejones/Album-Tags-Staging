@@ -15,33 +15,42 @@ function safeParse(content) {
 function replaceBackSlashWithHtml(str) {
   return str.replace(/\//g, '&sol;');
 }
+
+function stringToNode(html) {
+  const template = document.createElement('template');
+  template.innerHTML = html;
+  return template.content.firstChild;
+}
 // ---------------- END UTILITIES ---------------
 
 let allTags = [];
 let tagElements;
 
-function populateTags() {
-    $.getJSON ( '/api/v1/tag', function(allTags) {      
-      $(".all_tags").text('');
-      allTags.forEach(tag => {
+async function populateTags() {
+  let response = await fetch("/api/v1/tag");
+  if (!response.ok) throw Error(response.statusText);
+  let allTags = await response.json();
+   
+  document.querySelectorAll('.all_tags')[0].innerText = '';
+  // $(".all_tags").text('');
+  allTags.forEach(tag => {
+    // creating a unique tag for each element, solving the problem of number tags not allowed
+    // by adding some letters to the start of any tag that can be converted to a number
+    // then using a regular expression to remove all spaces in each tag
+    let tagName;
+    if (parseInt(tag)) {
+      var addLetters = "tag_";
+      tagName = addLetters.concat(tag).replace(/[^A-Z0-9]+/ig,'');
+    } else {                  
+      tagName = tag.replace(/[^A-Z0-9]+/ig,'');
+    }
 
-        // creating a unique tag for each element, solving the problem of number tags not allowed
-        // by adding some letters to the start of any tag that can be converted to a number
-        // then using a regular expression to remove all spaces in each tag
-        let tagName;
-        if (parseInt(tag)) {
-          var addLetters = "tag_";
-          tagName = addLetters.concat(tag).replace(/[^A-Z0-9]+/ig,'');
-        } else {                  
-          tagName = tag.replace(/[^A-Z0-9]+/ig,'');
-        }
-
-        // Here we add the tags as elements on the DOM, with an onclick function that uses a unique
-        // tag to toggle a badge-success class name and change the color
-        $('.all_tags').append(`<a href="" onclick="changeClass(${tagName}, event)" id="${tagName}" class="badge badge-light tag">${safeParse(tag)}</a>`);    
-      });
-      tagElements = document.getElementsByClassName("tag");
+    // Here we add the tags as elements on the DOM, with an onclick function that uses a unique
+    // tag to toggle a badge-success class name and change the color
+    document.querySelectorAll('.all_tags')[0].appendChild(stringToNode(`<a href="" onclick="changeClass(${tagName}, event)" id="${tagName}" class="badge badge-light tag">${safeParse(tag)}</a>`));
+    // $('.all_tags').append(`<a href="" onclick="changeClass(${tagName}, event)" id="${tagName}" class="badge badge-light tag">${safeParse(tag)}</a>`);    
   });
+  tagElements = document.getElementsByClassName("tag");
 }
 
 // this function is avaiable onclick for all the tags it will toggle
@@ -51,7 +60,7 @@ function populateTags() {
 function changeClass(tagName, event) {
   if (event) { event.preventDefault(); }
   // clear warning label
-  $('.warning_label').text('');
+  document.getElementsByClassName('warning_label')[0].innerText = '';
   var thisTag = document.getElementById(tagName.id);
   thisTag.classList.toggle("badge-primary");
   thisTag.classList.toggle("selected_tag");
@@ -66,7 +75,7 @@ var selectedTags = [];
 function addToTagArray(tag) {
 
   // this conditional returns -1 value if tag is not in array
-  if ($.inArray(tag, selectedTags) === -1) {
+  if (selectedTags.indexOf(tag) === -1) {
     selectedTags.push(tag);
   } else {
     // cant use pop because it removes last item only
@@ -79,15 +88,21 @@ function addToTagArray(tag) {
 
 function clearTagArray(event) {
   if (event) { event.preventDefault(); }
-  if ($( ".selected_tag" ).length > 0) {
-    $( ".selected_tag" ).toggleClass( "badge-primary" );
-    $( ".selected_tag" ).toggleClass( "badge-light" );
-    $( ".selected_tag" ).toggleClass( "selected_tag" );
+  if (document.getElementsByClassName('selected_tag').length > 0) {
+    const selectedTagElements = document.querySelectorAll(".selected_tag");
+    for (let i = 0; i < selectedTagElements.length; i++) {
+      selectedTagElements[i].classList.toggle('badge-primary');
+      selectedTagElements[i].classList.toggle('badge-light');
+      selectedTagElements[i].classList.toggle('selected_tag');
+    }
+    // $( ".selected_tag" ).toggleClass( "badge-primary" );
+    // $( ".selected_tag" ).toggleClass( "badge-light" );
+    // $( ".selected_tag" ).toggleClass( "selected_tag" );
+
     selectedTags = [];
   }
   else {
-    $('.warning_label').text('');
-    // $('.warning_label').text('No tags have been selected.');
+    document.getElementsByClassName('warning_label')[0].innerText = '';
   }
 }
 
@@ -102,8 +117,7 @@ function tagSearch(event) {
     listURL.searchParams.set("search", selectedTags);
     window.location = (listURL.href);
   }  else {
-    $('.warning_label').text('');
-    $('.warning_label').text('Select one or more tags to preform a tag-search.');
+    document.getElementsByClassName('warning_label')[0].innerText = 'Select one or more tags to preform a tag-search.';
   }
 }
 
@@ -128,12 +142,13 @@ function searchFilter() {
   }
 }
 
-$("#tag-search-input").on("input", searchFilter);
+document.getElementById('tag-search-input').addEventListener('input', searchFilter);
 
 function showFilter(event) {
   event.preventDefault();
-  $("#tag-search-input").toggleClass('hide_me');
-  $(".all_tags").toggleClass('shrink_height');
+  document.getElementById('tag-search-input').classList.toggle('hide_me');
+  document.querySelectorAll('.all_tags')[0].classList.toggle('shrink_height');
+  // $(".all_tags").toggleClass('shrink_height');
 }
 
 populateTags();

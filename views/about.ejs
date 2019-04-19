@@ -204,28 +204,40 @@
 
 		<!-- custom script to enable tool tabs on non-touch screens -->
 		<script>
+			function addClassEventListener(selector, eventType, myFunction) {
+				const c = document.getElementsByClassName(selector);
+				for (let i = 0; i < c.length; i++) {
+					c[i].addEventListener(eventType, myFunction);
+				}
+			}		
+
 			let isTouchDevice = false;
-			$(function () {
+			document.addEventListener('DOMContentLoaded', function() {
 				setTimeout(function(){ 
-					if ("ontouchstart" in document.documentElement) {
-						isTouchDevice = true;
-					}
-					if(isTouchDevice == false) {
-						$('[data-toggle="tooltip"]').tooltip();
+					if ("ontouchstart" in document.documentElement) { isTouchDevice = true; }
+					if (isTouchDevice == false) {
+						const elementsTooltip = document.querySelectorAll('[title]');
+						for (let i = 0; i < elementsTooltip.length; i++){
+							new Tooltip(elementsTooltip[i], {
+								placement: 'top', //string
+								animation: 'hide', // CSS class
+								delay: 10, // integer
+							})
+						}
 					}
 				}, 1000);
-			});
+			});		
 
-			$('.open-search-modal-button').click(function(event) {
+			addClassEventListener('open-search-modal-button', 'click', function(event) {
 				event.preventDefault();
-				$('#modalOne').modal('hide');
-				$('#modalTwo').modal('hide');
-				$('#modalThree').modal('hide');
-				$('#modalFour').modal('hide');
-				$('#modalFive').modal('hide');
-				$('#modalSix').modal('hide');
-				$('#searchModal').modal('show');
-			})
+				new Modal(document.getElementById('modalOne')).hide();
+				new Modal(document.getElementById('modalTwo')).hide();
+				new Modal(document.getElementById('modalThree')).hide();
+				new Modal(document.getElementById('modalFour')).hide();
+      	new Modal(document.getElementById('modalFive')).hide();
+      	new Modal(document.getElementById('modalSix')).hide();
+      	new Modal(document.getElementById('searchModal')).show();	
+			});
 		</script>
 		<script src="https://player.vimeo.com/api/player.js"></script>
 		<script src="/javascripts/search_modal.script.min.js"></script>
