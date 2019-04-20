@@ -11,22 +11,17 @@
 </ul>
 <!-- END FOOTER HTML -->
 
-<!-- START PAGE SPECIFIC SCRIPT LOADING -->
+<!-- SCRIPTS TO LOAD ON EVERY PAGE -->
+<!-- <script src="https://polyfill.io/v3/polyfill.min.js?flags=gated"></script> -->
+<script src="/javascripts/libraries/bootstrap-native.2.0.x.min.js"></script>
+
+<!-- PAGE SPECIFIC SCRIPT LOADING -->
 <% if (subTitle === "Album Details") { %>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
 <% } %>
 
 <% const authPages = ["Your Favorite Albums", "Update Album Tags", "Album Details", "Create & Manage Album Lists", "View & Edit Album Lists"] %>
 <% if (authPages.indexOf(subTitle) !== -1) { %>
-    <!-- NEW FIREBASE -->
     <script src="https://www.gstatic.com/firebasejs/5.9.2/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/5.9.2/firebase-auth.js"></script>
 <% } %>
-<!-- END PAGE SPECIFIC SCRIPT LOADING -->
-
-<!-- SCRIPTS TO LOAD ON EVERY PAGE -->
-<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT" crossorigin="anonymous"></script> -->
-<!-- <script src="/javascripts/libraries/popper.1.14.7.min.js"></script> -->
-<!-- <script src="/javascripts/libraries/bootstrap.4.3.1.min.js"></script> -->
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap.native/2.0.19/bootstrap-native-v4.min.js"></script>
