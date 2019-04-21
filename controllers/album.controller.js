@@ -751,7 +751,8 @@ exports.get_album_lists = function (req, res, next) {
 };
 
 exports.create_virtual_favorites_list = function (req, res, next) {
-  res.send(cryptr.encrypt(`${req.params.id.trim()}\s\s\s${req.body.displayName.trim()}`));
+  const virtualFavoritesURL = cryptr.encrypt(`${req.params.id.trim()}\s\s\s${req.body.displayName.trim()}`);
+  res.send(JSON.stringify(virtualFavoritesURL));
 };
 
 exports.get_virtual_favorites_list = function (req, res, next) {
