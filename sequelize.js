@@ -12,10 +12,10 @@ if (process.env.NODE_ENV === "development") {
   sequelize
     .authenticate()
     .then(() => {
-      console.log('Sqlite connection established successfully.');
+      console.log('\x1b[32mSqlite connection established successfully.\x1b[0m');
     })
     .catch(err => {
-      console.error('Unable to connect to the Sqlite database:', err);
+      console.error('\x1b[31mUnable to connect to the Sqlite database:' + err + '\x1b[0m');
     });
 
   module.exports = sequelize;
@@ -31,10 +31,10 @@ if (process.env.NODE_ENV === "development") {
   sequelize
     .authenticate()
     .then(() => {
-      console.log('MySQL connection established successfully.');
+      console.log('\x1b[34mMySQL connection established successfully.\x1b[0m');
     })
     .catch(err => {
-      console.error('Unable to connect to the MySQL database:', err);
+      console.error('\x1b[31mUnable to connect to the MySQL database:' + err + '\x1b[0m');
     });
 
   module.exports = sequelize;

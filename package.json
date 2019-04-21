@@ -1,11 +1,12 @@
 {
   "name": "album-tags-staging",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "",
   "main": "bin/www",
   "scripts": {
     "test": "mocha",
-    "start": "node bin/www"
+    "start": "node bin/www",
+    "start:dev": "NODE_ENV=development nodemon --quiet node bin/www"
   },
   "repository": {
     "type": "git",
@@ -26,12 +27,15 @@
     "helmet": "^3.16.0",
     "mocha": "^5.2.0",
     "mysql2": "^1.6.5",
-    "newrelic": "^5.6.3",
+    "newrelic": "^5.6.4",
     "path": "^0.12.7",
     "request": "^2.88.0",
     "sequelize": "^4.43.0",
     "should": "^13.2.3",
     "sqlite3": "^4.0.6",
     "supertest": "^3.4.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.11"
   }
 }

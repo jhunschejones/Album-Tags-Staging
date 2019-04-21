@@ -1,0 +1,15 @@
+version: "3.7"
+
+services:
+  dev_docker:
+    build: .
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports: 
+      - 3000:3000
+    command: npm run start:dev
+    env_file:
+      - .env
+    tty: true
+    stdin_open: true
