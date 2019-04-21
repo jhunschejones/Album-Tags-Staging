@@ -16,14 +16,15 @@
     <!-- compact navigation -->
     <ul id="compact_menu" class="nav">
         <li class="nav-item dropdown">
-            <a class="my_dropdown lead text-secondary nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><img id="menu_hamburger" style="height:23px" src="/images/menu.png"></a>
+            <a id="compact-menu-dropdown" class="my_dropdown lead text-secondary nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><img id="menu_hamburger" style="height:23px" src="/images/menu.png"></a>
             <div class="dropdown-menu">
                 <a class="dropdown-item hide_when_logged_in hide_me" id="login_button" style="cursor:pointer;">Log In</a>
                 <a class="dropdown-item hide_when_logged_out hide_me" id="logout_button" style="cursor:pointer;">Log Out</a>
                 <div class="dropdown-divider" id="login_divider" class="hide_me"></div>
                 <a class="dropdown-item" href="/">Home</a>
                 <a class="dropdown-item" href="/about">About</a>
-                <a class="dropdown-item" href="" data-toggle="modal" data-target="#searchModal">Search</a>
+                <a id="launch-search-modal-button" class="dropdown-item" href="" >Search</a>
+                <!-- <a class="dropdown-item" href="" data-toggle="modal" data-target="#searchModal">Search</a> -->
                 <a class="dropdown-item" href="/alltags">All Tags</a>
                 <!-- ====== OLD OUR FAVORITES PAGE ====== -->
                 <!-- <a class="dropdown-item" href="/favorites">Favorites</a> -->
