@@ -1,5 +1,5 @@
 const should = require('should')
-require('dotenv').load();
+require('dotenv').config();
 const album_controller = require('../controllers/album.controller')
 
 // ====== TESTING CLEANALBUMDATA UTILITY FUNCTION ======

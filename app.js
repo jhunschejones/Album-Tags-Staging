@@ -1,6 +1,6 @@
 const newrelic = require('newrelic')
 if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== 'staging') {
-  require('dotenv').load();
+  require('dotenv').config();
 }
 const express = require('express')
 const path = require('path')
