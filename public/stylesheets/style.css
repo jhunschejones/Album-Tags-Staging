@@ -131,3 +131,45 @@ hr {
 }
 
 [v-cloak] { display: none; }
+
+/* ====== styling for the noscript element ====== */
+
+/* The alert message box */
+#noscript-alert {
+  left: 0;
+  right: 0;
+  margin: 8px auto 0px auto;
+  padding: 5px;
+  width: 95%;
+  position: absolute;
+  z-index: 1025;
+  background-color: pink;
+  border-radius: 10px;
+  transition: 0.5s;
+}
+
+#noscript-alert-text{
+  padding: 5px;
+  text-align: center;
+}
+
+/* Fake hiding the alert on click */
+#noscript-alert:target {
+  display: none;
+}
+
+/* The close button */
+.closebtn {
+  margin: -1px 4px 0px 5px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+.closebtn:hover {
+  color: black;
+  text-decoration: none;
+}
