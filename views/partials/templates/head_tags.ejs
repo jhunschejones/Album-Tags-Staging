@@ -7,4 +7,28 @@
 <link rel="stylesheet" href="/stylesheets/style.min.css">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
+<!-- ====== start preload or prefetch resource links by page ====== -->
+<% let authPages = ["Your Favorite Albums", "Update Album Tags", "Album Details", "Create & Manage Album Lists", "View & Edit Album Lists"] %>
+<% let listPages = ["View & Edit Album Lists", "Your Favorite Albums"] %>
+
+<% if (authPages.indexOf(subTitle) !== -1) { %>
+  <link rel="preload" href="https://www.gstatic.com/firebasejs/5.9.2/firebase-app.js" as="script">
+  <link rel="preload" href="https://www.gstatic.com/firebasejs/5.9.2/firebase-auth.js" as="script">
+<% } else { %>
+  <link rel="prefetch" href="https://www.gstatic.com/firebasejs/5.9.2/firebase-app.js">
+  <link rel="prefetch" href="https://www.gstatic.com/firebasejs/5.9.2/firebase-auth.js">  
+<% } %>
+
+<% if (listPages.indexOf(subTitle) !== -1) { %>
+  <link rel="preload" href="/javascripts/list.script.min.js" as="script">
+<% } else { %>
+  <link rel="prefetch" href="/javascripts/list.script.min.js">
+<% } %>
+
+<% if (subTitle === "Album Details") { %>
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/vue" as="script">
+  <link rel="preload" href="/javascripts/album.script.min.js" as="script">
+<% } %>
+<!-- ====== end preload or prefetch resource links by page ====== -->
+
 <title>Album Tags <%= pageTitle %></title>
