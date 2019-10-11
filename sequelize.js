@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
   // ------ SQLite Local Database ------
   const sequelize = new Sequelize('database', 'username', 'password', {
     dialect: 'sqlite',
@@ -8,7 +8,7 @@ if (process.env.NODE_ENV === "development") {
     // operatorsAliases: false,
     logging: false
   });
-  
+
   sequelize
     .authenticate()
     .then(() => {
