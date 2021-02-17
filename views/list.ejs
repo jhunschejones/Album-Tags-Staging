@@ -1,16 +1,16 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <% include partials/templates/head_tags.ejs %>
+    <%- include("partials/templates/head_tags.ejs") %>
     <link rel="stylesheet" href="/stylesheets/list.min.css">
     <link rel="stylesheet" href="/stylesheets/search_modal_cards.min.css">
   </head>
   <body>
     <!-- BASIC NAVBAR TEMPLATE -->
-    <% include partials/templates/navbar_basic.ejs %>
+    <%- include("partials/templates/navbar_basic.ejs") %>
 
     <!-- LIST FILTERS -->
-    <% include partials/content/list_filters.ejs %>
+    <%- include("partials/content/list_filters.ejs") %>
     <br/><br/>
 
     <!-- START PAGE CONTENT -->
@@ -32,25 +32,25 @@
       <span id="log_in_message" class="hide_me"><div class="text-center"><br/><br/><br/><h4 class="text-secondary">Please <span class="login_button text-primary" style="cursor:pointer;">log in</span> to access your favorites!</h4><br/><br/><br/><br/><br/></div></span>
 
       <!-- ====== EDIT LIST MODAL ====== -->
-      <% include partials/content/modal/list/edit_modal.ejs %>
+      <%- include("partials/content/modal/list/edit_modal.ejs") %>
 
       <!-- ====== PAGE INFO MODAL ====== -->
-      <% include partials/content/modal/list/page_info_modal.ejs %>
+      <%- include("partials/content/modal/list/page_info_modal.ejs") %>
 
       <!-- ====== SEARCH MODAL ====== -->
-      <% include partials/content/modal/search_modal.ejs %>
+      <%- include("partials/content/modal/search_modal.ejs") %>
 
       <!-- ====== ADD FAVORITES MODAL ====== -->
-      <% include partials/content/modal/list/add_favorites_album_modal.ejs %>    
+      <%- include("partials/content/modal/list/add_favorites_album_modal.ejs") %>    
       
       <!-- ====== SHARE FAVORITES MODAL ====== -->
-      <% include partials/content/modal/list/share_favorites_modal.ejs %>
+      <%- include("partials/content/modal/list/share_favorites_modal.ejs") %>
 
     </div>
     <!-- END PAGE CONTENT -->
 
     <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
-    <% include partials/templates/footer.ejs %>
+    <%- include("partials/templates/footer.ejs") %>
     <script src="/javascripts/list.script.min.js"></script>
     <script src="/javascripts/search_modal.script.min.js"></script>
   </body>

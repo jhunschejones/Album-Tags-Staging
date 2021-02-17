@@ -25,7 +25,7 @@
     "express-http-to-https": "^1.1.4",
     "express-rate-limit": "^3.5.3",
     "helmet": "^3.22.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.20",
     "mocha": "^6.2.3",
     "mysql2": "^1.7.0",
     "newrelic": "^6.5.0",

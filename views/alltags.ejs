@@ -1,14 +1,14 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <% include partials/templates/head_tags.ejs %>
+    <%- include("partials/templates/head_tags.ejs") %>
     <link rel="stylesheet" href="/stylesheets/alltags.min.css">
     <link rel="stylesheet" href="/stylesheets/search_modal_cards.min.css">
   </head>
   <body>
 
     <!-- BASIC NAVBAR TEMPLATE -->
-    <% include partials/templates/navbar_basic.ejs %>
+    <%- include("partials/templates/navbar_basic.ejs") %>
 
     <div id="background_image_container">
     <!--CSS PUTS BACKGROUND HERE-->
@@ -29,11 +29,11 @@
     </div>  
     
     <!-- ====== START SEARCH MODAL ====== -->
-    <% include partials/content/modal/search_modal.ejs %>
+    <%- include("partials/content/modal/search_modal.ejs") %>
     <!-- ====== END SEARCH MODAL ====== -->    
 
     <!-- BASIC FOOTER TEMPLATE + JavaScript Tags -->
-    <% include partials/templates/footer.ejs %>
+    <%- include("partials/templates/footer.ejs") %>
     <script src="/javascripts/alltags.script.min.js"></script>
     <script src="/javascripts/search_modal.script.min.js"></script>
   </body>
